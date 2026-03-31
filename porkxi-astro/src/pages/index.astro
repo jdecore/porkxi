@@ -1,0 +1,122 @@
+---
+import Encabezado from '../components/Encabezado.vue';
+import BannerAlerta from '../components/BannerAlerta.vue';
+import TarjetasKpi from '../components/TarjetasKpi.vue';
+import GraficaPrincipal from '../components/GraficaPrincipal.vue';
+import ComparativaFrecuencia from '../components/ComparativaFrecuencia.vue';
+import DetalleUltimoReporte from '../components/DetalleUltimoReporte.vue';
+import TablaHistorica from '../components/TablaHistorica.vue';
+import Explicacion from '../components/Explicacion.vue';
+import PieDePagina from '../components/PieDePagina.vue';
+
+import '../styles/variables.css';
+import '../styles/encabezado.css';
+import '../styles/alerta.css';
+import '../styles/tarjetas.css';
+import '../styles/grafica.css';
+import '../styles/frecuencia.css';
+import '../styles/detalle.css';
+import '../styles/tabla.css';
+import '../styles/explicacion.css';
+import '../styles/pieDepagina.css';
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content="Inventario porcino Colombia vs EE.UU. — y la brecha invisible en sus datos oficiales." />
+    <meta name="author" content="Juan Enríquez" />
+    <meta name="theme-color" content="#FDF0EE" />
+    <meta property="og:title" content="porkξ | Inventario porcino" />
+    <meta property="og:description" content="Inventario porcino Colombia vs EE.UU. — y la brecha invisible en sus datos oficiales." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <title>porkξ | Inventario porcino</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet" /></noscript>
+    
+    <style>
+      :root {
+        --crema: #FDF0EE;
+        --crema-oscuro: #F7E0DC;
+        --crema-borde: #EEC9C4;
+        --tinta: #3B1F1C;
+      }
+      
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+      
+      html {
+        -webkit-text-size-adjust: 100%;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'DM Sans', sans-serif;
+        background-color: var(--crema);
+        color: var(--tinta);
+        min-height: 100vh;
+        position: relative;
+      }
+      
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        opacity: 0.03;
+        pointer-events: none;
+        z-index: 0;
+      }
+      
+      .contenedor {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 24px;
+        position: relative;
+        z-index: 1;
+      }
+      
+      @media (max-width: 700px) {
+        .contenedor {
+          padding: 0 16px;
+        }
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      .fade-in {
+        animation: fadeIn 0.5s ease forwards;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="contenedor">
+      <Encabezado client:visible />
+      <BannerAlerta client:visible />
+      <TarjetasKpi client:visible />
+      <GraficaPrincipal client:only="vue" />
+      <ComparativaFrecuencia client:visible />
+      <DetalleUltimoReporte client:visible />
+      <TablaHistorica client:visible />
+      <Explicacion client:visible />
+      <PieDePagina client:visible />
+    </main>
+  </body>
+</html>

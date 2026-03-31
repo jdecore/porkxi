@@ -1,0 +1,42 @@
+export const SERIE_USA = [
+  { periodo: "Mar 2023", valor: 72800000 },
+  { periodo: "Jun 2023", valor: 73200000 },
+  { periodo: "Sep 2023", valor: 73800000 },
+  { periodo: "Dic 2023", valor: 74100000 },
+  { periodo: "Mar 2024", valor: 73900000 },
+  { periodo: "Jun 2024", valor: 74200000 },
+  { periodo: "Sep 2024", valor: 74800000 },
+  { periodo: "Dic 2024", valor: 74700000 },
+  { periodo: "Mar 2025", valor: 74500000 },
+  { periodo: "Jun 2025", valor: 75100000 },
+  { periodo: "Sep 2025", valor: 74500000 },
+  { periodo: "Dic 2025", valor: 75500000, ultimoDato: true },
+];
+
+export const DETALLE_USA = {
+  fechaDato: "1 dic 2025",
+  fechaPublicacion: "23 dic 2025",
+  totalCabezas: 75500000,
+  variacionAnualPct: 1,
+  cerDosMercado: 69600000,
+  reproductores: 5950000,
+  cerdosDestetados: 35000000,
+  promedioLechonesPorCamada: 11.93,
+  sowsFarroDicFeb: 2890000,
+  sowsFarroMarMay: 2910000,
+  estados: [
+    { nombre: "Iowa",               cabezas: 25300000, posicion: 1 },
+    { nombre: "Minnesota",          cabezas: 9400000,  posicion: 2 },
+    { nombre: "Carolina del Norte", cabezas: 7900000,  posicion: 3 },
+  ],
+  operadoresEncuestados: 5752,
+  metodosEncuesta: [
+    "Portal en línea NASS",
+    "Correo postal",
+    "Teléfono",
+    "Entrevistas presenciales",
+  ],
+  proximoReporte: "26 mar 2026",
+  fuente: "USDA NASS — Quarterly Hogs and Pigs Report",
+  enlace: "https://www.nass.usda.gov/Newsroom/2025/12-23-2025.php",
+};

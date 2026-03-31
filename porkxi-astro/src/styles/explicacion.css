@@ -1,0 +1,108 @@
+.explicacion {
+  background: var(--crema-oscuro);
+  border: 1.5px solid var(--crema-borde);
+  border-radius: 14px;
+  padding: 30px 32px;
+  margin-bottom: 36px;
+}
+
+.explicacion__titulo {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0 0 24px;
+  color: var(--tinta);
+}
+
+.explicacion__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+}
+
+@media (max-width: 700px) {
+  .explicacion__grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+.explicacion-columna__titulo {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0 0 14px;
+}
+
+.explicacion-columna--colombia .explicacion-columna__titulo {
+  color: var(--colombia);
+}
+
+.explicacion-columna--usa .explicacion-columna__titulo {
+  color: var(--usa);
+}
+
+.explicacion-columna__texto {
+  font-size: 13px;
+  color: var(--tinta-claro);
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+
+.explicacion-destacado {
+  background: #FFF8E6;
+  border-left: 3px solid var(--colombia);
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--tinta);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.explicacion-tabla {
+  background: white;
+  border: 1px solid var(--crema-borde);
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 12px;
+}
+
+.explicacion-tabla table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.explicacion-tabla th {
+  background: var(--crema-oscuro);
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--tinta);
+  border-bottom: 1px solid var(--crema-borde);
+}
+
+.explicacion-tabla td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--crema);
+  color: var(--tinta-claro);
+}
+
+.explicacion-tabla tr:last-child td {
+  border-bottom: none;
+}
+
+.explicacion-tabla tr:nth-child(even) td {
+  background: var(--crema);
+}
+
+.explicacion-tabla__problema {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.explicacion-tabla__problema-icono {
+  color: var(--alerta);
+  flex-shrink: 0;
+}
