@@ -1,5 +1,6 @@
 ---
-import GraficaPrincipal from '../components/GraficaPrincipal.astro';
+import GraficaInteractiva from '../components/GraficaInteractiva.vue';
+import TabsComparativa from '../components/TabsComparativa.vue';
 
 import '../styles/encabezado.css';
 import '../styles/alerta.css';
@@ -105,48 +106,11 @@ const usaRecientes = SERIE_USA.filter(d => d.periodo >= "Mar 2025");
         </div>
       </div>
 
-      <!-- GRÁFICA (solo esto tiene JS) -->
-      <GraficaPrincipal />
+      <!-- GRÁFICA INTERACTIVA (Vue con tooltips + animaciones + filtros) -->
+      <GraficaInteractiva client:visible colombia={SERIE_COLOMBIA} usa={SERIE_USA} />
 
-      <!-- COMPARATIVA FRECUENCIA -->
-      <div class="comparativa-frecuencia">
-        <div class="frecuencia-card frecuencia-card--colombia">
-          <div class="frecuencia-card__encabezado"><span class="frecuencia-card__icono">🇨🇴</span><h3 class="frecuencia-card__titulo">Colombia</h3></div>
-          <span class="frecuencia-card__pildora">Anual · con retraso</span>
-          <p class="frecuencia-card__descripcion">Los datos más recientes provienen de Porcinews, un medio especializado.</p>
-          <div class="frecuencia-timeline">
-            {colombiaRecientes.map((d) => (
-              <div class="frecuencia-timeline__item">
-                <span class={`frecuencia-timeline__punto ${d.advertencia ? 'frecuencia-timeline__punto--alerta' : 'frecuencia-timeline__punto--colombia'}`}></span>
-                <div class="frecuencia-timeline__periodo">{d.periodo}</div>
-                <div class={`frecuencia-timeline__valor ${d.advertencia ? 'frecuencia-timeline__valor--alerta' : ''}`}>{d.valor.toLocaleString()} cabezas {d.advertencia ? '⚠️ mismo dato de 2022' : d.ultimoDato ? '(Porcinews, ene 2026)' : '✓'}</div>
-              </div>
-            ))}
-          </div>
-          <p class="frecuencia-card__fuente">Fuente: Porcinews (enero 2026)</p>
-        </div>
-
-        <div class="frecuencia-card frecuencia-card--usa">
-          <div class="frecuencia-card__encabezado"><span class="frecuencia-card__icono">🇺🇸</span><h3 class="frecuencia-card__titulo">Estados Unidos</h3></div>
-          <span class="frecuencia-card__pildora">Trimestral · obligatorio por ley</span>
-          <p class="frecuencia-card__descripcion">Reporte obligatorio bajo la Livestock Mandatory Reporting Act.</p>
-          <div class="frecuencia-timeline">
-            {usaRecientes.map((d) => (
-              <div class="frecuencia-timeline__item">
-                <span class="frecuencia-timeline__punto frecuencia-timeline__punto--usa"></span>
-                <div class="frecuencia-timeline__periodo">{d.periodo}</div>
-                <div class="frecuencia-timeline__valor">{d.valor.toLocaleString()} cabezas ✓ {d.ultimoDato ? '(23 dic 2025)' : ''}</div>
-              </div>
-            ))}
-            <div class="frecuencia-timeline__item">
-              <span class="frecuencia-timeline__punto frecuencia-timeline__punto--futuro"></span>
-              <div class="frecuencia-timeline__periodo">Mar 2026</div>
-              <div class="frecuencia-timeline__valor">🔜 Sale el 26 mar 2026</div>
-            </div>
-          </div>
-          <p class="frecuencia-card__fuente">Fuente: USDA NASS</p>
-        </div>
-      </div>
+      <!-- COMPARATIVA FRECUENCIA (Vue con tabs) -->
+      <TabsComparativa client:visible colombia={colombiaRecientes} usa={usaRecientes} />
 
       <!-- DETALLE REPORTE -->
       <section class="detalle-seccion">
