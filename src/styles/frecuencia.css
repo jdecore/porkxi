@@ -1,38 +1,15 @@
 .comparativa-frecuencia {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
   margin-bottom: 36px;
 }
 
-.comparativa-tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.comparativa-tab {
-  padding: 8px 20px;
-  border: 1.5px solid var(--crema-borde);
-  border-radius: 10px;
-  background: white;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--tinta-claro);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.comparativa-tab:hover {
-  border-color: var(--cerdo);
-  color: var(--tinta);
-}
-
-.comparativa-tab--activo {
-  background: var(--tinta);
-  color: white;
-  border-color: var(--tinta);
+@media (max-width: 700px) {
+  .comparativa-frecuencia {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
 }
 
 .frecuencia-card {
@@ -102,7 +79,6 @@
 .frecuencia-timeline__item {
   position: relative;
   padding-bottom: 16px;
-  animation: fadeSlideIn 0.4s ease both;
 }
 
 .frecuencia-timeline__item:last-child {
@@ -157,26 +133,4 @@
   color: var(--tinta-claro);
   font-style: italic;
   text-align: right;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.25s ease, transform 0.25s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-  transform: translateY(8px);
-}
-
-@keyframes fadeSlideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
 }

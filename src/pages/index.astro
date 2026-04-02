@@ -1,6 +1,5 @@
 ---
-import GraficaInteractiva from '../components/GraficaInteractiva.vue';
-import TabsComparativa from '../components/TabsComparativa.vue';
+import GraficaPrincipal from '../components/GraficaPrincipal.astro';
 
 import '../styles/encabezado.css';
 import '../styles/alerta.css';
@@ -65,7 +64,6 @@ const usaRecientes = SERIE_USA.filter(d => d.periodo >= "Mar 2025");
   <body>
     <main class="contenedor">
       
-      <!-- ENCABEZADO -->
       <header class="encabezado">
         <h1 class="encabezado__logo"><span class="encabezado__logo-parte">pork</span><span class="encabezado__logo-xi">ξ</span></h1>
         <p class="encabezado__subtitulo">Inventario porcino Colombia vs EE.UU. — y la brecha invisible en sus datos oficiales.</p>
@@ -76,13 +74,11 @@ const usaRecientes = SERIE_USA.filter(d => d.periodo >= "Mar 2025");
         </div>
       </header>
 
-      <!-- BANNER ALERTA -->
       <div class="banner-alerta">
         <span class="banner-alerta__icono">⚠️</span>
         <p class="banner-alerta__texto">En EE.UU., el USDA NASS publica datos de inventario porcino cada trimestre desde fuentes gubernamentales directas — el último salió el 23 de diciembre de 2025. En Colombia, los datos oficiales no son fáciles de acceder: están fragmentados, desactualizados o sin API funcional. El último dato disponible proviene de Porcinews, un medio especializado.</p>
       </div>
 
-      <!-- TARJETAS KPI -->
       <div class="tarjetas-kpi">
         <div class="tarjeta-kpi tarjeta-kpi--colombia">
           <div class="tarjeta-kpi__etiqueta">Último dato Colombia</div>
@@ -106,13 +102,47 @@ const usaRecientes = SERIE_USA.filter(d => d.periodo >= "Mar 2025");
         </div>
       </div>
 
-      <!-- GRÁFICA INTERACTIVA (Vue con tooltips + animaciones + filtros) -->
-      <GraficaInteractiva client:visible colombia={SERIE_COLOMBIA} usa={SERIE_USA} />
+      <GraficaPrincipal />
 
-      <!-- COMPARATIVA FRECUENCIA (Vue con tabs) -->
-      <TabsComparativa client:visible colombia={colombiaRecientes} usa={usaRecientes} />
+      <div class="comparativa-frecuencia">
+        <div class="frecuencia-card frecuencia-card--colombia">
+          <div class="frecuencia-card__encabezado"><span class="frecuencia-card__icono">🇨🇴</span><h3 class="frecuencia-card__titulo">Colombia</h3></div>
+          <span class="frecuencia-card__pildora">Anual · con retraso</span>
+          <p class="frecuencia-card__descripcion">Los datos más recientes provienen de Porcinews, un medio especializado.</p>
+          <div class="frecuencia-timeline">
+            {colombiaRecientes.map((d) => (
+              <div class="frecuencia-timeline__item">
+                <span class={`frecuencia-timeline__punto ${d.advertencia ? 'frecuencia-timeline__punto--alerta' : 'frecuencia-timeline__punto--colombia'}`}></span>
+                <div class="frecuencia-timeline__periodo">{d.periodo}</div>
+                <div class={`frecuencia-timeline__valor ${d.advertencia ? 'frecuencia-timeline__valor--alerta' : ''}`}>{d.valor.toLocaleString()} cabezas {d.advertencia ? '⚠️ mismo dato de 2022' : d.ultimoDato ? '(Porcinews, ene 2026)' : '✓'}</div>
+              </div>
+            ))}
+          </div>
+          <p class="frecuencia-card__fuente">Fuente: Porcinews (enero 2026)</p>
+        </div>
 
-      <!-- DETALLE REPORTE -->
+        <div class="frecuencia-card frecuencia-card--usa">
+          <div class="frecuencia-card__encabezado"><span class="frecuencia-card__icono">🇺🇸</span><h3 class="frecuencia-card__titulo">Estados Unidos</h3></div>
+          <span class="frecuencia-card__pildora">Trimestral · obligatorio por ley</span>
+          <p class="frecuencia-card__descripcion">Reporte obligatorio bajo la Livestock Mandatory Reporting Act.</p>
+          <div class="frecuencia-timeline">
+            {usaRecientes.map((d) => (
+              <div class="frecuencia-timeline__item">
+                <span class="frecuencia-timeline__punto frecuencia-timeline__punto--usa"></span>
+                <div class="frecuencia-timeline__periodo">{d.periodo}</div>
+                <div class="frecuencia-timeline__valor">{d.valor.toLocaleString()} cabezas ✓ {d.ultimoDato ? '(23 dic 2025)' : ''}</div>
+              </div>
+            ))}
+            <div class="frecuencia-timeline__item">
+              <span class="frecuencia-timeline__punto frecuencia-timeline__punto--futuro"></span>
+              <div class="frecuencia-timeline__periodo">Mar 2026</div>
+              <div class="frecuencia-timeline__valor">🔜 Sale el 26 mar 2026</div>
+            </div>
+          </div>
+          <p class="frecuencia-card__fuente">Fuente: USDA NASS</p>
+        </div>
+      </div>
+
       <section class="detalle-seccion">
         <h2 class="detalle-seccion__titulo">Detalle del último reporte oficial</h2>
         <div class="detalle-grid">
@@ -162,7 +192,6 @@ const usaRecientes = SERIE_USA.filter(d => d.periodo >= "Mar 2025");
         </div>
       </section>
 
-      <!-- TABLA HISTÓRICA -->
       <section class="tabla-historica">
         <h2 class="tabla-historica__titulo">Histórico año a año</h2>
         <p class="tabla-historica__subtitulo">Filas marcadas: dato duplicado o faltante.</p>
@@ -190,7 +219,6 @@ const usaRecientes = SERIE_USA.filter(d => d.periodo >= "Mar 2025");
         <div class="tabla__pie"><span>Colombia: Porcinews</span><span>EE.UU.: USDA NASS</span></div>
       </section>
 
-      <!-- EXPLICACIÓN -->
       <section class="explicacion">
         <h2 class="explicacion__titulo">¿Por qué existe esta brecha?</h2>
         <div class="explicacion__grid">
@@ -217,7 +245,6 @@ const usaRecientes = SERIE_USA.filter(d => d.periodo >= "Mar 2025");
         </div>
       </section>
 
-      <!-- PIE DE PÁGINA -->
       <footer class="pie-pagina">
         <div class="pie-pagina__fuentes">
           <div class="pie-pagina__fuente">
