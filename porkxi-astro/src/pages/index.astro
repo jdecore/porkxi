@@ -1,5 +1,5 @@
 ---
-import GraficaPrincipal from '../components/GraficaPrincipal.vue';
+import GraficaPrincipal from '../components/GraficaPrincipal.astro';
 
 import '../styles/variables.css';
 import '../styles/encabezado.css';
@@ -108,7 +108,7 @@ const usaRecientes = SERIE_USA.filter(d => d.periodo >= "Mar 2025");
       </div>
 
       <!-- GRÁFICA (solo esto tiene JS) -->
-      <GraficaPrincipal client:visible="vue" />
+      <GraficaPrincipal />
 
       <!-- COMPARATIVA FRECUENCIA -->
       <div class="comparativa-frecuencia">

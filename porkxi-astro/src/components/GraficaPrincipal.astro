@@ -1,0 +1,91 @@
+---
+import { SERIE_COLOMBIA } from '../data/colombia';
+import { SERIE_USA } from '../data/usa';
+
+const width = 700;
+const height = 450;
+const padding = 55;
+const maxValor = 80000000;
+
+const allPeriodos = [
+  ...SERIE_COLOMBIA.map(d => d.periodo),
+  ...SERIE_USA.map(d => d.periodo)
+].filter((v, i, a) => a.indexOf(v) === i).sort((a, b) => {
+  const parseP = p => {
+    const parts = p.split(' ');
+    return parseInt(parts[0]) * 10 + ({ 'Mar': 1, 'Jun': 2, 'Sep': 3, 'Dic': 4 }[parts[1]] || 5);
+  };
+  return parseP(a) - parseP(b);
+});
+
+const getX = (idx) => padding + idx * ((width - padding * 2) / (allPeriodos.length - 1));
+const getY = (valor) => padding + (height - padding * 2) - ((valor / maxValor) * (height - padding * 2));
+
+const colombiaPoints = SERIE_COLOMBIA.map(d => ({ x: getX(allPeriodos.indexOf(d.periodo)), y: getY(d.valor) })).filter(p => p.x >= padding);
+const usaPoints = SERIE_USA.map(d => ({ x: getX(allPeriodos.indexOf(d.periodo)), y: getY(d.valor) })).filter(p => p.x >= padding);
+
+const colombiaPoly = colombiaPoints.map(p => `${p.x},${p.y}`).join(' ');
+const usaPoly = usaPoints.map(p => `${p.x},${p.y}`).join(' ');
+---
+
+<section class="grafica-card">
+  <h2 class="grafica-card__titulo">Inventario histórico comparado</h2>
+  <p class="grafica-card__subtitulo">
+    En millones de cabezas. 
+    <span class="grafica-card__colombia">🟡 Colombia (anual · fuente: Porcinews)</span> ·
+    <span class="grafica-card__usa">🔵 EE.UU. (trimestral · fuente: USDA NASS)</span>
+  </p>
+  
+  <div class="grafica-contenedor">
+    <svg class="grafica-svg" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMidYMid meet">
+      <!-- Grid -->
+      <g class="grafica-grid">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <line x1={padding} y1={padding + (height - padding * 2) * i / 4} x2={width - padding} y2={padding + (height - padding * 2) * i / 4} stroke="#EEC9C4" stroke-dasharray="3,3" />
+        ))}
+      </g>
+      
+      <!-- Y axis -->
+      <g class="grafica-y-axis">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <text x={padding - 8} y={padding + (height - padding * 2) * i / 4} text-anchor="end" dominant-baseline="middle" font-size="11" fill="#7A4A44">{80 - i * 20}M</text>
+        ))}
+      </g>
+      
+      <!-- X axis - fewer labels to avoid overlap -->
+      <g class="grafica-x-axis">
+        {allPeriodos.filter((_, i) => i % 2 === 0 || i === allPeriodos.length - 1).map((label, i) => {
+          const originalIdx = allPeriodos.indexOf(label);
+          return (
+            <text x={getX(originalIdx)} y={height - padding + 20} text-anchor="end" dominant-baseline="middle" font-size="9" fill="#7A4A44" transform={`rotate(-30, ${getX(originalIdx)}, ${height - padding + 20})`}>{label}</text>
+          );
+        })}
+      </g>
+      
+      <!-- Lines -->
+      <polyline points={colombiaPoly} fill="none" stroke="#F5A800" stroke-width="2.5" stroke-linecap="round" />
+      <polyline points={usaPoly} fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" />
+      
+      <!-- Dots Colombia -->
+      {colombiaPoints.map((p, i) => (
+        <circle cx={p.x} cy={p.y} r="3" fill="#F5A800" />
+      ))}
+      
+      <!-- Dots USA -->
+      {usaPoints.map((p, i) => (
+        <circle cx={p.x} cy={p.y} r="3" fill="#2563EB" />
+      ))}
+      
+      <!-- Legend -->
+      <g transform={`translate(${width - 220}, ${padding - 20})`}>
+        <line x1="0" y1="0" x2="20" y2="0" stroke="#F5A800" stroke-width="2.5" />
+        <circle cx="10" cy="0" r="3" fill="#F5A800" />
+        <text x="28" y="4" font-size="11" fill="#3B1F1C">🇨🇴 Colombia (Porcinews)</text>
+        
+        <line x1="160" y1="0" x2="180" y2="0" stroke="#2563EB" stroke-width="2.5" />
+        <circle cx="170" cy="0" r="3" fill="#2563EB" />
+        <text x="188" y="4" font-size="11" fill="#3B1F1C">🇺🇸 EE.UU. (USDA NASS)</text>
+      </g>
+    </svg>
+  </div>
+</section>

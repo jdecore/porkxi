@@ -37,7 +37,23 @@
 
 .grafica-contenedor {
   width: 100%;
-  height: 380px;
+  height: 450px;
+}
+
+@media (max-width: 700px) {
+  .grafica-card {
+    padding: 20px;
+    overflow-x: auto;
+  }
+  
+  .grafica-card__titulo {
+    font-size: 22px;
+  }
+  
+  .grafica-contenedor {
+    height: 350px;
+    min-width: 600px;
+  }
 }
 
 .grafica-tooltip {
