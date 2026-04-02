@@ -145,13 +145,6 @@
   color: var(--tinta-claro);
 }
 
-.detalle-metodologia {
-  font-size: 12px;
-  color: var(--tinta-claro);
-  line-height: 1.6;
-  margin-bottom: 12px;
-}
-
 .detalle-proximo {
   font-size: 12px;
   color: var(--usa);

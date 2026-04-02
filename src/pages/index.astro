@@ -1,7 +1,6 @@
 ---
 import GraficaPrincipal from '../components/GraficaPrincipal.astro';
 
-import '../styles/variables.css';
 import '../styles/encabezado.css';
 import '../styles/alerta.css';
 import '../styles/tarjetas.css';
@@ -15,7 +14,6 @@ import '../styles/pieDepagina.css';
 import { SERIE_COLOMBIA, DETALLE_COLOMBIA, PROBLEMA_DATOS_COLOMBIA } from '../data/colombia';
 import { SERIE_USA, DETALLE_USA } from '../data/usa';
 
-const usaData = { 2024: 74700000, 2023: 74100000 };
 const anos = [2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015];
 const colombiaRecientes = SERIE_COLOMBIA.filter(d => d.periodo >= "2020");
 const usaRecientes = SERIE_USA.filter(d => d.periodo >= "Mar 2025");
@@ -51,10 +49,10 @@ const usaRecientes = SERIE_USA.filter(d => d.periodo >= "Mar 2025");
         --alerta: #C0392B;
         --alerta-fondo: #FEF0EE;
         --cerdo: #D4736B;
+        --cerdo-claro: #E8A09A;
         --radio: 14px;
         --sombra: 0 10px 28px rgba(59,31,28,0.08);
       }
-      
       *, *::before, *::after { box-sizing: border-box; }
       html { -webkit-text-size-adjust: 100%; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
       body { margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; background-color: var(--crema); color: var(--tinta); min-height: 100vh; position: relative; }
@@ -71,9 +69,9 @@ const usaRecientes = SERIE_USA.filter(d => d.periodo >= "Mar 2025");
         <h1 class="encabezado__logo"><span class="encabezado__logo-parte">pork</span><span class="encabezado__logo-xi">ξ</span></h1>
         <p class="encabezado__subtitulo">Inventario porcino Colombia vs EE.UU. — y la brecha invisible en sus datos oficiales.</p>
         <div class="encabezado__badges">
-          <span class="encabezado__badge encabezamiento__badge--colombia">Porcinews (enero 2026)</span>
-          <span class="encabezado__badge encabezamiento__badge--usa">USDA NASS (dic 2025)</span>
-          <span class="encabezado__badge encabezamiento__badge--datos">Datos verificados · Sin API</span>
+          <span class="encabezado__badge encabezado__badge--colombia">Porcinews (enero 2026)</span>
+          <span class="encabezado__badge encabezado__badge--usa">USDA NASS (dic 2025)</span>
+          <span class="encabezado__badge encabezado__badge--datos">Datos verificados · Sin API</span>
         </div>
       </header>
 
@@ -210,7 +208,7 @@ const usaRecientes = SERIE_USA.filter(d => d.periodo >= "Mar 2025");
             <tbody class="tabla__cuerpo">
               {anos.map((ano) => {
                 const datoColombia = SERIE_COLOMBIA.find(d => d.periodo === String(ano));
-                const datoUsa = usaData[ano];
+                const datoUsa = SERIE_USA.find(d => d.periodo === `Dic ${ano}`)?.valor;
                 const es2023 = ano === 2023;
                 const es2024 = ano === 2024;
                 return (
