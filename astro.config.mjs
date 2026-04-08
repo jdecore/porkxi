@@ -5,7 +5,6 @@ import vue from '@astrojs/vue';
 export default defineConfig({
   integrations: [
     vue({
-      appEntrypoint: '/src/vue-app.ts',
       template: {
         compilerOptions: {
           isCustomElement: (tag) => tag.includes('-'),
