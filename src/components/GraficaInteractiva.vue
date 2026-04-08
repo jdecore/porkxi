@@ -28,28 +28,28 @@
     </div>
 
     <div class="grafica-contenedor">
-      <svg class="grafica-svg" viewBox="0 0 700 400" preserveAspectRatio="xMidYMid meet">
+      <svg class="grafica-svg" viewBox="0 0 700 380" preserveAspectRatio="xMidYMid meet">
         <g class="grafica-grid">
           <line v-for="i in 5" :key="'grid-'+i" 
-            :x1="50" :y1="50 + 300 * (i - 1) / 4" 
-            :x2="650" :y2="50 + 300 * (i - 1) / 4" 
+            x1="60" :y1="60 + 240 * (i - 1) / 4" 
+            x2="640" :y2="60 + 240 * (i - 1) / 4" 
             stroke="#EEC9C4" stroke-dasharray="3,3" />
         </g>
 
         <g class="grafica-y-axis">
           <text v-for="i in 5" :key="'y-'+i" 
-            :x="42" :y="50 + 300 * (i - 1) / 4" 
+            x="52" :y="60 + 240 * (i - 1) / 4" 
             text-anchor="end" dominant-baseline="middle" font-size="11" fill="#7A4A44">
-            {{ Math.round(maximo * (1 - (i - 1) / 4)) }}
+            {{ obtenerEtiquetaY(i) }}
           </text>
         </g>
 
         <g class="grafica-x-axis">
           <text v-for="(label, i) in etiquetasX" :key="'x-'+i"
-            :x="getXLabel(i)"
-            y="380"
+            :x="obtenerX(i)"
+            y="350"
             text-anchor="end" dominant-baseline="middle" font-size="9" fill="#7A4A44"
-            :transform="`rotate(-35, ${getXLabel(i)}, 380)`">
+            :transform="`rotate(-35, ${obtenerX(i)}, 350)`">
             {{ label }}
           </text>
         </g>
@@ -57,8 +57,8 @@
         <template v-if="paisActivo !== 'usa'">
           <polyline :points="lineaColombia" fill="none" stroke="#F5A800" stroke-width="2.5" stroke-linecap="round" />
           <circle v-for="(p, i) in datosColombia" :key="'c-'+i"
-            :cx="getCxColombia(i)"
-            :cy="getCy(p.valor)"
+            :cx="obtenerX(i)"
+            :cy="obtenerY(p.valor)"
             r="4" fill="#F5A800" class="grafica-punto"
             @mouseenter="mostrarTooltip($event, 'Colombia', p)" />
         </template>
@@ -66,10 +66,10 @@
         <template v-if="paisActivo !== 'colombia'">
           <polyline :points="lineaUsa" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" />
           <circle v-for="(p, i) in datosUsa" :key="'u-'+i"
-            :cx="getCxUsa(i)"
-            :cy="getCy(p.valor)"
+            :cx="obtenerX(i + (paisActivo === 'ambos' ? datosColombia.length : 0))"
+            :cy="obtenerY(p.valor)"
             r="4" fill="#2563EB" class="grafica-punto"
-            @mouseenter="mostrarTooltip($event, 'USA', p)" />
+            @mouseenter="mostrarTooltipUSA($event, p, i)" />
         </template>
 
         <g transform="translate(480, 30)">
@@ -89,7 +89,7 @@
       <div v-if="tooltip.visible" class="grafica-tooltip"
         :style="{ left: tooltip.x + 'px', top: tooltip.y + 'px' }">
         <div class="grafica-tooltip__titulo">{{ tooltip.pais === 'Colombia' ? '🇨🇴 Colombia' : '🇺🇸 USA' }}</div>
-        <div class="grafica-tooltip__valor">{{ tooltip.valor.toLocaleString() }}</div>
+        <div class="grafica-tooltip__valor">{{ tooltip.valor.toLocaleString() }} cabezas</div>
         <div class="grafica-tooltip__periodo">{{ tooltip.periodo }}</div>
       </div>
     </div>
@@ -115,18 +115,18 @@ const datosColombia = [
 ]
 
 const datosUsa = [
-  { periodo: "Mar", valor: 72.8 },
-  { periodo: "Jun", valor: 73.2 },
-  { periodo: "Sep", valor: 73.8 },
-  { periodo: "Dic", valor: 74.1 },
-  { periodo: "Mar", valor: 73.9 },
-  { periodo: "Jun", valor: 74.2 },
-  { periodo: "Sep", valor: 74.8 },
-  { periodo: "Dic", valor: 74.7 },
-  { periodo: "Mar", valor: 74.5 },
-  { periodo: "Jun", valor: 75.1 },
-  { periodo: "Sep", valor: 74.5 },
-  { periodo: "Dic", valor: 75.5 },
+  { periodo: "Mar 23", valor: 72.8 },
+  { periodo: "Jun 23", valor: 73.2 },
+  { periodo: "Sep 23", valor: 73.8 },
+  { periodo: "Dic 23", valor: 74.1 },
+  { periodo: "Mar 24", valor: 73.9 },
+  { periodo: "Jun 24", valor: 74.2 },
+  { periodo: "Sep 24", valor: 74.8 },
+  { periodo: "Dic 24", valor: 74.7 },
+  { periodo: "Mar 25", valor: 74.5 },
+  { periodo: "Jun 25", valor: 75.1 },
+  { periodo: "Sep 25", valor: 74.5 },
+  { periodo: "Dic 25", valor: 75.5 },
 ]
 
 const tooltip = ref({ visible: false, x: 0, y: 0, pais: '', valor: 0, periodo: '' })
@@ -136,29 +136,39 @@ const maximo = computed(() => {
   return 80
 })
 
-const getCxColombia = (i) => 50 + i * (600 / (datosColombia.length - 1 || 1))
-const getCy = (valor) => 350 - (valor / maximo.value * 300)
-const getCxUsa = (i) => 50 + i * (600 / (datosUsa.length - 1 || 1))
-const getXLabel = (i) => 50 + i * (600 / (Math.max(etiquetasX.value.length - 1, 1)))
+const obtenerEtiquetaY = (i) => {
+  const valores = paisActivo.value === 'colombia' 
+    ? [12, 9, 6, 3, 0] 
+    : [80, 60, 40, 20, 0]
+  return valores[i - 1] + 'M'
+}
+
+const obtenerX = (i) => {
+  const total = paisActivo.value === 'ambos' 
+    ? datosColombia.length + datosUsa.length 
+    : (paisActivo.value === 'colombia' ? datosColombia.length : datosUsa.length)
+  return 60 + i * (580 / Math.max(total - 1, 1))
+}
+
+const obtenerY = (valor) => {
+  return 300 - (valor / maximo.value * 240)
+}
 
 const lineaColombia = computed(() => {
   if (paisActivo.value === 'usa') return ''
-  return datosColombia.map((p, i) => 
-    `${getCxColombia(i)},${getCy(p.valor)}`
-  ).join(' ')
+  return datosColombia.map((p, i) => `${obtenerX(i)},${obtenerY(p.valor)}`).join(' ')
 })
 
 const lineaUsa = computed(() => {
   if (paisActivo.value === 'colombia') return ''
-  return datosUsa.map((p, i) => 
-    `${getCxUsa(i)},${getCy(p.valor)}`
-  ).join(' ')
+  const offset = datosColombia.length
+  return datosUsa.map((p, i) => `${obtenerX(i + offset)},${obtenerY(p.valor)}`).join(' ')
 })
 
 const etiquetasX = computed(() => {
   if (paisActivo.value === 'colombia') return datosColombia.map(d => d.periodo)
   if (paisActivo.value === 'usa') return datosUsa.map(d => d.periodo)
-  return datosUsa.map(d => d.periodo)
+  return [...datosColombia.map(d => d.periodo), ...datosUsa.map(d => d.periodo)]
 })
 
 const mostrarTooltip = (event, pais, dato) => {
@@ -169,6 +179,19 @@ const mostrarTooltip = (event, pais, dato) => {
     x: rect.left - container.left + 10, 
     y: rect.top - container.top - 60, 
     pais, 
+    valor: dato.valor * 1000000, 
+    periodo: dato.periodo 
+  }
+}
+
+const mostrarTooltipUSA = (event, dato, idx) => {
+  const rect = event.target.getBoundingClientRect()
+  const container = event.target.closest('.grafica-contenedor').getBoundingClientRect()
+  tooltip.value = { 
+    visible: true, 
+    x: rect.left - container.left + 10, 
+    y: rect.top - container.top - 60, 
+    pais: 'USA', 
     valor: dato.valor * 1000000, 
     periodo: dato.periodo 
   }
