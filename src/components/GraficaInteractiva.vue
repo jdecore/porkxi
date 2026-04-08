@@ -50,45 +50,49 @@
         <title>Inventario histórico porcino: Colombia vs EE.UU.</title>
         <desc>Gráfica de líneas que compara el inventario porcino en Colombia (datos anuales) y EE.UU. (datos trimestrales) desde 2015 hasta 2025.</desc>
 
+        <!-- Grid horizontal -->
         <g class="grafica-grid">
           <line
             v-for="i in 5"
             :key="'grid-' + i"
-            x1="50"
-            :y1="50 + 200 * (i - 1) / 4"
-            x2="650"
-            :y2="50 + 200 * (i - 1) / 4"
+            x1="70"
+            :y1="40 + 300 * (i - 1) / 4"
+            x2="790"
+            :y2="40 + 300 * (i - 1) / 4"
             stroke="#EEC9C4"
             stroke-dasharray="3,3"
           />
         </g>
 
+        <!-- Eje Y -->
         <g class="grafica-y-axis">
           <text
             v-for="(valor, i) in etiquetasY"
             :key="'y-' + i"
-            x="40"
-            :y="50 + 200 * i / 4"
+            x="58"
+            :y="40 + 300 * i / 4"
             text-anchor="end"
             dominant-baseline="middle"
-            font-size="11"
+            font-size="12"
             fill="#7A4A44"
           >
             {{ valor }}
           </text>
         </g>
 
+        <!-- Eje X -->
         <g class="grafica-x-axis">
+          <!-- Línea base del eje X -->
+          <line x1="70" y1="340" x2="790" y2="340" stroke="#EEC9C4" stroke-width="1" />
           <text
             v-for="(label, i) in etiquetasX"
             :key="'x-' + i"
-            :x="50 + i * pasoX"
-            y="320"
-            text-anchor="end"
-            dominant-baseline="middle"
-            font-size="9"
+            :x="70 + i * pasoX"
+            y="365"
+            text-anchor="middle"
+            font-size="11"
             fill="#7A4A44"
-            :transform="etiquetasX.length > 10 ? `rotate(-45, ${50 + i * pasoX}, 320)` : ''"
+            :transform="debeRotar ? `rotate(-40, ${70 + i * pasoX}, 365)` : ''"
           >
             {{ label }}
           </text>
@@ -100,15 +104,16 @@
             :points="lineaColombia"
             fill="none"
             stroke="#F5A800"
-            stroke-width="2.5"
+            stroke-width="3"
             stroke-linecap="round"
+            stroke-linejoin="round"
           />
           <circle
             v-for="(p, i) in datosColombia"
             :key="'c-' + i"
-            :cx="50 + i * pasoXCol"
+            :cx="70 + i * pasoXCol"
             :cy="escalaY(p.valor)"
-            r="4"
+            r="5"
             fill="#F5A800"
             class="grafica-punto"
             tabindex="0"
@@ -126,15 +131,16 @@
             :points="lineaUsa"
             fill="none"
             stroke="#2563EB"
-            stroke-width="2.5"
+            stroke-width="3"
             stroke-linecap="round"
+            stroke-linejoin="round"
           />
           <circle
             v-for="(p, i) in datosUsa"
             :key="'u-' + i"
-            :cx="50 + i * pasoXUsa"
+            :cx="70 + i * pasoXUsa"
             :cy="escalaY(p.valor)"
-            r="4"
+            r="5"
             fill="#2563EB"
             class="grafica-punto"
             tabindex="0"
@@ -147,32 +153,33 @@
         </template>
 
         <!-- Leyenda -->
-        <g transform="translate(480, 25)">
+        <g transform="translate(600, 20)">
           <template v-if="paisActivo !== 'usa'">
-            <line x1="0" y1="0" x2="20" y2="0" stroke="#F5A800" stroke-width="2.5" />
-            <circle cx="10" cy="0" r="3" fill="#F5A800" />
-            <text x="28" y="4" font-size="11" fill="#3B1F1C">Colombia</text>
+            <line x1="0" y1="0" x2="24" y2="0" stroke="#F5A800" stroke-width="3" />
+            <circle cx="12" cy="0" r="4" fill="#F5A800" />
+            <text x="32" y="4" font-size="12" fill="#3B1F1C" font-weight="500">Colombia</text>
           </template>
           <template v-if="paisActivo !== 'colombia'">
             <line
-              :x1="paisActivo === 'ambos' ? 100 : 0"
+              :x1="paisActivo === 'ambos' ? 110 : 0"
               y1="0"
-              :x2="paisActivo === 'ambos' ? 120 : 20"
+              :x2="paisActivo === 'ambos' ? 134 : 24"
               y2="0"
               stroke="#2563EB"
-              stroke-width="2.5"
+              stroke-width="3"
             />
             <circle
-              :cx="paisActivo === 'ambos' ? 110 : 10"
+              :cx="paisActivo === 'ambos' ? 122 : 12"
               cy="0"
-              r="3"
+              r="4"
               fill="#2563EB"
             />
             <text
-              :x="paisActivo === 'ambos' ? 128 : 28"
+              :x="paisActivo === 'ambos' ? 142 : 32"
               y="4"
-              font-size="11"
+              font-size="12"
               fill="#3B1F1C"
+              font-weight="500"
             >
               USA
             </text>
@@ -206,6 +213,11 @@ import { SERIE_USA } from '../data/usa.js'
 const paisActivo = ref('colombia')
 const contenedorRef = ref(null)
 const esMovil = ref(false)
+
+// Dimensiones del área de dibujo
+const areaAncho = 720 // 790 - 70
+const areaAlto = 300
+const svgAlto = 420 // 350 * 1.2 = 420
 
 // Transformar datos: Colombia está en unidades, convertir a millones para la gráfica
 const datosColombia = computed(() => {
@@ -251,12 +263,12 @@ const etiquetasY = computed(() => {
 
 const pasoXCol = computed(() => {
   const len = datosColombia.value.length
-  return len > 1 ? 600 / (len - 1) : 0
+  return len > 1 ? areaAncho / (len - 1) : 0
 })
 
 const pasoXUsa = computed(() => {
   const len = datosUsa.value.length
-  return len > 1 ? 600 / (len - 1) : 0
+  return len > 1 ? areaAncho / (len - 1) : 0
 })
 
 const pasoX = computed(() => {
@@ -264,14 +276,14 @@ const pasoX = computed(() => {
   return pasoXUsa.value
 })
 
-const escalaY = (valor) => 250 - (valor / maximo.value) * 200
+const escalaY = (valor) => 340 - (valor / maximo.value) * areaAlto
 
 const lineaColombia = computed(() => {
   if (paisActivo.value === 'usa' || !datosColombia.value.length) return ''
   return datosColombia.value
     .map(
       (p, i) =>
-        `${50 + i * pasoXCol.value},${escalaY(p.valor)}`
+        `${70 + i * pasoXCol.value},${escalaY(p.valor)}`
     )
     .join(' ')
 })
@@ -281,9 +293,13 @@ const lineaUsa = computed(() => {
   return datosUsa.value
     .map(
       (p, i) =>
-        `${50 + i * pasoXUsa.value},${escalaY(p.valor)}`
+        `${70 + i * pasoXUsa.value},${escalaY(p.valor)}`
     )
     .join(' ')
+})
+
+const debeRotar = computed(() => {
+  return etiquetasX.value.length > 10
 })
 
 const etiquetasX = computed(() => {
@@ -301,9 +317,9 @@ const etiquetasX = computed(() => {
 })
 
 // Responsive SVG
-const svgWidth = computed(() => (esMovil.value ? '100%' : 700))
-const svgHeight = computed(() => (esMovil.value ? 350 : 350))
-const svgViewBox = computed(() => '0 0 700 350')
+const svgWidth = computed(() => (esMovil.value ? '100%' : 840))
+const svgHeight = computed(() => svgAlto)
+const svgViewBox = computed(() => `0 0 840 ${svgAlto}`)
 
 const mostrarTooltip = (event, pais, dato) => {
   const rect = event.target.getBoundingClientRect()
@@ -311,8 +327,7 @@ const mostrarTooltip = (event, pais, dato) => {
   const x = rect.left - container.left + 10
   const y = rect.top - container.top - 60
 
-  // Verificar si se sale por la derecha
-  const tooltipWidth = 160
+  const tooltipWidth = 170
   const izquierda = x + tooltipWidth > container.width
 
   tooltip.value = {
@@ -332,7 +347,7 @@ const mostrarTooltipUSA = (event, dato, idx) => {
   const x = rect.left - container.left + 10
   const y = rect.top - container.top - 60
 
-  const tooltipWidth = 160
+  const tooltipWidth = 170
   const izquierda = x + tooltipWidth > container.width
 
   tooltip.value = {
@@ -349,11 +364,12 @@ const mostrarTooltipUSA = (event, dato, idx) => {
 const mostrarTooltipTouch = (pais, dato, idx) => {
   if (!contenedorRef.value) return
   const container = contenedorRef.value.getBoundingClientRect()
-  const x = 50 + idx * pasoXCol.value
-  const xPx = (x / 700) * container.width
-  const yPx = (escalaY(dato.valor) / 350) * container.height
+  const xSvg = 70 + idx * pasoXCol.value
+  const ySvg = escalaY(dato.valor)
+  const xPx = (xSvg / 840) * container.width
+  const yPx = (ySvg / svgAlto) * container.height
 
-  const tooltipWidth = 160
+  const tooltipWidth = 170
   const izquierda = xPx + tooltipWidth > container.width
 
   tooltip.value = {
@@ -370,11 +386,12 @@ const mostrarTooltipTouch = (pais, dato, idx) => {
 const mostrarTooltipTouchUSA = (dato, idx) => {
   if (!contenedorRef.value) return
   const container = contenedorRef.value.getBoundingClientRect()
-  const x = 50 + idx * pasoXUsa.value
-  const xPx = (x / 700) * container.width
-  const yPx = (escalaY(dato.valor) / 350) * container.height
+  const xSvg = 70 + idx * pasoXUsa.value
+  const ySvg = escalaY(dato.valor)
+  const xPx = (xSvg / 840) * container.width
+  const yPx = (ySvg / svgAlto) * container.height
 
-  const tooltipWidth = 160
+  const tooltipWidth = 170
   const izquierda = xPx + tooltipWidth > container.width
 
   tooltip.value = {
@@ -399,12 +416,8 @@ onMounted(() => {
   }
   window.addEventListener('resize', handleResize)
 
-  // Cerrar tooltip al tocar fuera
   document.addEventListener('touchstart', (e) => {
-    if (
-      contenedorRef.value &&
-      !contenedorRef.value.contains(e.target)
-    ) {
+    if (contenedorRef.value && !contenedorRef.value.contains(e.target)) {
       ocultarTooltip()
     }
   })
@@ -477,10 +490,10 @@ onMounted(() => {
   -webkit-overflow-scrolling: touch;
 }
 
-.grafica-svg {
+.grafica-contenedor svg {
+  display: block;
   width: 100%;
   height: auto;
-  display: block;
 }
 
 .grafica-punto {
@@ -489,7 +502,7 @@ onMounted(() => {
 }
 
 .grafica-punto:hover {
-  r: 6;
+  r: 7;
 }
 
 .grafica-tooltip {
@@ -547,7 +560,22 @@ onMounted(() => {
   }
 
   .grafica-contenedor {
-    min-width: 600px;
+    min-width: 700px;
+  }
+}
+
+@media (max-width: 500px) {
+  .grafica-card {
+    padding: 16px 12px;
+  }
+
+  .grafica-card__titulo {
+    font-size: 20px;
+  }
+
+  .grafica-card__subtitulo {
+    font-size: 12px;
+    margin-bottom: 16px;
   }
 }
 </style>
