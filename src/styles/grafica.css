@@ -1,9 +1,10 @@
 .grafica-card {
-  background: white;
-  border: 1.5px solid var(--crema-borde);
-  border-radius: 14px;
+  background: var(--crema-oscuro, #F7E0DC);
+  border: 1.5px solid var(--crema-borde, #EEC9C4);
+  border-radius: var(--radio, 14px);
   padding: 28px 32px;
   margin-bottom: 36px;
+  box-shadow: var(--sombra, 0 10px 28px rgba(59, 31, 28, 0.08));
 }
 
 .grafica-card__titulo {
@@ -11,12 +12,12 @@
   font-size: 26px;
   font-weight: 700;
   margin: 0 0 8px;
-  color: var(--tinta);
+  color: var(--tinta, #3B1F1C);
 }
 
 .grafica-card__subtitulo {
   font-size: 13px;
-  color: var(--tinta-claro);
+  color: var(--tinta-claro, #7A4A44);
   margin: 0 0 24px;
   line-height: 1.5;
 }
@@ -26,12 +27,12 @@
 }
 
 .grafica-card__colombia {
-  color: var(--colombia);
+  color: var(--colombia, #F5A800);
   font-weight: 600;
 }
 
 .grafica-card__usa {
-  color: var(--usa);
+  color: var(--usa, #2563EB);
   font-weight: 600;
 }
 
@@ -48,16 +49,33 @@
 
 @media (max-width: 700px) {
   .grafica-card {
-    padding: 20px;
-    overflow-x: auto;
+    padding: 20px 16px;
+    margin-bottom: 28px;
   }
-  
+
   .grafica-card__titulo {
     font-size: 22px;
   }
-  
+
   .grafica-contenedor {
     height: 350px;
     min-width: 600px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (max-width: 500px) {
+  .grafica-card {
+    padding: 16px 12px;
+  }
+
+  .grafica-card__titulo {
+    font-size: 20px;
+  }
+
+  .grafica-card__subtitulo {
+    font-size: 12px;
+    margin-bottom: 16px;
   }
 }

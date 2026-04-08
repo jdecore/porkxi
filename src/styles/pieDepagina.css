@@ -76,3 +76,37 @@
   color: var(--cerdo);
   font-weight: 700;
 }
+
+@media (max-width: 700px) {
+  .pie-pagina {
+    padding-top: 24px;
+  }
+
+  .pie-pagina__fuentes {
+    font-size: 10px;
+  }
+
+  .pie-pagina__fuente {
+    margin-bottom: 12px;
+  }
+
+  .pie-pagina__fuente-nota {
+    font-size: 9px;
+  }
+
+  .pie-pagina__enlace {
+    font-size: 10px;
+  }
+
+  .pie-pagina__creditos {
+    font-size: 12px;
+  }
+
+  .pie-pagina__creditos-nota {
+    font-size: 10px;
+  }
+
+  .pie-pagina__marca {
+    font-size: 11px;
+  }
+}

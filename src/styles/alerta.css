@@ -38,9 +38,33 @@
 @media (max-width: 700px) {
   .banner-alerta {
     padding: 14px 16px;
+    margin-bottom: 28px;
+    gap: 12px;
   }
-  
+
+  .banner-alerta__icono {
+    font-size: 20px;
+  }
+
   .banner-alerta__texto {
     font-size: 13px;
+  }
+}
+
+@media (max-width: 500px) {
+  .banner-alerta {
+    padding: 12px 14px;
+    margin-bottom: 24px;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .banner-alerta__icono {
+    font-size: 18px;
+    align-self: flex-start;
+  }
+
+  .banner-alerta__texto {
+    font-size: 12px;
   }
 }

@@ -21,9 +21,89 @@
 }
 
 @media (max-width: 700px) {
+  .explicacion {
+    padding: 24px 20px;
+    margin-bottom: 28px;
+  }
+
+  .explicacion__titulo {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+
   .explicacion__grid {
     grid-template-columns: 1fr;
     gap: 24px;
+  }
+
+  .explicacion-columna__titulo {
+    font-size: 16px;
+  }
+
+  .explicacion-columna__texto {
+    font-size: 12px;
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+
+  .explicacion-destacado {
+    padding: 10px 14px;
+    font-size: 12px;
+    margin-bottom: 16px;
+  }
+
+  .explicacion-tabla {
+    font-size: 11px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .explicacion-tabla table {
+    min-width: 400px;
+  }
+
+  .explicacion-tabla th,
+  .explicacion-tabla td {
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+
+  .explicacion-tabla__problema {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+@media (max-width: 500px) {
+  .explicacion {
+    padding: 20px 16px;
+    border-radius: 10px;
+  }
+
+  .explicacion__titulo {
+    font-size: 20px;
+  }
+
+  .explicacion-columna__titulo {
+    font-size: 15px;
+  }
+
+  .explicacion-columna__texto {
+    font-size: 11px;
+  }
+
+  .explicacion-destacado {
+    font-size: 11px;
+    padding: 8px 12px;
+  }
+
+  .explicacion-tabla {
+    font-size: 10px;
+  }
+
+  .explicacion-tabla th,
+  .explicacion-tabla td {
+    padding: 6px 8px;
   }
 }
 

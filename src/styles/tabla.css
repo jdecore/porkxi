@@ -18,6 +18,7 @@
 
 .tabla-contenedor {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border: 1.5px solid var(--crema-borde);
   border-radius: 14px;
 }
@@ -26,6 +27,7 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
+  min-width: 500px;
 }
 
 .tabla__encabezado {
@@ -38,6 +40,7 @@
   font-weight: 600;
   color: var(--tinta);
   border-bottom: 1.5px solid var(--crema-borde);
+  white-space: nowrap;
 }
 
 .tabla__cuerpo tr {
@@ -79,6 +82,7 @@
   border-radius: 12px;
   font-size: 11px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .tabla__estado--alerta {
@@ -94,8 +98,69 @@
 .tabla__pie {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
   padding: 16px 16px 0;
   font-size: 11px;
   color: var(--tinta-claro);
   font-style: italic;
+}
+
+@media (max-width: 700px) {
+  .tabla-historica {
+    margin-bottom: 28px;
+  }
+
+  .tabla-historica__titulo {
+    font-size: 22px;
+  }
+
+  .tabla-historica__subtitulo {
+    font-size: 12px;
+    margin-bottom: 16px;
+  }
+
+  .tabla {
+    font-size: 12px;
+  }
+
+  .tabla__encabezado th {
+    padding: 12px 12px;
+    font-size: 12px;
+  }
+
+  .tabla__cuerpo td {
+    padding: 10px 12px;
+  }
+
+  .tabla__estado {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+
+  .tabla__pie {
+    flex-direction: column;
+    gap: 4px;
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 500px) {
+  .tabla-historica__titulo {
+    font-size: 20px;
+  }
+
+  .tabla {
+    font-size: 11px;
+    min-width: 450px;
+  }
+
+  .tabla__encabezado th {
+    padding: 10px 10px;
+    font-size: 11px;
+  }
+
+  .tabla__cuerpo td {
+    padding: 8px 10px;
+  }
 }

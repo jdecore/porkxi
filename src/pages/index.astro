@@ -14,29 +14,57 @@ import '../styles/pieDepagina.css';
 import { SERIE_COLOMBIA, DETALLE_COLOMBIA, PROBLEMA_DATOS_COLOMBIA } from '../data/colombia';
 import { SERIE_USA, DETALLE_USA } from '../data/usa';
 
+// Validación básica de datos
+if (!Array.isArray(SERIE_COLOMBIA) || !SERIE_COLOMBIA.length) {
+  throw new Error('SERIE_COLOMBIA está vacío o no es un array');
+}
+if (!Array.isArray(SERIE_USA) || !SERIE_USA.length) {
+  throw new Error('SERIE_USA está vacío o no es un array');
+}
+
 const anos = [2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015];
 const colombiaRecientes = SERIE_COLOMBIA.filter(d => d.periodo >= "2020");
 const usaRecientes = SERIE_USA.filter(d => d.periodo >= "Mar 2025");
+
+const ultimoDatoColombia = SERIE_COLOMBIA[SERIE_COLOMBIA.length - 1];
+const ultimoDatoUsa = SERIE_USA[SERIE_USA.length - 1];
 ---
 
 <html lang="es">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
     <meta name="description" content="Inventario porcino Colombia vs EE.UU. — y la brecha invisible en sus datos oficiales." />
     <meta name="author" content="Juan Enríquez" />
     <meta name="theme-color" content="#FDF0EE" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://porkxi.com/" />
+
+    <!-- Open Graph -->
     <meta property="og:title" content="porkξ | Inventario porcino" />
     <meta property="og:description" content="Inventario porcino Colombia vs EE.UU. — y la brecha invisible en sus datos oficiales." />
     <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_CO" />
+    <meta property="og:site_name" content="porkξ" />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Gráfica comparativa de inventario porcino Colombia vs EE.UU." />
+
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="porkξ | Inventario porcino" />
+    <meta name="twitter:description" content="Inventario porcino Colombia vs EE.UU. — y la brecha invisible en sus datos oficiales." />
+    <meta name="twitter:image" content="/og-image.png" />
+    <meta name="twitter:image:alt" content="Gráfica comparativa de inventario porcino Colombia vs EE.UU." />
+
     <title>porkξ | Inventario porcino</title>
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet" />
-    
+
     <style>
       :root {
         --crema: #FDF0EE;
@@ -54,16 +82,17 @@ const usaRecientes = SERIE_USA.filter(d => d.periodo >= "Mar 2025");
         --sombra: 0 10px 28px rgba(59,31,28,0.08);
       }
       *, *::before, *::after { box-sizing: border-box; }
-      html { -webkit-text-size-adjust: 100%; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+      html { -webkit-text-size-adjust: 100%; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; scroll-behavior: smooth; }
       body { margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; background-color: var(--crema); color: var(--tinta); min-height: 100vh; position: relative; }
       body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); opacity: 0.03; pointer-events: none; z-index: 0; }
       .contenedor { max-width: 1100px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+      img, svg { max-width: 100%; height: auto; }
       @media (max-width: 700px) { .contenedor { padding: 0 16px; } }
     </style>
   </head>
   <body>
     <main class="contenedor">
-      
+
       <header class="encabezado">
         <h1 class="encabezado__logo"><span class="encabezado__logo-parte">pork</span><span class="encabezado__logo-xi">ξ</span></h1>
         <p class="encabezado__subtitulo">Inventario porcino Colombia vs EE.UU. — y la brecha invisible en sus datos oficiales.</p>
@@ -156,13 +185,13 @@ const usaRecientes = SERIE_USA.filter(d => d.periodo >= "Mar 2025");
             <div class="detalle-subseccion">
               <h4 class="detalle-subseccion__titulo">Ranking estados</h4>
               <div class="detalle-ranking">
-                {DETALLE_USA.estados.map((estado) => (
+                {DETALLE_USA.estados && DETALLE_USA.estados.length > 0 ? DETALLE_USA.estados.map((estado) => (
                   <div class="detalle-ranking__item">
                     <span class={`detalle-ranking__posicion detalle-ranking__posicion--${estado.posicion}`}>{estado.posicion === 1 ? '🥇' : estado.posicion === 2 ? '🥈' : '🥉'}</span>
                     <span class="detalle-ranking__nombre">{estado.nombre}</span>
                     <span class="detalle-ranking__cabezas">{estado.cabezas.toLocaleString()}</span>
                   </div>
-                ))}
+                )) : <p class="detalle-ranking__vacio">Datos de estados no disponibles.</p>}
               </div>
             </div>
             <p class="detalle-proximo">Próximo reporte: {DETALLE_USA.proximoReporte}</p>
@@ -180,14 +209,14 @@ const usaRecientes = SERIE_USA.filter(d => d.periodo >= "Mar 2025");
             <tbody class="tabla__cuerpo">
               {anos.map((ano) => {
                 const datoColombia = SERIE_COLOMBIA.find(d => d.periodo === String(ano));
-                const datoUsa = SERIE_USA.find(d => d.periodo === `Dic ${ano}`)?.valor;
+                const datoUsa = SERIE_USA.find(d => d.periodo === `Dic ${ano}`);
                 const es2023 = ano === 2023;
                 const es2024 = ano === 2024;
                 return (
                   <tr class={es2023 ? 'tabla__fila--alerta' : es2024 ? 'tabla__fila--reciente' : ''}>
                     <td>{ano}</td>
                     <td class="tabla__cabezas">{datoColombia ? datoColombia.valor.toLocaleString() : '—'}</td>
-                    <td class="tabla__cabezas">{datoUsa ? datoUsa.toLocaleString() : '—'}</td>
+                    <td class="tabla__cabezas">{datoUsa ? datoUsa.valor.toLocaleString() : '—'}</td>
                     <td>{es2023 && <span class="tabla__estado tabla__estado--alerta">⚠️ Dato duplicado</span>}{es2024 && <span class="tabla__estado tabla__estado--reciente">✓ Más reciente</span>}</td>
                   </tr>
                 );
@@ -210,9 +239,9 @@ const usaRecientes = SERIE_USA.filter(d => d.periodo >= "Mar 2025");
               <table>
                 <thead><tr><th>Entidad</th><th>Qué publica</th><th>Problema</th></tr></thead>
                 <tbody>
-                  {PROBLEMA_DATOS_COLOMBIA.problemas.map((prob) => (
+                  {PROBLEMA_DATOS_COLOMBIA.problemas && PROBLEMA_DATOS_COLOMBIA.problemas.length > 0 ? PROBLEMA_DATOS_COLOMBIA.problemas.map((prob) => (
                     <tr><td>{prob.entidad}</td><td>{prob.dato}</td><td><div class="explicacion-tabla__problema"><span class="explicacion-tabla__problema-icono">⚠️</span><span>{prob.problema}</span></div></td></tr>
-                  ))}
+                  )) : <tr><td colspan="3">No hay datos disponibles.</td></tr>}
                 </tbody>
               </table>
             </div>

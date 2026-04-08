@@ -64,13 +64,45 @@
 @media (max-width: 700px) {
   .encabezado {
     padding: 36px 0 20px;
+    margin-bottom: 28px;
   }
-  
+
   .encabezado__logo {
     font-size: 48px;
+    letter-spacing: -2px;
   }
-  
+
   .encabezado__subtitulo {
     font-size: 14px;
+    max-width: 100%;
+  }
+
+  .encabezado__badges {
+    gap: 8px;
+  }
+
+  .encabezado__badge {
+    padding: 5px 12px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 500px) {
+  .encabezado {
+    padding: 28px 0 16px;
+  }
+
+  .encabezado__logo {
+    font-size: 40px;
+  }
+
+  .encabezado__subtitulo {
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  .encabezado__badge {
+    padding: 4px 10px;
+    font-size: 10px;
   }
 }

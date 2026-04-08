@@ -17,9 +17,88 @@
 }
 
 @media (max-width: 700px) {
+  .detalle-seccion__titulo {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+
   .detalle-grid {
     grid-template-columns: 1fr;
     gap: 20px;
+  }
+
+  .detalle-card {
+    padding: 20px;
+  }
+
+  .detalle-card__aviso {
+    font-size: 11px;
+    padding: 8px 12px;
+  }
+
+  .detalle-card__encabezado {
+    flex-wrap: wrap;
+  }
+
+  .detalle-card__icono {
+    font-size: 18px;
+  }
+
+  .detalle-card__titulo {
+    font-size: 16px;
+  }
+
+  .detalle-metrica {
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 0;
+  }
+
+  .detalle-metrica__valor {
+    text-align: left;
+    font-size: 14px;
+  }
+
+  .detalle-metrica__etiqueta {
+    font-size: 12px;
+  }
+
+  .detalle-subseccion__titulo {
+    font-size: 13px;
+  }
+
+  .detalle-ranking__item {
+    font-size: 12px;
+  }
+
+  .detalle-proximo {
+    font-size: 11px;
+  }
+
+  .detalle-card__enlace {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 500px) {
+  .detalle-seccion {
+    margin-bottom: 28px;
+  }
+
+  .detalle-seccion__titulo {
+    font-size: 20px;
+  }
+
+  .detalle-card {
+    padding: 16px;
+  }
+
+  .detalle-metrica {
+    padding: 8px 0;
+  }
+
+  .detalle-metrica__valor {
+    font-size: 13px;
   }
 }
 
