@@ -3,9 +3,31 @@
     <h2 class="grafica-card__titulo">Inventario histórico comparado</h2>
     <p class="grafica-card__subtitulo">
       En millones de cabezas.
-      <span class="grafica-card__colombia">🟡 Colombia (anual · fuente: Porcinews)</span> ·
-      <span class="grafica-card__usa">🔵 EE.UU. (trimestral · fuente: USDA NASS)</span>
     </p>
+
+    <div class="grafica-botones">
+      <button 
+        class="grafica-boton" 
+        :class="{ 'grafica-boton--activo': paisActivo === 'colombia' }"
+        @click="paisActivo = 'colombia'"
+      >
+        🟡 Colombia
+      </button>
+      <button 
+        class="grafica-boton" 
+        :class="{ 'grafica-boton--activo': paisActivo === 'usa' }"
+        @click="paisActivo = 'usa'"
+      >
+        🔵 EE.UU.
+      </button>
+      <button 
+        class="grafica-boton" 
+        :class="{ 'grafica-boton--activo': paisActivo === 'ambos' }"
+        @click="paisActivo = 'ambos'"
+      >
+        ⚖️ Ambos
+      </button>
+    </div>
 
     <div class="grafica-filtros">
       <label class="grafica-filtro__label">Rango:</label>
@@ -30,7 +52,7 @@
           <text v-for="i in 5" :key="'y-'+i" 
             :x="padding - 8" :y="padding + (height - padding * 2) * (i-1) / 4" 
             text-anchor="end" dominant-baseline="middle" font-size="11" fill="#7A4A44">
-            {{ (15 - (i-1) * 3) }}M
+            {{ etiquetaEjeY(i) }}
           </text>
         </g>
 
@@ -43,28 +65,31 @@
           </text>
         </g>
 
-        <polygon :points="colombiaArea" fill="#F5A800" opacity="0.08" />
-        <polygon :points="usaArea" fill="#2563EB" opacity="0.08" />
+        <polygon v-if="paisActivo === 'colombia' || paisActivo === 'ambos'" :points="colombiaArea" fill="#F5A800" opacity="0.08" class="grafica-area" />
+        <polygon v-if="paisActivo === 'usa' || paisActivo === 'ambos'" :points="usaArea" fill="#2563EB" opacity="0.08" class="grafica-area" />
 
-        <polyline :points="colombiaPoly" fill="none" stroke="#F5A800" stroke-width="2.5" stroke-linecap="round" class="grafica-linea" />
-        <polyline :points="usaPoly" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" class="grafica-linea" />
+        <polyline v-if="paisActivo === 'colombia' || paisActivo === 'ambos'" :points="colombiaPoly" fill="none" stroke="#F5A800" stroke-width="2.5" stroke-linecap="round" class="grafica-linea" />
+        <polyline v-if="paisActivo === 'usa' || paisActivo === 'ambos'" :points="usaPoly" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" class="grafica-linea" />
 
-        <circle v-for="(p, i) in colombiaPoints" :key="'c-'+i"
+        <circle v-if="paisActivo === 'colombia' || paisActivo === 'ambos'" v-for="(p, i) in colombiaPoints" :key="'c-'+i"
           :cx="p.x" :cy="p.y" r="4" fill="#F5A800" class="grafica-punto"
           @mouseenter="mostrarTooltip($event, 'colombia', i)" />
 
-        <circle v-for="(p, i) in usaPoints" :key="'u-'+i"
+        <circle v-if="paisActivo === 'usa' || paisActivo === 'ambos'" v-for="(p, i) in usaPoints" :key="'u-'+i"
           :cx="p.x" :cy="p.y" r="4" fill="#2563EB" class="grafica-punto"
           @mouseenter="mostrarTooltip($event, 'usa', i)" />
 
         <g :transform="`translate(${width - 220}, ${padding - 20})`">
-          <line x1="0" y1="0" x2="20" y2="0" stroke="#F5A800" stroke-width="2.5" />
-          <circle cx="10" cy="0" r="3" fill="#F5A800" />
-          <text x="28" y="4" font-size="11" fill="#3B1F1C">🇨🇴 Colombia</text>
-
-          <line x1="160" y1="0" x2="180" y2="0" stroke="#2563EB" stroke-width="2.5" />
-          <circle cx="170" cy="0" r="3" fill="#2563EB" />
-          <text x="188" y="4" font-size="11" fill="#3B1F1C">🇺🇸 EE.UU.</text>
+          <template v-if="paisActivo === 'colombia' || paisActivo === 'ambos'">
+            <line x1="0" y1="0" x2="20" y2="0" stroke="#F5A800" stroke-width="2.5" />
+            <circle cx="10" cy="0" r="3" fill="#F5A800" />
+            <text x="28" y="4" font-size="11" fill="#3B1F1C">🇨🇴 Colombia</text>
+          </template>
+          <template v-if="paisActivo === 'usa' || paisActivo === 'ambos'">
+            <line :x1="paisActivo === 'ambos' ? 160 : 0" y1="0" :x2="paisActivo === 'ambos' ? 180 : 20" y2="0" stroke="#2563EB" stroke-width="2.5" />
+            <circle :cx="paisActivo === 'ambos' ? 170 : 10" cy="0" r="3" fill="#2563EB" />
+            <text :x="paisActivo === 'ambos' ? 188 : 28" y="4" font-size="11" fill="#3B1F1C">🇺🇸 EE.UU.</text>
+          </template>
         </g>
       </svg>
 
@@ -84,7 +109,8 @@ import { ref, computed } from 'vue'
 const width = 700
 const height = 450
 const padding = 55
-const maxValor = 15000000
+
+const paisActivo = ref('colombia')
 
 const datosColombia = [
   { periodo: "2015", valor: 4400000 },
@@ -149,6 +175,12 @@ const datosUsa = [
 const rangoAnos = ref('todos')
 const tooltip = ref({ visible: false, x: 0, y: 0, titulo: '', valor: 0, periodo: '' })
 
+const maxValor = computed(() => {
+  if (paisActivo.value === 'colombia') return 12000000
+  if (paisActivo.value === 'usa') return 85000000
+  return 85000000
+})
+
 const allPeriodos = computed(() => {
   const periodos = [...new Set([...datosColombia.map(d => d.periodo), ...datosUsa.map(d => d.periodo)])]
   return periodos.sort((a, b) => {
@@ -171,7 +203,7 @@ const filteredPeriodos = computed(() => {
 const labelsVisibles = computed(() => filteredPeriodos.value.filter((_, i) => i % 2 === 0 || i === filteredPeriodos.value.length - 1))
 
 const getX = (idx) => padding + idx * ((width - padding * 2) / Math.max(filteredPeriodos.value.length - 1, 1))
-const getY = (valor) => padding + (height - padding * 2) - ((valor / maxValor) * (height - padding * 2))
+const getY = (valor) => padding + (height - padding * 2) - ((valor / maxValor.value) * (height - padding * 2))
 
 const colombiaPoints = computed(() => datosColombia.filter(d => filteredPeriodos.value.includes(d.periodo)).map(d => ({ x: getX(filteredPeriodos.value.indexOf(d.periodo)), y: getY(d.valor), ...d })))
 const usaPoints = computed(() => datosUsa.filter(d => filteredPeriodos.value.includes(d.periodo)).map(d => ({ x: getX(filteredPeriodos.value.indexOf(d.periodo)), y: getY(d.valor), ...d })))
@@ -191,6 +223,12 @@ const usaArea = computed(() => {
   return `${usaPoly.value} ${pts[pts.length-1].x},${height-padding} ${pts[0].x},${height-padding}`
 })
 
+const etiquetaEjeY = (i) => {
+  if (paisActivo.value === 'colombia') return `${(12 - (i-1) * 2.4).toFixed(1)}M`
+  if (paisActivo.value === 'usa') return `${(85 - (i-1) * 17)}M`
+  return `${(85 - (i-1) * 17)}M`
+}
+
 const mostrarTooltip = (event, tipo, idx) => {
   const datos = tipo === 'colombia' ? colombiaPoints.value : usaPoints.value
   const d = datos[idx]
@@ -207,8 +245,36 @@ const ocultarTooltip = () => { tooltip.value.visible = false }
 .grafica-card { background: #fff; border-radius: 14px; padding: 28px; box-shadow: 0 10px 28px rgba(59,31,28,0.08); margin: 32px 0; }
 .grafica-card__titulo { font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 600; color: #3B1F1C; margin: 0 0 8px; }
 .grafica-card__subtitulo { font-size: 14px; color: #7A4A44; margin: 0 0 16px; }
-.grafica-card__colombia { color: #F5A800; }
-.grafica-card__usa { color: #2563EB; }
+
+.grafica-botones {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.grafica-boton {
+  padding: 10px 20px;
+  border: 2px solid #EEC9C4;
+  border-radius: 8px;
+  background: white;
+  font-size: 14px;
+  font-weight: 500;
+  color: #7A4A44;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.grafica-boton:hover {
+  border-color: #3B1F1C;
+  color: #3B1F1C;
+}
+
+.grafica-boton--activo {
+  border-color: #3B1F1C;
+  background: #3B1F1C;
+  color: white;
+}
+
 .grafica-filtros { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
 .grafica-filtro__label { font-size: 13px; color: #7A4A44; }
 .grafica-filtro__select { padding: 6px 12px; border: 1px solid #EEC9C4; border-radius: 6px; font-size: 13px; background: white; color: #3B1F1C; cursor: pointer; }
@@ -222,4 +288,7 @@ const ocultarTooltip = () => { tooltip.value.visible = false }
 .grafica-tooltip__titulo { font-weight: 600; margin-bottom: 4px; }
 .grafica-tooltip__valor { font-size: 14px; font-weight: 700; }
 .grafica-tooltip__periodo { opacity: 0.7; margin-top: 2px; }
+
+.grafica-area { animation: fadeIn 0.5s ease-out; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 0.08; } }
 </style>
