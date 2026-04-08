@@ -28,63 +28,68 @@
     </div>
 
     <div class="grafica-contenedor">
-      <svg class="grafica-svg" :viewBox="`0 0 ${width} ${height}`" preserveAspectRatio="xMidYMid meet">
+      <svg class="grafica-svg" viewBox="0 0 700 400" preserveAspectRatio="xMidYMid meet">
         <g class="grafica-grid">
           <line v-for="i in 5" :key="'grid-'+i" 
-            :x1="padding" :y1="padding + (height - padding * 2) * (i-1) / 4" 
-            :x2="width - padding" :y2="padding + (height - padding * 2) * (i-1) / 4" 
+            :x1="50" :y1="50 + 300 * (i - 1) / 4" 
+            :x2="650" :y2="50 + 300 * (i - 1) / 4" 
             stroke="#EEC9C4" stroke-dasharray="3,3" />
         </g>
 
         <g class="grafica-y-axis">
           <text v-for="i in 5" :key="'y-'+i" 
-            :x="padding - 8" :y="padding + (height - padding * 2) * (i-1) / 4" 
+            :x="42" :y="50 + 300 * (i - 1) / 4" 
             text-anchor="end" dominant-baseline="middle" font-size="11" fill="#7A4A44">
-            {{ Math.round(maxValorY - (maxValorY / 4) * (i-1)) }}M
+            {{ Math.round(maximo * (1 - (i - 1) / 4)) }}
           </text>
         </g>
 
         <g class="grafica-x-axis">
           <text v-for="(label, i) in etiquetasX" :key="'x-'+i"
-            :x="getX(i)" :y="height - padding + 20"
+            :x="getXLabel(i)"
+            y="380"
             text-anchor="end" dominant-baseline="middle" font-size="9" fill="#7A4A44"
-            :transform="`rotate(-30, ${getX(i)}, ${height - padding + 20})`">
+            :transform="`rotate(-35, ${getXLabel(i)}, 380)`">
             {{ label }}
           </text>
         </g>
 
-        <template v-if="paisActivo === 'colombia' || paisActivo === 'ambos'">
-          <polyline :points="puntosColombia" fill="none" stroke="#F5A800" stroke-width="2.5" stroke-linecap="round" />
-          <circle v-for="(p, i) in datosColombiaFiltrados" :key="'c-'+i"
-            :cx="getX(i)" :cy="getY(p.valor)" r="4" fill="#F5A800" class="grafica-punto"
-            @mouseenter="mostrarTooltip($event, p)" />
+        <template v-if="paisActivo !== 'usa'">
+          <polyline :points="lineaColombia" fill="none" stroke="#F5A800" stroke-width="2.5" stroke-linecap="round" />
+          <circle v-for="(p, i) in datosColombia" :key="'c-'+i"
+            :cx="getCxColombia(i)"
+            :cy="getCy(p.valor)"
+            r="4" fill="#F5A800" class="grafica-punto"
+            @mouseenter="mostrarTooltip($event, 'Colombia', p)" />
         </template>
 
-        <template v-if="paisActivo === 'usa' || paisActivo === 'ambos'">
-          <polyline :points="puntosUsa" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" />
-          <circle v-for="(p, i) in datosUsaFiltrados" :key="'u-'+i"
-            :cx="getX(i + (paisActivo === 'ambos' ? datosColombiaFiltrados.length : 0))" :cy="getY(p.valor)" r="4" fill="#2563EB" class="grafica-punto"
-            @mouseenter="mostrarTooltipUSA($event, p, i)" />
+        <template v-if="paisActivo !== 'colombia'">
+          <polyline :points="lineaUsa" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" />
+          <circle v-for="(p, i) in datosUsa" :key="'u-'+i"
+            :cx="getCxUsa(i)"
+            :cy="getCy(p.valor)"
+            r="4" fill="#2563EB" class="grafica-punto"
+            @mouseenter="mostrarTooltip($event, 'USA', p)" />
         </template>
 
-        <g :transform="`translate(${width - 180}, ${padding - 20})`">
+        <g transform="translate(480, 30)">
           <template v-if="paisActivo !== 'usa'">
             <line x1="0" y1="0" x2="20" y2="0" stroke="#F5A800" stroke-width="2.5" />
             <circle cx="10" cy="0" r="3" fill="#F5A800" />
-            <text x="28" y="4" font-size="11" fill="#3B1F1C">🇨🇴 Colombia</text>
+            <text x="28" y="4" font-size="11" fill="#3B1F1C">Colombia</text>
           </template>
           <template v-if="paisActivo !== 'colombia'">
-            <line :x1="paisActivo === 'ambos' ? 110 : 0" y1="0" :x2="paisActivo === 'ambos' ? 130 : 20" y2="0" stroke="#2563EB" stroke-width="2.5" />
-            <circle :cx="paisActivo === 'ambos' ? 120 : 10" cy="0" r="3" fill="#2563EB" />
-            <text :x="paisActivo === 'ambos' ? 138 : 28" y="4" font-size="11" fill="#3B1F1C">🇺🇸 EE.UU.</text>
+            <line :x1="paisActivo === 'ambos' ? 100 : 0" y1="0" :x2="paisActivo === 'ambos' ? 120 : 20" y2="0" stroke="#2563EB" stroke-width="2.5" />
+            <circle :cx="paisActivo === 'ambos' ? 110 : 10" cy="0" r="3" fill="#2563EB" />
+            <text :x="paisActivo === 'ambos' ? 128 : 28" y="4" font-size="11" fill="#3B1F1C">USA</text>
           </template>
         </g>
       </svg>
 
       <div v-if="tooltip.visible" class="grafica-tooltip"
         :style="{ left: tooltip.x + 'px', top: tooltip.y + 'px' }">
-        <div class="grafica-tooltip__titulo">{{ tooltip.titulo }}</div>
-        <div class="grafica-tooltip__valor">{{ tooltip.valor.toLocaleString() }} cabezas</div>
+        <div class="grafica-tooltip__titulo">{{ tooltip.pais === 'Colombia' ? '🇨🇴 Colombia' : '🇺🇸 USA' }}</div>
+        <div class="grafica-tooltip__valor">{{ tooltip.valor.toLocaleString() }}</div>
         <div class="grafica-tooltip__periodo">{{ tooltip.periodo }}</div>
       </div>
     </div>
@@ -94,121 +99,77 @@
 <script setup>
 import { ref, computed } from 'vue'
 
-const width = 700
-const height = 450
-const padding = 55
-
 const paisActivo = ref('colombia')
 
 const datosColombia = [
-  { periodo: "2015", valor: 4400000 },
-  { periodo: "2016", valor: 4700000 },
-  { periodo: "2017", valor: 5100000 },
-  { periodo: "2018", valor: 5500000 },
-  { periodo: "2019", valor: 5900000 },
-  { periodo: "2020", valor: 6200000 },
-  { periodo: "2021", valor: 6500000 },
-  { periodo: "2022", valor: 9658204 },
-  { periodo: "2023", valor: 9658204 },
-  { periodo: "2024", valor: 10668276 },
+  { periodo: "2015", valor: 4.4 },
+  { periodo: "2016", valor: 4.7 },
+  { periodo: "2017", valor: 5.1 },
+  { periodo: "2018", valor: 5.5 },
+  { periodo: "2019", valor: 5.9 },
+  { periodo: "2020", valor: 6.2 },
+  { periodo: "2021", valor: 6.5 },
+  { periodo: "2022", valor: 9.66 },
+  { periodo: "2023", valor: 9.66 },
+  { periodo: "2024", valor: 10.67 },
 ]
 
 const datosUsa = [
-  { periodo: "Mar 2023", valor: 72800000 },
-  { periodo: "Jun 2023", valor: 73200000 },
-  { periodo: "Sep 2023", valor: 73800000 },
-  { periodo: "Dic 2023", valor: 74100000 },
-  { periodo: "Mar 2024", valor: 73900000 },
-  { periodo: "Jun 2024", valor: 74200000 },
-  { periodo: "Sep 2024", valor: 74800000 },
-  { periodo: "Dic 2024", valor: 74700000 },
-  { periodo: "Mar 2025", valor: 74500000 },
-  { periodo: "Jun 2025", valor: 75100000 },
-  { periodo: "Sep 2025", valor: 74500000 },
-  { periodo: "Dic 2025", valor: 75500000 },
+  { periodo: "Mar", valor: 72.8 },
+  { periodo: "Jun", valor: 73.2 },
+  { periodo: "Sep", valor: 73.8 },
+  { periodo: "Dic", valor: 74.1 },
+  { periodo: "Mar", valor: 73.9 },
+  { periodo: "Jun", valor: 74.2 },
+  { periodo: "Sep", valor: 74.8 },
+  { periodo: "Dic", valor: 74.7 },
+  { periodo: "Mar", valor: 74.5 },
+  { periodo: "Jun", valor: 75.1 },
+  { periodo: "Sep", valor: 74.5 },
+  { periodo: "Dic", valor: 75.5 },
 ]
 
-const tooltip = ref({ visible: false, x: 0, y: 0, titulo: '', valor: 0, periodo: '' })
+const tooltip = ref({ visible: false, x: 0, y: 0, pais: '', valor: 0, periodo: '' })
 
-const datosColombiaFiltrados = computed(() => {
-  if (paisActivo.value === 'usa') return []
-  return datosColombia
+const maximo = computed(() => {
+  if (paisActivo.value === 'colombia') return 12
+  return 80
 })
 
-const datosUsaFiltrados = computed(() => {
-  if (paisActivo.value === 'colombia') return []
-  return datosUsa
+const getCxColombia = (i) => 50 + i * (600 / (datosColombia.length - 1 || 1))
+const getCy = (valor) => 350 - (valor / maximo.value * 300)
+const getCxUsa = (i) => 50 + i * (600 / (datosUsa.length - 1 || 1))
+const getXLabel = (i) => 50 + i * (600 / (Math.max(etiquetasX.value.length - 1, 1)))
+
+const lineaColombia = computed(() => {
+  if (paisActivo.value === 'usa') return ''
+  return datosColombia.map((p, i) => 
+    `${getCxColombia(i)},${getCy(p.valor)}`
+  ).join(' ')
 })
 
-const maxValorY = computed(() => {
-  if (paisActivo.value === 'colombia') return 12000000
-  if (paisActivo.value === 'usa') return 80000000
-  return 80000000
-})
-
-const totalPuntos = computed(() => {
-  if (paisActivo.value === 'colombia') return datosColombiaFiltrados.value.length
-  if (paisActivo.value === 'usa') return datosUsaFiltrados.value.length
-  return datosColombiaFiltrados.value.length + datosUsaFiltrados.value.length
+const lineaUsa = computed(() => {
+  if (paisActivo.value === 'colombia') return ''
+  return datosUsa.map((p, i) => 
+    `${getCxUsa(i)},${getCy(p.valor)}`
+  ).join(' ')
 })
 
 const etiquetasX = computed(() => {
-  const etiquetas = []
-  if (paisActivo.value !== 'usa') {
-    datosColombiaFiltrados.value.forEach(d => etiquetas.push(d.periodo))
-  }
-  if (paisActivo.value !== 'colombia') {
-    datosUsaFiltrados.value.forEach(d => etiquetas.push(d.periodo))
-  }
-  return etiquetas.filter((_, i) => i % 2 === 0 || i === etiquetas.length - 1)
+  if (paisActivo.value === 'colombia') return datosColombia.map(d => d.periodo)
+  if (paisActivo.value === 'usa') return datosUsa.map(d => d.periodo)
+  return datosUsa.map(d => d.periodo)
 })
 
-const getX = (idx) => {
-  const total = totalPuntos.value
-  if (total <= 1) return width / 2
-  return padding + idx * ((width - padding * 2) / (total - 1))
-}
-
-const getY = (valor) => {
-  const rango = maxValorY.value
-  const alturaUtil = height - padding * 2
-  const normalizado = valor / rango
-  return padding + alturaUtil - (normalizado * alturaUtil)
-}
-
-const puntosColombia = computed(() => {
-  if (paisActivo.value === 'usa') return ''
-  return datosColombiaFiltrados.value.map((d, i) => `${getX(i)},${getY(d.valor)}`).join(' ')
-})
-
-const puntosUsa = computed(() => {
-  if (paisActivo.value === 'colombia') return ''
-  const offset = datosColombiaFiltrados.value.length
-  return datosUsaFiltrados.value.map((d, i) => `${getX(i + offset)},${getY(d.valor)}`).join(' ')
-})
-
-const mostrarTooltip = (event, dato) => {
+const mostrarTooltip = (event, pais, dato) => {
   const rect = event.target.getBoundingClientRect()
   const container = event.target.closest('.grafica-contenedor').getBoundingClientRect()
   tooltip.value = { 
     visible: true, 
     x: rect.left - container.left + 10, 
     y: rect.top - container.top - 60, 
-    titulo: '🇨🇴 Colombia', 
-    valor: dato.valor, 
-    periodo: dato.periodo 
-  }
-}
-
-const mostrarTooltipUSA = (event, dato, idx) => {
-  const rect = event.target.getBoundingClientRect()
-  const container = event.target.closest('.grafica-contenedor').getBoundingClientRect()
-  tooltip.value = { 
-    visible: true, 
-    x: rect.left - container.left + 10, 
-    y: rect.top - container.top - 60, 
-    titulo: '🇺🇸 EE.UU.', 
-    valor: dato.valor, 
+    pais, 
+    valor: dato.valor * 1000000, 
     periodo: dato.periodo 
   }
 }
@@ -219,11 +180,7 @@ const mostrarTooltipUSA = (event, dato, idx) => {
 .grafica-card__titulo { font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 600; color: #3B1F1C; margin: 0 0 8px; }
 .grafica-card__subtitulo { font-size: 14px; color: #7A4A44; margin: 0 0 16px; }
 
-.grafica-botones {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
-}
+.grafica-botones { display: flex; gap: 12px; margin-bottom: 16px; }
 
 .grafica-boton {
   padding: 10px 20px;
@@ -238,20 +195,9 @@ const mostrarTooltipUSA = (event, dato, idx) => {
   font-family: 'DM Sans', sans-serif;
 }
 
-.grafica-boton:hover {
-  border-color: #3B1F1C;
-  background: #F7E0DC;
-}
-
-.grafica-boton--activo {
-  border-color: #3B1F1C;
-  background: #3B1F1C;
-  color: white;
-}
-
-.grafica-boton--activo:hover {
-  background: #3B1F1C;
-}
+.grafica-boton:hover { border-color: #3B1F1C; background: #F7E0DC; }
+.grafica-boton--activo { border-color: #3B1F1C; background: #3B1F1C; color: white; }
+.grafica-boton--activo:hover { background: #3B1F1C; }
 
 .grafica-contenedor { position: relative; }
 .grafica-svg { width: 100%; height: auto; }
