@@ -1,6 +1,6 @@
 ---
-import GraficaPrincipal from '../components/GraficaPrincipal.astro';
-
+import GraficaInteractiva from '../components/GraficaInteractiva.vue';
+import TarjetasKpiAnimadas from '../components/TarjetasKpiAnimadas.vue';
 
 import '../styles/encabezado.css';
 import '../styles/alerta.css';
@@ -79,35 +79,9 @@ const usaRecientes = SERIE_USA.filter(d => d.periodo >= "Mar 2025");
         <p class="banner-alerta__texto">En EE.UU., el USDA NASS publica datos de inventario porcino cada trimestre desde fuentes gubernamentales directas — el último salió el 23 de diciembre de 2025. En Colombia, los datos oficiales no son fáciles de acceder: están fragmentados, desactualizados o sin API funcional. El último dato disponible proviene de Porcinews, un medio especializado.</p>
       </div>
 
-      <div class="tarjetas-kpi">
+      <TarjetasKpiAnimadas client:visible />
 
-        <div class="tarjeta-kpi tarjeta-kpi--colombia">
-          <div class="tarjeta-kpi__etiqueta">Último dato Colombia</div>
-          <div class="tarjeta-kpi__valor">2024</div>
-          <div class="tarjeta-kpi__descripcion">10,668,276 cabezas</div>
-        </div>
-
-        <div class="tarjeta-kpi tarjeta-kpi--usa">
-          <div class="tarjeta-kpi__etiqueta">Último dato EE.UU.</div>
-          <div class="tarjeta-kpi__valor">Dic 2025</div>
-          <div class="tarjeta-kpi__descripcion">75,500,000 cabezas</div>
-        </div>
-
-        <div class="tarjeta-kpi tarjeta-kpi--alerta">
-          <div class="tarjeta-kpi__etiqueta">Frecuencia de reporte</div>
-          <div class="tarjeta-kpi__valor">Anual vs Trimestral</div>
-          <div class="tarjeta-kpi__descripcion">COL: 1 dato/año · USA: 4 datos/año</div>
-        </div>
-
-        <div class="tarjeta-kpi tarjeta-kpi--cerdo">
-          <div class="tarjeta-kpi__etiqueta">Escala comparativa</div>
-          <div class="tarjeta-kpi__valor">7.1x</div>
-          <div class="tarjeta-kpi__descripcion">EE.UU. tiene 7.1 veces más cerdos</div>
-        </div>
-
-      </div>
-
-      <GraficaPrincipal />
+      <GraficaInteractiva client:visible />
 
       <div class="comparativa-frecuencia">
         <div class="frecuencia-card frecuencia-card--colombia">

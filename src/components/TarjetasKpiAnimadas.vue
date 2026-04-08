@@ -66,21 +66,21 @@ onMounted(() => {
 
 .tarjeta-kpi {
   background: #fff;
-  border-radius: var(--radio);
+  border-radius: 14px;
   padding: 20px;
-  box-shadow: var(--sombra);
+  box-shadow: 0 10px 28px rgba(59,31,28,0.08);
   text-align: center;
 }
 
-.tarjeta-kpi--colombia { border-top: 4px solid var(--colombia); }
-.tarjeta-kpi--usa { border-top: 4px solid var(--usa); }
-.tarjeta-kpi--alerta { border-top: 4px solid var(--alerta); }
-.tarjeta-kpi--cerdo { border-top: 4px solid var(--cerdo); }
+.tarjeta-kpi--colombia { border-top: 4px solid #F5A800; }
+.tarjeta-kpi--usa { border-top: 4px solid #2563EB; }
+.tarjeta-kpi--alerta { border-top: 4px solid #C0392B; }
+.tarjeta-kpi--cerdo { border-top: 4px solid #D4736B; }
 
 .tarjeta-kpi__etiqueta {
   font-size: 12px;
   font-weight: 500;
-  color: var(--tinta-claro);
+  color: #7A4A44;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 8px;
@@ -90,13 +90,13 @@ onMounted(() => {
   font-family: 'Playfair Display', serif;
   font-size: 28px;
   font-weight: 700;
-  color: var(--tinta);
+  color: #3B1F1C;
   margin-bottom: 6px;
 }
 
 .tarjeta-kpi__descripcion {
   font-size: 13px;
-  color: var(--tinta-claro);
+  color: #7A4A44;
   line-height: 1.4;
 }
 
