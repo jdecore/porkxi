@@ -28,17 +28,17 @@
     </div>
 
     <div class="grafica-contenedor">
-      <svg class="grafica-svg" viewBox="0 0 700 380" preserveAspectRatio="xMidYMid meet">
+      <svg class="grafica-svg" viewBox="0 0 700 360" preserveAspectRatio="xMidYMid meet">
         <g class="grafica-grid">
           <line v-for="i in 5" :key="'grid-'+i" 
-            x1="60" :y1="60 + 240 * (i - 1) / 4" 
-            x2="640" :y2="60 + 240 * (i - 1) / 4" 
+            x1="60" :y1="60 + 220 * (i - 1) / 4" 
+            x2="640" :y2="60 + 220 * (i - 1) / 4" 
             stroke="#EEC9C4" stroke-dasharray="3,3" />
         </g>
 
         <g class="grafica-y-axis">
           <text v-for="i in 5" :key="'y-'+i" 
-            x="52" :y="60 + 240 * (i - 1) / 4" 
+            x="52" :y="60 + 220 * (i - 1) / 4" 
             text-anchor="end" dominant-baseline="middle" font-size="11" fill="#7A4A44">
             {{ obtenerEtiquetaY(i) }}
           </text>
@@ -47,9 +47,9 @@
         <g class="grafica-x-axis">
           <text v-for="(label, i) in etiquetasX" :key="'x-'+i"
             :x="obtenerX(i)"
-            y="350"
+            y="340"
             text-anchor="end" dominant-baseline="middle" font-size="9" fill="#7A4A44"
-            :transform="`rotate(-35, ${obtenerX(i)}, 350)`">
+            :transform="`rotate(-35, ${obtenerX(i)}, 340)`">
             {{ label }}
           </text>
         </g>
@@ -151,7 +151,7 @@ const obtenerX = (i) => {
 }
 
 const obtenerY = (valor) => {
-  return 300 - (valor / maximo.value * 240)
+  return 280 - (valor / maximo.value * 220)
 }
 
 const lineaColombia = computed(() => {
