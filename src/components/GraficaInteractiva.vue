@@ -28,17 +28,17 @@
     </div>
 
     <div class="grafica-contenedor">
-      <svg width="700" height="350" viewBox="0 0 700 350">
+      <svg width="700" height="330" viewBox="0 0 700 330">
         <g class="grafica-grid">
           <line v-for="i in 5" :key="'grid-'+i" 
-            x1="50" :y1="50 + 200 * (i - 1) / 4" 
-            x2="650" :y2="50 + 200 * (i - 1) / 4" 
+            x1="50" :y1="40 + 180 * (i - 1) / 4" 
+            x2="650" :y2="40 + 180 * (i - 1) / 4" 
             stroke="#EEC9C4" stroke-dasharray="3,3" />
         </g>
 
         <g class="grafica-y-axis">
           <text v-for="(valor, i) in etiquetasY" :key="'y-'+i" 
-            x="40" :y="50 + 200 * i / 4" 
+            x="40" :y="40 + 180 * i / 4" 
             text-anchor="end" dominant-baseline="middle" font-size="11" fill="#7A4A44">
             {{ valor }}
           </text>
@@ -47,7 +47,7 @@
         <g class="grafica-x-axis">
           <text v-for="(label, i) in etiquetasX" :key="'x-'+i"
             x="50 + i * (600 / (etiquetasX.length - 1 || 1))"
-            y="320"
+            y="300"
             text-anchor="end" dominant-baseline="middle" font-size="9" fill="#7A4A44">
             {{ label }}
           </text>
@@ -57,7 +57,7 @@
           <polyline :points="lineaColombia" fill="none" stroke="#F5A800" stroke-width="2.5" stroke-linecap="round" />
           <circle v-for="(p, i) in datosColombia" :key="'c-'+i"
             :cx="50 + i * (600 / (datosColombia.length - 1 || 1))"
-            :cy="250 - (p.valor / maximo * 200)"
+            :cy="220 - (p.valor / maximo * 180)"
             r="4" fill="#F5A800" class="grafica-punto"
             @mouseenter="mostrarTooltip($event, 'Colombia', p)" />
         </template>
@@ -66,7 +66,7 @@
           <polyline :points="lineaUsa" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" />
           <circle v-for="(p, i) in datosUsa" :key="'u-'+i"
             :cx="50 + i * (600 / (datosUsa.length - 1 || 1))"
-            :cy="250 - (p.valor / maximo * 200)"
+            :cy="220 - (p.valor / maximo * 180)"
             r="4" fill="#2563EB" class="grafica-punto"
             @mouseenter="mostrarTooltipUSA($event, p, i)" />
         </template>
@@ -143,14 +143,14 @@ const etiquetasY = computed(() => {
 const lineaColombia = computed(() => {
   if (paisActivo.value === 'usa') return ''
   return datosColombia.map((p, i) => 
-    `${50 + i * (600 / (datosColombia.length - 1 || 1))},${250 - (p.valor / maximo.value * 200)}`
+    `${50 + i * (600 / (datosColombia.length - 1 || 1))},${220 - (p.valor / maximo.value * 180)}`
   ).join(' ')
 })
 
 const lineaUsa = computed(() => {
   if (paisActivo.value === 'colombia') return ''
   return datosUsa.map((p, i) => 
-    `${50 + i * (600 / (datosUsa.length - 1 || 1))},${250 - (p.valor / maximo.value * 200)}`
+    `${50 + i * (600 / (datosUsa.length - 1 || 1))},${220 - (p.valor / maximo.value * 180)}`
   ).join(' ')
 })
 
