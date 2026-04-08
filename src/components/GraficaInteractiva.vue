@@ -1,9 +1,7 @@
 <template>
   <section class="grafica-card">
     <h2 class="grafica-card__titulo">Inventario histórico comparado</h2>
-    <p class="grafica-card__subtitulo">
-      En millones de cabezas.
-    </p>
+    <p class="grafica-card__subtitulo">En millones de cabezas.</p>
 
     <div class="grafica-botones">
       <button 
@@ -65,11 +63,11 @@
           </text>
         </g>
 
-        <polygon v-if="paisActivo === 'colombia' || paisActivo === 'ambos'" :points="colombiaArea" fill="#F5A800" opacity="0.08" class="grafica-area" />
-        <polygon v-if="paisActivo === 'usa' || paisActivo === 'ambos'" :points="usaArea" fill="#2563EB" opacity="0.08" class="grafica-area" />
+        <polygon v-if="paisActivo === 'colombia' || paisActivo === 'ambos'" :points="colombiaArea" fill="#F5A800" opacity="0.1" />
+        <polygon v-if="paisActivo === 'usa' || paisActivo === 'ambos'" :points="usaArea" fill="#2563EB" opacity="0.1" />
 
-        <polyline v-if="paisActivo === 'colombia' || paisActivo === 'ambos'" :points="colombiaPoly" fill="none" stroke="#F5A800" stroke-width="2.5" stroke-linecap="round" class="grafica-linea" />
-        <polyline v-if="paisActivo === 'usa' || paisActivo === 'ambos'" :points="usaPoly" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" class="grafica-linea" />
+        <polyline v-if="paisActivo === 'colombia' || paisActivo === 'ambos'" :points="colombiaPoly" fill="none" stroke="#F5A800" stroke-width="2.5" stroke-linecap="round" />
+        <polyline v-if="paisActivo === 'usa' || paisActivo === 'ambos'" :points="usaPoly" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" />
 
         <circle v-if="paisActivo === 'colombia' || paisActivo === 'ambos'" v-for="(p, i) in colombiaPoints" :key="'c-'+i"
           :cx="p.x" :cy="p.y" r="4" fill="#F5A800" class="grafica-punto"
@@ -126,49 +124,17 @@ const datosColombia = [
 ]
 
 const datosUsa = [
-  { periodo: "Mar 2015", valor: 64936000 },
-  { periodo: "Jun 2015", valor: 64936000 },
-  { periodo: "Sep 2015", valor: 65899000 },
-  { periodo: "Dic 2015", valor: 66933000 },
-  { periodo: "Mar 2016", valor: 67756000 },
-  { periodo: "Jun 2016", valor: 68095000 },
-  { periodo: "Sep 2016", valor: 68928000 },
-  { periodo: "Dic 2016", valor: 70132000 },
-  { periodo: "Mar 2017", valor: 71140000 },
-  { periodo: "Jun 2017", valor: 72350000 },
-  { periodo: "Sep 2017", valor: 75070000 },
-  { periodo: "Dic 2017", valor: 73170000 },
-  { periodo: "Mar 2018", valor: 72800000 },
-  { periodo: "Jun 2018", valor: 73300000 },
-  { periodo: "Sep 2018", valor: 74900000 },
-  { periodo: "Dic 2018", valor: 74900000 },
-  { periodo: "Mar 2019", valor: 75000000 },
-  { periodo: "Jun 2019", valor: 75500000 },
-  { periodo: "Sep 2019", valor: 76700000 },
-  { periodo: "Dic 2019", valor: 77500000 },
-  { periodo: "Mar 2020", valor: 79800000 },
-  { periodo: "Jun 2020", valor: 78700000 },
-  { periodo: "Sep 2020", valor: 77600000 },
-  { periodo: "Dic 2020", valor: 77000000 },
-  { periodo: "Mar 2021", valor: 76400000 },
-  { periodo: "Jun 2021", valor: 75300000 },
-  { periodo: "Sep 2021", valor: 75100000 },
-  { periodo: "Dic 2021", valor: 74200000 },
-  { periodo: "Mar 2022", valor: 72800000 },
-  { periodo: "Jun 2022", valor: 72500000 },
-  { periodo: "Sep 2022", valor: 73400000 },
-  { periodo: "Dic 2022", valor: 73500000 },
-  { periodo: "Mar 2023", valor: 72300000 },
-  { periodo: "Jun 2023", valor: 72500000 },
+  { periodo: "Mar 2023", valor: 72800000 },
+  { periodo: "Jun 2023", valor: 73200000 },
   { periodo: "Sep 2023", valor: 73800000 },
-  { periodo: "Dic 2023", valor: 73500000 },
-  { periodo: "Mar 2024", valor: 72100000 },
-  { periodo: "Jun 2024", valor: 72700000 },
-  { periodo: "Sep 2024", valor: 74100000 },
-  { periodo: "Dic 2024", valor: 75100000 },
-  { periodo: "Mar 2025", valor: 74100000 },
-  { periodo: "Jun 2025", valor: 74300000 },
-  { periodo: "Sep 2025", valor: 75400000 },
+  { periodo: "Dic 2023", valor: 74100000 },
+  { periodo: "Mar 2024", valor: 73900000 },
+  { periodo: "Jun 2024", valor: 74200000 },
+  { periodo: "Sep 2024", valor: 74800000 },
+  { periodo: "Dic 2024", valor: 74700000 },
+  { periodo: "Mar 2025", valor: 74500000 },
+  { periodo: "Jun 2025", valor: 75100000 },
+  { periodo: "Sep 2025", valor: 74500000 },
   { periodo: "Dic 2025", valor: 75500000, ultimoDato: true },
 ]
 
@@ -177,8 +143,8 @@ const tooltip = ref({ visible: false, x: 0, y: 0, titulo: '', valor: 0, periodo:
 
 const maxValor = computed(() => {
   if (paisActivo.value === 'colombia') return 12000000
-  if (paisActivo.value === 'usa') return 85000000
-  return 85000000
+  if (paisActivo.value === 'usa') return 80000000
+  return 80000000
 })
 
 const allPeriodos = computed(() => {
@@ -225,8 +191,8 @@ const usaArea = computed(() => {
 
 const etiquetaEjeY = (i) => {
   if (paisActivo.value === 'colombia') return `${(12 - (i-1) * 2.4).toFixed(1)}M`
-  if (paisActivo.value === 'usa') return `${(85 - (i-1) * 17)}M`
-  return `${(85 - (i-1) * 17)}M`
+  if (paisActivo.value === 'usa') return `${(80 - (i-1) * 16)}M`
+  return `${(80 - (i-1) * 16)}M`
 }
 
 const mostrarTooltip = (event, tipo, idx) => {
@@ -262,11 +228,12 @@ const ocultarTooltip = () => { tooltip.value.visible = false }
   color: #7A4A44;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-family: 'DM Sans', sans-serif;
 }
 
 .grafica-boton:hover {
-  border-color: #3B1F1C;
-  color: #3B1F1C;
+  border-color: #F5A800;
+  color: #F5A800;
 }
 
 .grafica-boton--activo {
@@ -280,15 +247,10 @@ const ocultarTooltip = () => { tooltip.value.visible = false }
 .grafica-filtro__select { padding: 6px 12px; border: 1px solid #EEC9C4; border-radius: 6px; font-size: 13px; background: white; color: #3B1F1C; cursor: pointer; }
 .grafica-contenedor { position: relative; }
 .grafica-svg { width: 100%; height: auto; }
-.grafica-linea { animation: drawLine 1.5s ease-out forwards; }
-@keyframes drawLine { from { stroke-dasharray: 2000; stroke-dashoffset: 2000; } to { stroke-dasharray: 2000; stroke-dashoffset: 0; } }
 .grafica-punto { cursor: pointer; transition: r 0.2s ease; }
 .grafica-punto:hover { r: 6; }
 .grafica-tooltip { position: absolute; background: #3B1F1C; color: white; padding: 10px 14px; border-radius: 8px; font-size: 12px; pointer-events: none; z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
 .grafica-tooltip__titulo { font-weight: 600; margin-bottom: 4px; }
 .grafica-tooltip__valor { font-size: 14px; font-weight: 700; }
 .grafica-tooltip__periodo { opacity: 0.7; margin-top: 2px; }
-
-.grafica-area { animation: fadeIn 0.5s ease-out; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 0.08; } }
 </style>
