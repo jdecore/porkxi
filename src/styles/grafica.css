@@ -38,7 +38,7 @@
 
 .grafica-contenedor {
   width: 100%;
-  height: 420px;
+  height: 588px;
 }
 
 .grafica-contenedor svg {
@@ -58,8 +58,8 @@
   }
 
   .grafica-contenedor {
-    height: 380px;
-    min-width: 700px;
+    height: 480px;
+    min-width: 800px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
@@ -80,6 +80,6 @@
   }
 
   .grafica-contenedor {
-    height: 350px;
+    height: 420px;
   }
 }

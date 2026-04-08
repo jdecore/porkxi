@@ -55,10 +55,10 @@
           <line
             v-for="i in 5"
             :key="'grid-' + i"
-            x1="70"
-            :y1="40 + 300 * (i - 1) / 4"
-            x2="790"
-            :y2="40 + 300 * (i - 1) / 4"
+            x1="98"
+            :y1="56 + 420 * (i - 1) / 4"
+            x2="1106"
+            :y2="56 + 420 * (i - 1) / 4"
             stroke="#EEC9C4"
             stroke-dasharray="3,3"
           />
@@ -69,11 +69,11 @@
           <text
             v-for="(valor, i) in etiquetasY"
             :key="'y-' + i"
-            x="58"
-            :y="40 + 300 * i / 4"
+            x="81"
+            :y="56 + 420 * i / 4"
             text-anchor="end"
             dominant-baseline="middle"
-            font-size="12"
+            font-size="13"
             fill="#7A4A44"
           >
             {{ valor }}
@@ -83,16 +83,16 @@
         <!-- Eje X -->
         <g class="grafica-x-axis">
           <!-- Línea base del eje X -->
-          <line x1="70" y1="340" x2="790" y2="340" stroke="#EEC9C4" stroke-width="1" />
+          <line x1="98" y1="476" x2="1106" y2="476" stroke="#EEC9C4" stroke-width="1" />
           <text
             v-for="(label, i) in etiquetasX"
             :key="'x-' + i"
-            :x="70 + i * pasoX"
-            y="365"
+            :x="98 + i * pasoX"
+            y="511"
             text-anchor="middle"
-            font-size="11"
+            font-size="12"
             fill="#7A4A44"
-            :transform="debeRotar ? `rotate(-40, ${70 + i * pasoX}, 365)` : ''"
+            :transform="debeRotar ? `rotate(-40, ${98 + i * pasoX}, 511)` : ''"
           >
             {{ label }}
           </text>
@@ -104,16 +104,16 @@
             :points="lineaColombia"
             fill="none"
             stroke="#F5A800"
-            stroke-width="3"
+            stroke-width="3.5"
             stroke-linecap="round"
             stroke-linejoin="round"
           />
           <circle
             v-for="(p, i) in datosColombia"
             :key="'c-' + i"
-            :cx="70 + i * pasoXCol"
+            :cx="98 + i * pasoXCol"
             :cy="escalaY(p.valor)"
-            r="5"
+            r="6"
             fill="#F5A800"
             class="grafica-punto"
             tabindex="0"
@@ -131,16 +131,16 @@
             :points="lineaUsa"
             fill="none"
             stroke="#2563EB"
-            stroke-width="3"
+            stroke-width="3.5"
             stroke-linecap="round"
             stroke-linejoin="round"
           />
           <circle
             v-for="(p, i) in datosUsa"
             :key="'u-' + i"
-            :cx="70 + i * pasoXUsa"
+            :cx="98 + i * pasoXUsa"
             :cy="escalaY(p.valor)"
-            r="5"
+            r="6"
             fill="#2563EB"
             class="grafica-punto"
             tabindex="0"
@@ -153,7 +153,7 @@
         </template>
 
         <!-- Leyenda -->
-        <g transform="translate(600, 20)">
+        <g transform="translate(840, 28)">
           <template v-if="paisActivo !== 'usa'">
             <line x1="0" y1="0" x2="24" y2="0" stroke="#F5A800" stroke-width="3" />
             <circle cx="12" cy="0" r="4" fill="#F5A800" />
@@ -214,10 +214,10 @@ const paisActivo = ref('colombia')
 const contenedorRef = ref(null)
 const esMovil = ref(false)
 
-// Dimensiones del área de dibujo
-const areaAncho = 720 // 790 - 70
-const areaAlto = 300
-const svgAlto = 420 // 350 * 1.2 = 420
+// Dimensiones del área de dibujo (+40%)
+const areaAncho = 1008 // 1106 - 98
+const areaAlto = 420
+const svgAlto = 588
 
 // Transformar datos: Colombia está en unidades, convertir a millones para la gráfica
 const datosColombia = computed(() => {
@@ -276,14 +276,14 @@ const pasoX = computed(() => {
   return pasoXUsa.value
 })
 
-const escalaY = (valor) => 340 - (valor / maximo.value) * areaAlto
+const escalaY = (valor) => 476 - (valor / maximo.value) * areaAlto
 
 const lineaColombia = computed(() => {
   if (paisActivo.value === 'usa' || !datosColombia.value.length) return ''
   return datosColombia.value
     .map(
       (p, i) =>
-        `${70 + i * pasoXCol.value},${escalaY(p.valor)}`
+        `${98 + i * pasoXCol.value},${escalaY(p.valor)}`
     )
     .join(' ')
 })
@@ -293,7 +293,7 @@ const lineaUsa = computed(() => {
   return datosUsa.value
     .map(
       (p, i) =>
-        `${70 + i * pasoXUsa.value},${escalaY(p.valor)}`
+        `${98 + i * pasoXUsa.value},${escalaY(p.valor)}`
     )
     .join(' ')
 })
@@ -324,10 +324,10 @@ const svgViewBox = computed(() => `0 0 840 ${svgAlto}`)
 const mostrarTooltip = (event, pais, dato) => {
   const rect = event.target.getBoundingClientRect()
   const container = event.target.closest('.grafica-contenedor').getBoundingClientRect()
-  const x = rect.left - container.left + 10
-  const y = rect.top - container.top - 60
+  const x = rect.left - container.left + 12
+  const y = rect.top - container.top - 70
 
-  const tooltipWidth = 170
+  const tooltipWidth = 180
   const izquierda = x + tooltipWidth > container.width
 
   tooltip.value = {
@@ -344,10 +344,10 @@ const mostrarTooltip = (event, pais, dato) => {
 const mostrarTooltipUSA = (event, dato, idx) => {
   const rect = event.target.getBoundingClientRect()
   const container = event.target.closest('.grafica-contenedor').getBoundingClientRect()
-  const x = rect.left - container.left + 10
-  const y = rect.top - container.top - 60
+  const x = rect.left - container.left + 12
+  const y = rect.top - container.top - 70
 
-  const tooltipWidth = 170
+  const tooltipWidth = 180
   const izquierda = x + tooltipWidth > container.width
 
   tooltip.value = {
@@ -364,18 +364,18 @@ const mostrarTooltipUSA = (event, dato, idx) => {
 const mostrarTooltipTouch = (pais, dato, idx) => {
   if (!contenedorRef.value) return
   const container = contenedorRef.value.getBoundingClientRect()
-  const xSvg = 70 + idx * pasoXCol.value
+  const xSvg = 98 + idx * pasoXCol.value
   const ySvg = escalaY(dato.valor)
-  const xPx = (xSvg / 840) * container.width
+  const xPx = (xSvg / 1176) * container.width
   const yPx = (ySvg / svgAlto) * container.height
 
-  const tooltipWidth = 170
+  const tooltipWidth = 180
   const izquierda = xPx + tooltipWidth > container.width
 
   tooltip.value = {
     visible: true,
     x: izquierda ? xPx - tooltipWidth - 10 : xPx + 10,
-    y: Math.max(0, yPx - 60),
+    y: Math.max(0, yPx - 70),
     pais,
     valor: dato.valorReal,
     periodo: dato.periodo,
@@ -386,18 +386,18 @@ const mostrarTooltipTouch = (pais, dato, idx) => {
 const mostrarTooltipTouchUSA = (dato, idx) => {
   if (!contenedorRef.value) return
   const container = contenedorRef.value.getBoundingClientRect()
-  const xSvg = 70 + idx * pasoXUsa.value
+  const xSvg = 98 + idx * pasoXUsa.value
   const ySvg = escalaY(dato.valor)
-  const xPx = (xSvg / 840) * container.width
+  const xPx = (xSvg / 1176) * container.width
   const yPx = (ySvg / svgAlto) * container.height
 
-  const tooltipWidth = 170
+  const tooltipWidth = 180
   const izquierda = xPx + tooltipWidth > container.width
 
   tooltip.value = {
     visible: true,
     x: izquierda ? xPx - tooltipWidth - 10 : xPx + 10,
-    y: Math.max(0, yPx - 60),
+    y: Math.max(0, yPx - 70),
     pais: 'USA',
     valor: dato.valorReal,
     periodo: dato.periodo,
