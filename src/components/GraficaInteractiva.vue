@@ -28,28 +28,27 @@
     </div>
 
     <div class="grafica-contenedor">
-      <svg class="grafica-svg" viewBox="0 0 700 360" preserveAspectRatio="xMidYMid meet">
+      <svg width="700" height="350" viewBox="0 0 700 350">
         <g class="grafica-grid">
           <line v-for="i in 5" :key="'grid-'+i" 
-            x1="60" :y1="60 + 220 * (i - 1) / 4" 
-            x2="640" :y2="60 + 220 * (i - 1) / 4" 
+            x1="50" :y1="50 + 200 * (i - 1) / 4" 
+            x2="650" :y2="50 + 200 * (i - 1) / 4" 
             stroke="#EEC9C4" stroke-dasharray="3,3" />
         </g>
 
         <g class="grafica-y-axis">
-          <text v-for="i in 5" :key="'y-'+i" 
-            x="52" :y="60 + 220 * (i - 1) / 4" 
+          <text v-for="(valor, i) in etiquetasY" :key="'y-'+i" 
+            x="40" :y="50 + 200 * i / 4" 
             text-anchor="end" dominant-baseline="middle" font-size="11" fill="#7A4A44">
-            {{ obtenerEtiquetaY(i) }}
+            {{ valor }}
           </text>
         </g>
 
         <g class="grafica-x-axis">
           <text v-for="(label, i) in etiquetasX" :key="'x-'+i"
-            :x="obtenerX(i)"
-            y="340"
-            text-anchor="end" dominant-baseline="middle" font-size="9" fill="#7A4A44"
-            :transform="`rotate(-35, ${obtenerX(i)}, 340)`">
+            x="50 + i * (600 / (etiquetasX.length - 1 || 1))"
+            y="320"
+            text-anchor="end" dominant-baseline="middle" font-size="9" fill="#7A4A44">
             {{ label }}
           </text>
         </g>
@@ -57,8 +56,8 @@
         <template v-if="paisActivo !== 'usa'">
           <polyline :points="lineaColombia" fill="none" stroke="#F5A800" stroke-width="2.5" stroke-linecap="round" />
           <circle v-for="(p, i) in datosColombia" :key="'c-'+i"
-            :cx="obtenerX(i)"
-            :cy="obtenerY(p.valor)"
+            :cx="50 + i * (600 / (datosColombia.length - 1 || 1))"
+            :cy="250 - (p.valor / maximo * 200)"
             r="4" fill="#F5A800" class="grafica-punto"
             @mouseenter="mostrarTooltip($event, 'Colombia', p)" />
         </template>
@@ -66,13 +65,13 @@
         <template v-if="paisActivo !== 'colombia'">
           <polyline :points="lineaUsa" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" />
           <circle v-for="(p, i) in datosUsa" :key="'u-'+i"
-            :cx="obtenerX(i + (paisActivo === 'ambos' ? datosColombia.length : 0))"
-            :cy="obtenerY(p.valor)"
+            :cx="50 + i * (600 / (datosUsa.length - 1 || 1))"
+            :cy="250 - (p.valor / maximo * 200)"
             r="4" fill="#2563EB" class="grafica-punto"
             @mouseenter="mostrarTooltipUSA($event, p, i)" />
         </template>
 
-        <g transform="translate(480, 30)">
+        <g transform="translate(480, 25)">
           <template v-if="paisActivo !== 'usa'">
             <line x1="0" y1="0" x2="20" y2="0" stroke="#F5A800" stroke-width="2.5" />
             <circle cx="10" cy="0" r="3" fill="#F5A800" />
@@ -115,18 +114,18 @@ const datosColombia = [
 ]
 
 const datosUsa = [
-  { periodo: "Mar 23", valor: 72.8 },
-  { periodo: "Jun 23", valor: 73.2 },
-  { periodo: "Sep 23", valor: 73.8 },
-  { periodo: "Dic 23", valor: 74.1 },
-  { periodo: "Mar 24", valor: 73.9 },
-  { periodo: "Jun 24", valor: 74.2 },
-  { periodo: "Sep 24", valor: 74.8 },
-  { periodo: "Dic 24", valor: 74.7 },
-  { periodo: "Mar 25", valor: 74.5 },
-  { periodo: "Jun 25", valor: 75.1 },
-  { periodo: "Sep 25", valor: 74.5 },
-  { periodo: "Dic 25", valor: 75.5 },
+  { periodo: "Mar", valor: 72.8 },
+  { periodo: "Jun", valor: 73.2 },
+  { periodo: "Sep", valor: 73.8 },
+  { periodo: "Dic", valor: 74.1 },
+  { periodo: "Mar", valor: 73.9 },
+  { periodo: "Jun", valor: 74.2 },
+  { periodo: "Sep", valor: 74.8 },
+  { periodo: "Dic", valor: 74.7 },
+  { periodo: "Mar", valor: 74.5 },
+  { periodo: "Jun", valor: 75.1 },
+  { periodo: "Sep", valor: 74.5 },
+  { periodo: "Dic", valor: 75.5 },
 ]
 
 const tooltip = ref({ visible: false, x: 0, y: 0, pais: '', valor: 0, periodo: '' })
@@ -136,39 +135,29 @@ const maximo = computed(() => {
   return 80
 })
 
-const obtenerEtiquetaY = (i) => {
-  const valores = paisActivo.value === 'colombia' 
-    ? [12, 9, 6, 3, 0] 
-    : [80, 60, 40, 20, 0]
-  return valores[i - 1] + 'M'
-}
-
-const obtenerX = (i) => {
-  const total = paisActivo.value === 'ambos' 
-    ? datosColombia.length + datosUsa.length 
-    : (paisActivo.value === 'colombia' ? datosColombia.length : datosUsa.length)
-  return 60 + i * (580 / Math.max(total - 1, 1))
-}
-
-const obtenerY = (valor) => {
-  return 280 - (valor / maximo.value * 220)
-}
+const etiquetasY = computed(() => {
+  if (paisActivo.value === 'colombia') return ['12M', '9M', '6M', '3M', '0']
+  return ['80M', '60M', '40M', '20M', '0']
+})
 
 const lineaColombia = computed(() => {
   if (paisActivo.value === 'usa') return ''
-  return datosColombia.map((p, i) => `${obtenerX(i)},${obtenerY(p.valor)}`).join(' ')
+  return datosColombia.map((p, i) => 
+    `${50 + i * (600 / (datosColombia.length - 1 || 1))},${250 - (p.valor / maximo.value * 200)}`
+  ).join(' ')
 })
 
 const lineaUsa = computed(() => {
   if (paisActivo.value === 'colombia') return ''
-  const offset = datosColombia.length
-  return datosUsa.map((p, i) => `${obtenerX(i + offset)},${obtenerY(p.valor)}`).join(' ')
+  return datosUsa.map((p, i) => 
+    `${50 + i * (600 / (datosUsa.length - 1 || 1))},${250 - (p.valor / maximo.value * 200)}`
+  ).join(' ')
 })
 
 const etiquetasX = computed(() => {
   if (paisActivo.value === 'colombia') return datosColombia.map(d => d.periodo)
   if (paisActivo.value === 'usa') return datosUsa.map(d => d.periodo)
-  return [...datosColombia.map(d => d.periodo), ...datosUsa.map(d => d.periodo)]
+  return datosUsa.map(d => d.periodo)
 })
 
 const mostrarTooltip = (event, pais, dato) => {
@@ -222,8 +211,8 @@ const mostrarTooltipUSA = (event, dato, idx) => {
 .grafica-boton--activo { border-color: #3B1F1C; background: #3B1F1C; color: white; }
 .grafica-boton--activo:hover { background: #3B1F1C; }
 
-.grafica-contenedor { position: relative; }
-.grafica-svg { width: 100%; height: auto; }
+.grafica-contenedor { position: relative; overflow: hidden; }
+.grafica-svg { width: 100%; height: auto; display: block; }
 .grafica-punto { cursor: pointer; transition: r 0.2s ease; }
 .grafica-punto:hover { r: 6; }
 .grafica-tooltip { position: absolute; background: #3B1F1C; color: white; padding: 10px 14px; border-radius: 8px; font-size: 12px; pointer-events: none; z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
