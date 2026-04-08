@@ -30,10 +30,9 @@
     <div class="grafica-filtros">
       <label class="grafica-filtro__label">Rango:</label>
       <select v-model="rangoAnos" class="grafica-filtro__select">
-        <option value="todos">Todos (2015-2025)</option>
-        <option value="5">Últimos 5 años (2021-2025)</option>
-        <option value="3">Últimos 3 años (2023-2025)</option>
-        <option value="reciente">Solo 2024-2025</option>
+        <option value="todos">Todos</option>
+        <option value="5">Últimos 5 años</option>
+        <option value="3">Últimos 3 años</option>
       </select>
     </div>
 
@@ -55,39 +54,51 @@
         </g>
 
         <g class="grafica-x-axis">
-          <text v-for="label in labelsVisibles" :key="'x-'+label"
-            :x="getX(filteredPeriodos.indexOf(label))" :y="height - padding + 20"
+          <text v-for="(label, idx) in labelsVisibles" :key="'x-'+label"
+            :x="getX(idx)" :y="height - padding + 20"
             text-anchor="end" dominant-baseline="middle" font-size="9" fill="#7A4A44"
-            :transform="`rotate(-30, ${getX(filteredPeriodos.indexOf(label))}, ${height - padding + 20})`">
+            :transform="`rotate(-30, ${getX(idx)}, ${height - padding + 20})`">
             {{ label }}
           </text>
         </g>
 
-        <polygon v-if="paisActivo === 'colombia' || paisActivo === 'ambos'" :points="colombiaArea" fill="#F5A800" opacity="0.1" />
-        <polygon v-if="paisActivo === 'usa' || paisActivo === 'ambos'" :points="usaArea" fill="#2563EB" opacity="0.1" />
+        <polygon v-if="paisActivo === 'colombia'" :points="colombiaArea" fill="#F5A800" opacity="0.1" />
+        <polygon v-if="paisActivo === 'usa'" :points="usaArea" fill="#2563EB" opacity="0.1" />
+        <polygon v-if="paisActivo === 'ambos'" :points="colombiaArea" fill="#F5A800" opacity="0.1" />
+        <polygon v-if="paisActivo === 'ambos'" :points="usaArea" fill="#2563EB" opacity="0.1" />
 
-        <polyline v-if="paisActivo === 'colombia' || paisActivo === 'ambos'" :points="colombiaPoly" fill="none" stroke="#F5A800" stroke-width="2.5" stroke-linecap="round" />
-        <polyline v-if="paisActivo === 'usa' || paisActivo === 'ambos'" :points="usaPoly" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" />
+        <polyline v-if="paisActivo === 'colombia'" :points="colombiaPoly" fill="none" stroke="#F5A800" stroke-width="2.5" stroke-linecap="round" />
+        <polyline v-if="paisActivo === 'usa'" :points="usaPoly" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" />
+        <polyline v-if="paisActivo === 'ambos'" :points="colombiaPoly" fill="none" stroke="#F5A800" stroke-width="2.5" stroke-linecap="round" />
+        <polyline v-if="paisActivo === 'ambos'" :points="usaPoly" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" />
 
-        <circle v-if="paisActivo === 'colombia' || paisActivo === 'ambos'" v-for="(p, i) in colombiaPoints" :key="'c-'+i"
+        <circle v-if="paisActivo === 'colombia'" v-for="(p, i) in colombiaPoints" :key="'c-'+i"
           :cx="p.x" :cy="p.y" r="4" fill="#F5A800" class="grafica-punto"
           @mouseenter="mostrarTooltip($event, 'colombia', i)" />
 
-        <circle v-if="paisActivo === 'usa' || paisActivo === 'ambos'" v-for="(p, i) in usaPoints" :key="'u-'+i"
+        <circle v-if="paisActivo === 'usa'" v-for="(p, i) in usaPoints" :key="'u-'+i"
           :cx="p.x" :cy="p.y" r="4" fill="#2563EB" class="grafica-punto"
           @mouseenter="mostrarTooltip($event, 'usa', i)" />
 
-        <g :transform="`translate(${width - 220}, ${padding - 20})`">
-          <template v-if="paisActivo === 'colombia' || paisActivo === 'ambos'">
+        <circle v-if="paisActivo === 'ambos'" v-for="(p, i) in colombiaPoints" :key="'ca-'+i"
+          :cx="p.x" :cy="p.y" r="4" fill="#F5A800" class="grafica-punto"
+          @mouseenter="mostrarTooltip($event, 'colombia', i)" />
+
+        <circle v-if="paisActivo === 'ambos'" v-for="(p, i) in usaPoints" :key="'ua-'+i"
+          :cx="p.x" :cy="p.y" r="4" fill="#2563EB" class="grafica-punto"
+          @mouseenter="mostrarTooltip($event, 'usa', i)" />
+
+        <g :transform="`translate(${width - 200}, ${padding - 20})`">
+          <g v-if="paisActivo !== 'usa'">
             <line x1="0" y1="0" x2="20" y2="0" stroke="#F5A800" stroke-width="2.5" />
             <circle cx="10" cy="0" r="3" fill="#F5A800" />
             <text x="28" y="4" font-size="11" fill="#3B1F1C">🇨🇴 Colombia</text>
-          </template>
-          <template v-if="paisActivo === 'usa' || paisActivo === 'ambos'">
-            <line :x1="paisActivo === 'ambos' ? 160 : 0" y1="0" :x2="paisActivo === 'ambos' ? 180 : 20" y2="0" stroke="#2563EB" stroke-width="2.5" />
-            <circle :cx="paisActivo === 'ambos' ? 170 : 10" cy="0" r="3" fill="#2563EB" />
-            <text :x="paisActivo === 'ambos' ? 188 : 28" y="4" font-size="11" fill="#3B1F1C">🇺🇸 EE.UU.</text>
-          </template>
+          </g>
+          <g v-if="paisActivo !== 'colombia'">
+            <line :x1="paisActivo === 'ambos' ? 130 : 0" y1="0" :x2="paisActivo === 'ambos' ? 150 : 20" y2="0" stroke="#2563EB" stroke-width="2.5" />
+            <circle :cx="paisActivo === 'ambos' ? 140 : 10" cy="0" r="3" fill="#2563EB" />
+            <text :x="paisActivo === 'ambos' ? 158 : 28" y="4" font-size="11" fill="#3B1F1C">🇺🇸 EE.UU.</text>
+          </g>
         </g>
       </svg>
 
@@ -147,46 +158,93 @@ const maxValor = computed(() => {
   return 80000000
 })
 
-const allPeriodos = computed(() => {
-  const periodos = [...new Set([...datosColombia.map(d => d.periodo), ...datosUsa.map(d => d.periodo)])]
-  return periodos.sort((a, b) => {
-    const parseP = p => {
-      const parts = p.split(' ')
-      const year = parseInt(parts[parts.length - 1])
-      const month = { 'Mar': 1, 'Jun': 2, 'Sep': 3, 'Dic': 4 }[parts[0]] || 5
-      return year * 10 + month
-    }
-    return parseP(a) - parseP(b)
+const datosActivos = computed(() => {
+  if (paisActivo.value === 'colombia') return datosColombia
+  if (paisActivo.value === 'usa') return datosUsa
+  return [...datosColombia, ...datosUsa]
+})
+
+const filteredDatos = computed(() => {
+  const years = { 'todos': 0, '5': 2020, '3': 2022 }
+  const minYear = years[rangoAnos.value]
+  if (minYear === 0) return datosActivos.value
+  return datosActivos.value.filter(d => {
+    const year = parseInt(d.periodo.split(' ').pop())
+    return year >= minYear
   })
 })
 
-const filteredPeriodos = computed(() => {
-  const years = { 'todos': 2015, '5': 2021, '3': 2023, 'reciente': 2024 }
-  const minYear = years[rangoAnos.value]
-  return allPeriodos.value.filter(p => parseInt(p.split(' ').pop()) >= minYear)
+const labelsVisibles = computed(() => {
+  const labels = filteredDatos.value.map(d => d.periodo)
+  return labels.filter((_, i) => i % 2 === 0 || i === labels.length - 1)
 })
 
-const labelsVisibles = computed(() => filteredPeriodos.value.filter((_, i) => i % 2 === 0 || i === filteredPeriodos.value.length - 1))
+const getX = (idx) => {
+  const len = filteredDatos.value.length
+  if (len <= 1) return padding
+  return padding + idx * ((width - padding * 2) / (len - 1))
+}
 
-const getX = (idx) => padding + idx * ((width - padding * 2) / Math.max(filteredPeriodos.value.length - 1, 1))
 const getY = (valor) => padding + (height - padding * 2) - ((valor / maxValor.value) * (height - padding * 2))
 
-const colombiaPoints = computed(() => datosColombia.filter(d => filteredPeriodos.value.includes(d.periodo)).map(d => ({ x: getX(filteredPeriodos.value.indexOf(d.periodo)), y: getY(d.valor), ...d })))
-const usaPoints = computed(() => datosUsa.filter(d => filteredPeriodos.value.includes(d.periodo)).map(d => ({ x: getX(filteredPeriodos.value.indexOf(d.periodo)), y: getY(d.valor), ...d })))
+const colombiaPoints = computed(() => {
+  if (paisActivo.value === 'usa') return []
+  const datos = filteredDatos.value.filter(d => !d.periodo.includes(' '))
+  return datos.map((d, i) => {
+    const origIdx = datosColombia.findIndex(x => x.periodo === d.periodo)
+    return { x: getX(origIdx), y: getY(d.valor), ...d }
+  })
+})
 
-const colombiaPoly = computed(() => colombiaPoints.value.map(p => `${p.x},${p.y}`).join(' '))
-const usaPoly = computed(() => usaPoints.value.map(p => `${p.x},${p.y}`).join(' '))
+const usaPoints = computed(() => {
+  if (paisActivo.value === 'colombia') return []
+  const datos = filteredDatos.value.filter(d => d.periodo.includes(' '))
+  return datos.map(d => {
+    const origIdx = datosUsa.findIndex(x => x.periodo === d.periodo)
+    return { x: getX(origIdx), y: getY(d.valor), ...d }
+  })
+})
+
+const colombiaPoly = computed(() => {
+  if (paisActivo.value === 'usa') return ''
+  const pts = datosColombia.filter(d => filteredDatos.value.some(f => f.periodo === d.periodo))
+  if (!pts.length) return ''
+  return pts.map((d, i) => {
+    const idx = datosColombia.findIndex(x => x.periodo === d.periodo)
+    return `${getX(idx)},${getY(d.valor)}`
+  }).join(' ')
+})
+
+const usaPoly = computed(() => {
+  if (paisActivo.value === 'colombia') return ''
+  const pts = datosUsa.filter(d => filteredDatos.value.some(f => f.periodo === d.periodo))
+  if (!pts.length) return ''
+  return pts.map((d, i) => {
+    const idx = datosUsa.findIndex(x => x.periodo === d.periodo)
+    return `${getX(idx)},${getY(d.valor)}`
+  }).join(' ')
+})
 
 const colombiaArea = computed(() => {
-  const pts = colombiaPoints.value
+  if (paisActivo.value === 'usa') return ''
+  const pts = datosColombia.filter(d => filteredDatos.value.some(f => f.periodo === d.periodo))
   if (!pts.length) return ''
-  return `${colombiaPoly.value} ${pts[pts.length-1].x},${height-padding} ${pts[0].x},${height-padding}`
+  const first = pts[0]
+  const last = pts[pts.length - 1]
+  const firstIdx = datosColombia.findIndex(x => x.periodo === first.periodo)
+  const lastIdx = datosColombia.findIndex(x => x.periodo === last.periodo)
+  return `${colombiaPoly.value} ${getX(lastIdx)},${height - padding} ${getX(firstIdx)},${height - padding}`
 })
 
 const usaArea = computed(() => {
-  const pts = usaPoints.value
+  if (paisActivo.value === 'colombia') return ''
+  const pts = datosUsa.filter(d => filteredDatos.value.some(f => f.periodo === d.periodo))
   if (!pts.length) return ''
-  return `${usaPoly.value} ${pts[pts.length-1].x},${height-padding} ${pts[0].x},${height-padding}`
+  const first = pts[0]
+  const last = pts[pts.length - 1]
+  const firstIdx = datosUsa.findIndex(x => x.periodo === first.periodo)
+  const lastIdx = datosUsa.findIndex(x => x.periodo === last.periodo)
+  return `${usaPoly.value} ${getX(lastIdx)},${height - padding} ${getX(firstIdx)},${height - padding}`
 })
 
 const etiquetaEjeY = (i) => {
@@ -232,14 +290,18 @@ const ocultarTooltip = () => { tooltip.value.visible = false }
 }
 
 .grafica-boton:hover {
-  border-color: #F5A800;
-  color: #F5A800;
+  border-color: #3B1F1C;
+  background: #F7E0DC;
 }
 
 .grafica-boton--activo {
   border-color: #3B1F1C;
   background: #3B1F1C;
   color: white;
+}
+
+.grafica-boton--activo:hover {
+  background: #3B1F1C;
 }
 
 .grafica-filtros { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
