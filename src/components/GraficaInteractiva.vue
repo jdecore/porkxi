@@ -30,7 +30,7 @@
           <text v-for="i in 5" :key="'y-'+i" 
             :x="padding - 8" :y="padding + (height - padding * 2) * (i-1) / 4" 
             text-anchor="end" dominant-baseline="middle" font-size="11" fill="#7A4A44">
-            {{ 80 - (i-1) * 20 }}M
+            {{ (15 - (i-1) * 3) }}M
           </text>
         </g>
 
@@ -84,7 +84,7 @@ import { ref, computed } from 'vue'
 const width = 700
 const height = 450
 const padding = 55
-const maxValor = 80000000
+const maxValor = 15000000
 
 const datosColombia = [
   { periodo: "2015", valor: 4400000 },
