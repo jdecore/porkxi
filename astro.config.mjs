@@ -5,6 +5,7 @@ import vue from '@astrojs/vue';
 export default defineConfig({
   integrations: [
     vue({
+      appEntrypoint: '/src/vue-app.ts',
       template: {
         compilerOptions: {
           isCustomElement: (tag) => tag.includes('-'),
@@ -15,4 +16,14 @@ export default defineConfig({
   build: {
     inlineStylesheets: 'always',
   },
+  experimental: {
+    clientPrerender: false
+  },
+  vite: {
+    build: {
+      rollupOptions: {
+        external: ['astro:components']
+      }
+    }
+  }
 });

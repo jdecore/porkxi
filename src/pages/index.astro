@@ -80,7 +80,7 @@ const usaRecientes = SERIE_USA.filter(d => d.periodo >= "Mar 2025");
         <p class="banner-alerta__texto">En EE.UU., el USDA NASS publica datos de inventario porcino cada trimestre desde fuentes gubernamentales directas — el último salió el 23 de diciembre de 2025. En Colombia, los datos oficiales no son fáciles de acceder: están fragmentados, desactualizados o sin API funcional. El último dato disponible proviene de Porcinews, un medio especializado.</p>
       </div>
 
-      <TarjetasKpiAnimadas client:visible />
+      <div id="kpi-animadas" class="tarjetas-kpi"></div>
 
       <GraficaPrincipal />
 
@@ -244,5 +244,6 @@ const usaRecientes = SERIE_USA.filter(d => d.periodo >= "Mar 2025");
       </footer>
 
     </main>
+    <script type="module" src="/src/vue-app.ts"></script>
   </body>
 </html>
