@@ -25,6 +25,7 @@
   padding: 20px 22px;
   position: relative;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--sombra);
 }
 
 .tarjeta-kpi:hover {
