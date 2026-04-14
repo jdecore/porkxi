@@ -76,6 +76,7 @@
   border: 1.5px solid var(--crema-borde);
   border-radius: 14px;
   padding: 24px;
+  box-shadow: var(--sombra);
 }
 
 .frecuencia-card__encabezado {

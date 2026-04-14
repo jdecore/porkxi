@@ -45,19 +45,19 @@
 
 .encabezado__badge--colombia {
   border-color: var(--colombia);
-  background: white;
+  background: #FFF8E6;
   color: var(--colombia);
 }
 
 .encabezado__badge--usa {
   border-color: var(--usa);
-  background: white;
+  background: #EFF6FF;
   color: var(--usa);
 }
 
 .encabezado__badge--datos {
   border-color: var(--crema-borde);
-  background: white;
+  background: var(--crema-oscuro);
   color: var(--tinta-claro);
 }
 
