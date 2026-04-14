@@ -56,9 +56,9 @@
 }
 
 .encabezado__badge--datos {
-  border-color: var(--crema-borde);
+  border-color: var(--alerta);
   background: var(--crema-oscuro);
-  color: var(--tinta-claro);
+  color: var(--alerta);
 }
 
 @media (max-width: 700px) {
