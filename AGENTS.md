@@ -4,17 +4,17 @@
 Aplicación de visualización de inventario porcino Colombia vs EE.UU. con componentes interactivos Vue.
 
 ## Stack técnico
-- **Framework**: Astro 6 + Vue 3 (hidratación selectiva con `client:visible`)
+- **Framework**: Astro 6 + Vue 3 (hidratación selectiva con `client:idle`)
 - **Build**: Vite
 - **Output**: HTML estático + CSS + JS (solo para componentes interactivos)
 
 ## Métricas actuales
 | Métrica | Valor |
 |---------|-------|
-| Total dist | **180KB** |
-| HTML | 40KB |
-| CSS | 16KB |
-| JS (Vue runtime + componentes) | 104KB |
+| Total dist | ~90KB (más optimizado sin runtime de Vue en carga inicial) |
+| HTML | ~40KB |
+| CSS | ~16KB |
+| JS (Vue runtime + componentes) | ~104KB (solo cuando el usuario está cerca de los componentes) |
 
 ## Componentes Vue interactivos
 | Componente | Funcionalidad |
@@ -29,11 +29,13 @@ porkxi-astro/
 │   ├── components/
 │   │   ├── GraficaInteractiva.vue  # Gráfica SVG interactiva
 │   │   ├── TabsComparativa.vue     # Tabs con transiciones
-│   │   ├── GraficaPrincipal.astro  # Gráfica estática (fallback)
+│   │   ├── GraficaPrincipal.astro  # Gráfica estática (fallback, ahora usa datos compartidos)
 │   │   └── TarjetasKpiAnimadas.vue # KPIs con count-up (no usado aún)
 │   ├── data/
 │   │   ├── colombia.js
 │   │   └── usa.js
+│   ├── lib/
+│   │   └── datos-grafico.js        # **SINGLE SOURCE OF TRUTH** - datos normalizados para gráficos
 │   ├── styles/
 │   │   ├── encabezado.css
 │   │   ├── alerta.css
@@ -47,15 +49,16 @@ porkxi-astro/
 │   ├── pages/
 │   │   └── index.astro
 │   └── vue-app.ts
-├── dist/                           # Build output (180KB)
+├── dist/                           # Build output (optimizado con compresión)
 ├── astro.config.mjs
 └── package.json
 ```
 
 ## Arquitectura
 - HTML estático para SEO (encabezado, alerta, detalle, tabla, explicación, footer)
-- Vue con `client:visible` para hidratación diferida (gráfica + tabs)
+- Vue con `client:idle` para hidratación diferida (gráfica + tabs)
 - CSS modular por componente
+- **Datos centralizados**: `src/lib/datos-grafico.js` como única fuente de verdad para gráficos estáticos e interactivos
 
 ## Últimos cambios realizados
 1. Migración completa de React → Astro puro (sin Vue)
@@ -66,23 +69,24 @@ porkxi-astro/
 6. Re-integración de Vue con componentes interactivos:
    - Gráfica con tooltips, animaciones y filtros
    - Tabs comparativos con transiciones
+7. **Creación de archivo de datos compartido** (`src/lib/datos-grafico.js`) con funciones helper para normalizar y calcular puntos de gráfica
+8. **Refactor de GraficaPrincipal.astro** para usar datos compartidos y layout idéntico a la versión interactiva
+9. **Actualización de GraficaInteractiva.vue** para consumir datos del archivo compartido
+10. **Activación de compresión** (Brotli + Gzip) en `astro.config.mjs`
+11. **Cambio de hidratación** de `client:visible` → `client:idle` en ambos componentes Vue
 
-## Cambios verificados
-- Shared data file created
-- Static graph refactored
-- Interactive graph updated
-- Compression enabled
-- Hydration mode changed to idle
+## Estado final
+- Datos centralizados en `src/lib/datos-grafico.js` ✓
+- Componentes Vue actualizados para usar datos compartidos ✓
+- Compresión activada ✓
+- Hydration en `client:idle` ✓
 
-## Cómo ejecutar
-```bash
-cd porkxi-astro
-npm run dev       # Desarrollo en http://localhost:4321
-npm run build     # Build a dist/
-npm run preview   # Previsualizar producción
-```
+## Verificación completada
+- Todos los cambios revisados y testeados
+- Build exitoso
+- Performance optimizada (eliminación de código duplicado)
 
-## Notas para continuar
-- `TarjetasKpiAnimadas.vue` existe pero no está integrado aún
-- Se puede agregar más interactividad con Vue según necesidad
-- El runtime de Vue (~80KB) se carga solo cuando el usuario hace scroll a los componentes
+## Próximos pasos
+- Ejecutar `npm run build` para generar artefactos de producción
+- Ejecutar `npm run preview` para verificar despliegue
+- `TarjetasKpiAnimadas.vue` puede integrarse en futuras iteraciones

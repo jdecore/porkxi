@@ -187,26 +187,27 @@
         </g>
       </svg>
 
-      <div
-        v-if="tooltip.visible"
-        class="grafica-tooltip"
-        :class="{ 'grafica-tooltip--izquierda': tooltip.izquierda }"
-        :style="{ left: tooltip.x + 'px', top: tooltip.y + 'px' }"
-      >
-        <div class="grafica-tooltip__titulo">
-          {{ tooltip.pais === 'Colombia' ? '🇨🇴 Colombia' : '🇺🇸 USA' }}
-        </div>
-        <div class="grafica-tooltip__valor">
-          {{ tooltip.valor.toLocaleString() }} cabezas
-        </div>
-        <div class="grafica-tooltip__periodo">{{ tooltip.periodo }}</div>
-      </div>
+<template v-if="tooltip.visible">
+         <div
+           class="grafica-tooltip"
+           :class="{ 'grafica-tooltip--izquierda': tooltip.izquierda }"
+           :style="{ left: tooltip.x + 'px', top: tooltip.y + 'px' }"
+         >
+           <div class="grafica-tooltip__titulo">
+             {{ tooltip.pais === 'Colombia' ? '🇨🇴 Colombia' : '🇺🇸 USA' }}
+           </div>
+           <div class="grafica-tooltip__valor">
+             {{ tooltip.valor.toLocaleString() }} cabezas
+           </div>
+           <div class="grafica-tooltip__periodo">{{ tooltip.periodo }}</div>
+         </div>
+       </template>
     </div>
   </section>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { 
   SERIE_COLOMBIA, 
   SERIE_USA, 
@@ -214,39 +215,51 @@ import {
   getMaxValor, 
   getColombiaPoints, 
   getUsaPoints,
-  formatPoints 
-} from '../lib/datos-grafico'
+  formatPoints,
+  datosGrafico,
+  validarDatos
+} from '../lib/datos-grafico.js'
 
 const paisActivo = ref('colombia')
 const contenedorRef = ref(null)
 const esMovil = ref(false)
+const datosValidados = ref({ colombia: [], usa: [] })
 
-// Dimensioni del'area di disegno (-10%)
+// Dimensioni del'area di disegno
 const areaAncho = 907
 const areaAlto = 378
 const svgAlto = 529
 
-// Trasformare dati: Colombia e USA compaginano la stessa metrica in milioni
-const datosColombia = computed(() => {
-  if (!Array.isArray(SERIE_COLOMBIA) || !SERIE_COLOMBIA.length) return []
-  return SERIE_COLOMBIA.map((d) => ({
-    periodo: d.periodo,
-    valor: d.valor / 1e6,
-    valorReal: d.valor,
-    advertencia: d.advertencia || false,
-  }))
-})
+// Validar y transformar datos: Colombia y USA compaginando la misma métrica en millones
+watch(
+  () => [SERIE_COLOMBIA, SERIE_USA],
+  () => {
+    try {
+      validarDatos({ colombia: SERIE_COLOMBIA, usa: SERIE_USA })
+      datosValidados.value = {
+        colombia: SERIE_COLOMBIA.map((d) => ({
+          periodo: d.periodo,
+          valor: d.valor / 1e6,
+          valorReal: d.valor,
+          advertencia: d.advertencia || false,
+        })),
+        usa: SERIE_USA.map((d) => ({
+          periodo: d.periodo,
+          valor: d.valor / 1e6,
+          valorReal: d.valor,
+          ultimoDato: d.ultimoDato || false,
+        })),
+      }
+    } catch (error) {
+      console.error('Datos de gráfica inválidos:', error)
+      datosValidados.value = { colombia: [], usa: [] }
+    }
+  },
+  { immediate: true }
+)
 
-// USA: datos trimestrales con año completo
-const datosUsa = computed(() => {
-  if (!Array.isArray(SERIE_USA) || !SERIE_USA.length) return []
-  return SERIE_USA.map((d) => ({
-    periodo: d.periodo,
-    valor: d.valor / 1e6,
-    valorReal: d.valor,
-    ultimoDato: d.ultimoDato || false,
-  }))
-})
+const datosColombia = computed(() => datosValidados.value.colombia)
+const datosUsa = computed(() => datosValidados.value.usa)
 
 const tooltip = ref({
   visible: false,
@@ -329,8 +342,9 @@ const svgHeight = computed(() => svgAlto)
 const svgViewBox = computed(() => `0 0 840 ${svgAlto}`)
 
 const mostrarTooltip = (event, pais, dato) => {
+  if (!contenedorRef.value) return
   const rect = event.target.getBoundingClientRect()
-  const container = event.target.closest('.grafica-contenedor').getBoundingClientRect()
+  const container = contenedorRef.value.getBoundingClientRect()
   const x = rect.left - container.left + 12
   const y = rect.top - container.top - 70
 
@@ -349,8 +363,9 @@ const mostrarTooltip = (event, pais, dato) => {
 }
 
 const mostrarTooltipUSA = (event, dato, idx) => {
+  if (!contenedorRef.value) return
   const rect = event.target.getBoundingClientRect()
-  const container = event.target.closest('.grafica-contenedor').getBoundingClientRect()
+  const container = contenedorRef.value.getBoundingClientRect()
   const x = rect.left - container.left + 12
   const y = rect.top - container.top - 70
 
