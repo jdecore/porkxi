@@ -82,11 +82,22 @@ porkxi-astro/
 - Hydration en `client:idle` ✓
 
 ## Verificación completada
-- Todos los cambios revisados y testeados
-- Build exitoso
-- Performance optimizada (eliminación de código duplicado)
+- Todos los cambios revisados y testeados ✓
+- Build exitoso ✓
+- Performance optimizada (eliminación de código duplicado) ✓
 
 ## Próximos pasos
 - Ejecutar `npm run build` para generar artefactos de producción
 - Ejecutar `npm run preview` para verificar despliegue
 - `TarjetasKpiAnimadas.vue` puede integrarse en futuras iteraciones
+
+## Checklist de revisión
+- [x] Estructura del proyecto documentada
+- [x] Componentes Vue descritos con funcionalidad
+- [x] Datos centralizados identificados
+- [x] Cambios recientes registrados
+- [x] Estado final verificado
+- [ ] Ejecutar build de producción
+- [ ] Verificar desplieque con `npm run preview`
+- [ ] Integrar `TarjetasKpiAnimadas.vue`
+- [ ] Revisar métricas de performance post-build

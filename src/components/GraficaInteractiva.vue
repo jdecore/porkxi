@@ -187,38 +187,39 @@
         </g>
       </svg>
 
-<template v-if="tooltip.visible">
-         <div
-           class="grafica-tooltip"
-           :class="{ 'grafica-tooltip--izquierda': tooltip.izquierda }"
-           :style="{ left: tooltip.x + 'px', top: tooltip.y + 'px' }"
-         >
-           <div class="grafica-tooltip__titulo">
-             {{ tooltip.pais === 'Colombia' ? '🇨🇴 Colombia' : '🇺🇸 USA' }}
-           </div>
-           <div class="grafica-tooltip__valor">
-             {{ tooltip.valor.toLocaleString() }} cabezas
-           </div>
-           <div class="grafica-tooltip__periodo">{{ tooltip.periodo }}</div>
-         </div>
-       </template>
+      <template v-if="tooltip.visible">
+        <div
+          class="grafica-tooltip"
+          :class="{ 'grafica-tooltip--izquierda': tooltip.izquierda }"
+          :style="{ left: tooltip.x + 'px', top: tooltip.y + 'px' }"
+        >
+          <div class="grafica-tooltip__titulo">
+            {{ tooltip.pais === 'Colombia' ? '🇨🇴 Colombia' : '🇺🇸 USA' }}
+          </div>
+          <div class="grafica-tooltip__valor">
+            {{ tooltip.valor.toLocaleString() }} cabezas
+          </div>
+          <div class="grafica-tooltip__periodo">{{ tooltip.periodo }}</div>
+        </div>
+      </template>
     </div>
   </section>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
 import { 
-  SERIE_COLOMBIA, 
-  SERIE_USA, 
-  getPeriodos, 
-  getMaxValor, 
-  getColombiaPoints, 
-  getUsaPoints,
-  formatPoints,
-  datosGrafico,
-  validarDatos
+   SERIE_COLOMBIA, 
+   SERIE_USA, 
+   getPeriodos, 
+   getMaxValor, 
+   getColombiaPoints, 
+   getUsaPoints,
+   formatPoints,
+   datosGrafico,
+   validarDatos
 } from '../lib/datos-grafico.js'
+
+import { ref, computed, onMounted, watch } from 'vue'
 
 const paisActivo = ref('colombia')
 const contenedorRef = ref(null)
@@ -298,9 +299,9 @@ const pasoX = computed(() => {
 
 const escalaY = (valor) => 476 - (valor / maximo.value) * areaAlto
 
-const lineaColombia = computed(() => {
-  if (paisActivo.value === 'usa' || !datosColombia.value.length) return ''
-  return datosColombia.value
+const lineaColonia = computed(() => {
+  if (paisActivo.value === 'usa' || !datosColonia.value.length) return ''
+  return datosColonia.value
     .map(
       (p, i) =>
         `${98 + i * pasoXCol.value},${escalaY(p.valor)}`
@@ -324,7 +325,7 @@ const debeRotar = computed(() => {
 
 const etiquetasX = computed(() => {
   if (paisActivo.value === 'colombia') {
-    return datosColombia.value.map((d) => d.periodo)
+    return datosColonia.value.map((d) => d.periodo)
   }
   // USA: mostrar label abreviado solo en puntos clave para evitar overlap
   const allLabels = datosUsa.value.map((d) => d.periodo)
