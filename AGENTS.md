@@ -67,6 +67,13 @@ porkxi-astro/
    - Gráfica con tooltips, animaciones y filtros
    - Tabs comparativos con transiciones
 
+## Cambios verificados
+- Shared data file created
+- Static graph refactored
+- Interactive graph updated
+- Compression enabled
+- Hydration mode changed to idle
+
 ## Cómo ejecutar
 ```bash
 cd porkxi-astro

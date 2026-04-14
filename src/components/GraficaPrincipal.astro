@@ -1,31 +1,26 @@
 ---
-import { SERIE_COLOMBIA } from '../data/colombia';
-import { SERIE_USA } from '../data/usa';
+import { 
+  SERIE_COLOMBIA, 
+  SERIE_USA, 
+  getPeriodos, 
+  getMaxValor, 
+  getColombiaPoints, 
+  getUsaPoints,
+  formatPoints 
+} from '../lib/datos-grafico';
 
 const width = 700;
 const height = 450;
 const padding = 55;
-const maxValor = 85000000;
 
-const allPeriodos = [
-  ...SERIE_COLOMBIA.map(d => d.periodo),
-  ...SERIE_USA.map(d => d.periodo)
-].filter((v, i, a) => a.indexOf(v) === i).sort((a, b) => {
-  const parseP = p => {
-    const parts = p.split(' ');
-    return parseInt(parts[0]) * 10 + ({ 'Mar': 1, 'Jun': 2, 'Sep': 3, 'Dic': 4 }[parts[1]] || 5);
-  };
-  return parseP(a) - parseP(b);
-});
+const allPeriodos = getPeriodos();
+const maxValor = getMaxValor();
 
-const getX = (idx) => padding + idx * ((width - padding * 2) / (allPeriodos.length - 1));
-const getY = (valor) => padding + (height - padding * 2) - ((valor / maxValor) * (height - padding * 2));
+const colombiaPoints = getColombiaPoints();
+const usaPoints = getUsaPoints();
 
-const colombiaPoints = SERIE_COLOMBIA.map(d => ({ x: getX(allPeriodos.indexOf(d.periodo)), y: getY(d.valor) })).filter(p => p.x >= padding);
-const usaPoints = SERIE_USA.map(d => ({ x: getX(allPeriodos.indexOf(d.periodo)), y: getY(d.valor) })).filter(p => p.x >= padding);
-
-const colombiaPoly = colombiaPoints.map(p => `${p.x},${p.y}`).join(' ');
-const usaPoly = usaPoints.map(p => `${p.x},${p.y}`).join(' ');
+const colombiaPoly = formatPoints(colombiaPoints);
+const usaPoly = formatPoints(usaPoints);
 ---
 
 <section class="grafica-card">
@@ -37,7 +32,10 @@ const usaPoly = usaPoints.map(p => `${p.x},${p.y}`).join(' ');
   </p>
   
   <div class="grafica-contenedor">
-    <svg class="grafica-svg" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMidYMid meet">
+    <svg class="grafica-svg" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMidYMid meet" role="img" aria-label="Gráfica de inventario porcino Colombia vs EE.UU.">
+      <title>Inventario histórico porcino: Colombia vs EE.UU.</title>
+      <desc>Gráfica de líneas que compara el inventario porcino en Colombia (datos anuales) y EE.UU. (datos trimestrales) desde 2015 hasta 2025.</desc>
+      
       <!-- Grid -->
       <g class="grafica-grid">
         {Array.from({ length: 5 }).map((_, i) => (
@@ -52,7 +50,7 @@ const usaPoly = usaPoints.map(p => `${p.x},${p.y}`).join(' ');
         ))}
       </g>
       
-      <!-- X axis - fewer labels to avoid overlap -->
+      <!-- X axis -->
       <g class="grafica-x-axis">
         {allPeriodos.filter((_, i) => i % 2 === 0 || i === allPeriodos.length - 1).map((label, i) => {
           const originalIdx = allPeriodos.indexOf(label);

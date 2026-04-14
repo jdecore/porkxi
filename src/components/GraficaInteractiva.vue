@@ -207,19 +207,26 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { SERIE_COLOMBIA } from '../data/colombia.js'
-import { SERIE_USA } from '../data/usa.js'
+import { 
+  SERIE_COLOMBIA, 
+  SERIE_USA, 
+  getPeriodos, 
+  getMaxValor, 
+  getColombiaPoints, 
+  getUsaPoints,
+  formatPoints 
+} from '../lib/datos-grafico'
 
 const paisActivo = ref('colombia')
 const contenedorRef = ref(null)
 const esMovil = ref(false)
 
-// Dimensiones del área de dibujo (+40%)
-const areaAncho = 1008 // 1106 - 98
-const areaAlto = 420
-const svgAlto = 588
+// Dimensioni del'area di disegno (-10%)
+const areaAncho = 907
+const areaAlto = 378
+const svgAlto = 529
 
-// Transformar datos: Colombia está en unidades, convertir a millones para la gráfica
+// Trasformare dati: Colombia e USA compaginano la stessa metrica in milioni
 const datosColombia = computed(() => {
   if (!Array.isArray(SERIE_COLOMBIA) || !SERIE_COLOMBIA.length) return []
   return SERIE_COLOMBIA.map((d) => ({
