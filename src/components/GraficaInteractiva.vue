@@ -1,9 +1,9 @@
 <template>
-  <section class="grafica-card">
-    <h2 class="grafica-card__titulo">Inventario histórico comparado</h2>
-    <p class="grafica-card__subtitulo">En millones de cabezas.</p>
+  <section class="grafica-card" aria-labelledby="grafica-titulo" role="region">
+    <h2 id="grafica-titulo" class="grafica-card__titulo">Inventario histórico comparado</h2>
+    <p class="grafica-card__subtitulo" id="grafica-subtitulo">En millones de cabezas.</p>
 
-    <div class="grafica-botones" role="group" aria-label="Filtrar por país">
+    <div class="grafica-botones" role="group" aria-label="Filtrar por país" aria-describedby="grafica-subtitulo">
       <button
         class="grafica-boton"
         :class="{ 'grafica-boton--activo': paisActivo === 'colombia' }"
@@ -39,13 +39,13 @@
       </button>
     </div>
 
-    <div class="grafica-contenedor" ref="contenedorRef">
+    <div class="grafica-contenedor" ref="contenedorRef" role="img" aria-label="Gráfico de líneas interactivo del inventario porcino. Use las flechas del teclado para navegar por los puntos de datos.">
       <svg
         :viewBox="svgViewBox"
         :width="svgWidth"
         :height="svgHeight"
-        role="img"
-        aria-label="Gráfica de inventario porcino Colombia vs EE.UU."
+        role="presentation"
+        aria-hidden="true"
       >
         <title>Inventario histórico porcino: Colombia vs EE.UU.</title>
         <desc>Gráfica de líneas que compara el inventario porcino en Colombia (datos anuales) y EE.UU. (datos trimestrales) desde 2015 hasta 2025.</desc>
@@ -55,10 +55,10 @@
           <line
             v-for="i in 5"
             :key="'grid-' + i"
-            x1="98"
-            :y1="56 + 420 * (i - 1) / 4"
-            x2="1106"
-            :y2="56 + 420 * (i - 1) / 4"
+            x1="86"
+            :y1="56 + 340 * (i - 1) / 4"
+            x2="756"
+            :y2="56 + 340 * (i - 1) / 4"
             stroke="#EEC9C4"
             stroke-dasharray="3,3"
           />
@@ -69,8 +69,8 @@
           <text
             v-for="(valor, i) in etiquetasY"
             :key="'y-' + i"
-            x="81"
-            :y="56 + 420 * i / 4"
+            x="69"
+            :y="56 + 340 * i / 4"
             text-anchor="end"
             dominant-baseline="middle"
             font-size="13"
@@ -82,26 +82,25 @@
 
         <!-- Eje X -->
         <g class="grafica-x-axis">
-          <!-- Línea base del eje X -->
-          <line x1="98" y1="476" x2="1106" y2="476" stroke="#EEC9C4" stroke-width="1" />
+          <line x1="86" y1="420" x2="756" y2="420" stroke="#EEC9C4" stroke-width="1" />
           <text
             v-for="(label, i) in etiquetasX"
             :key="'x-' + i"
-            :x="98 + i * pasoX"
-            y="511"
+            :x="86 + i * pasoX"
+            y="455"
             text-anchor="middle"
             font-size="12"
             fill="#7A4A44"
-            :transform="debeRotar ? `rotate(-40, ${98 + i * pasoX}, 511)` : ''"
+            :transform="debeRotar ? `rotate(-40, ${86 + i * pasoX}, 455)` : ''"
           >
             {{ label }}
           </text>
         </g>
 
         <!-- Línea Colombia -->
-        <template v-if="paisActivo !== 'usa' && datosColombia.length">
+        <template v-if="paisActivo !== 'usa' && (datosValidados?.colombia || []).length">
           <polyline
-            :points="lineaColombia"
+            :points="lineaColonia"
             fill="none"
             stroke="#F5A800"
             stroke-width="3.5"
@@ -109,9 +108,9 @@
             stroke-linejoin="round"
           />
           <circle
-            v-for="(p, i) in datosColombia"
+            v-for="(p, i) in (datosValidados?.colombia || [])"
             :key="'c-' + i"
-            :cx="98 + i * pasoXCol"
+            :cx="86 + i * pasoXCol"
             :cy="escalaY(p.valor)"
             r="6"
             fill="#F5A800"
@@ -126,7 +125,7 @@
         </template>
 
         <!-- Línea USA -->
-        <template v-if="paisActivo !== 'colombia' && datosUsa.length">
+        <template v-if="paisActivo !== 'colombia' && (datosValidados?.usa || []).length">
           <polyline
             :points="lineaUsa"
             fill="none"
@@ -136,9 +135,9 @@
             stroke-linejoin="round"
           />
           <circle
-            v-for="(p, i) in datosUsa"
+            v-for="(p, i) in (datosValidados?.usa || [])"
             :key="'u-' + i"
-            :cx="98 + i * pasoXUsa"
+            :cx="86 + i * pasoXUsa"
             :cy="escalaY(p.valor)"
             r="6"
             fill="#2563EB"
@@ -153,7 +152,7 @@
         </template>
 
         <!-- Leyenda -->
-        <g transform="translate(840, 28)">
+        <g transform="translate(756, 28)">
           <template v-if="paisActivo !== 'usa'">
             <line x1="0" y1="0" x2="24" y2="0" stroke="#F5A800" stroke-width="3" />
             <circle cx="12" cy="0" r="4" fill="#F5A800" />
@@ -192,6 +191,8 @@
           class="grafica-tooltip"
           :class="{ 'grafica-tooltip--izquierda': tooltip.izquierda }"
           :style="{ left: tooltip.x + 'px', top: tooltip.y + 'px' }"
+          role="tooltip"
+          :aria-label="`Datos de ${tooltip.pais}: ${tooltip.valor.toLocaleString()} cabezas en ${tooltip.periodo}`"
         >
           <div class="grafica-tooltip__titulo">
             {{ tooltip.pais === 'Colombia' ? '🇨🇴 Colombia' : '🇺🇸 USA' }}
@@ -207,60 +208,21 @@
 </template>
 
 <script setup>
-import { 
-   SERIE_COLOMBIA, 
-   SERIE_USA, 
-   getPeriodos, 
-   getMaxValor, 
-   getColombiaPoints, 
-   getUsaPoints,
-   formatPoints,
-   datosGrafico,
-   validarDatos
-} from '../lib/datos-grafico.js'
-
+import { useEstadoGrafica } from '../lib/useEstadoGrafica.js'
+import { serieColombia, serieUSA } from '../lib/datos-grafico.js'
 import { ref, computed, onMounted, watch } from 'vue'
 
-const paisActivo = ref('colombia')
+const { paisActivo, datosValidados, setPais, initDatos, maximo, dataByPais } = useEstadoGrafica()
+
 const contenedorRef = ref(null)
 const esMovil = ref(false)
-const datosValidados = ref({ colombia: [], usa: [] })
 
-// Dimensioni del'area di disegno
-const areaAncho = 907
-const areaAlto = 378
-const svgAlto = 529
+// Dimensioni del'area di disegno (ridotte del 10%)
+const areaAncho = 816
+const areaAlto = 340
+const svgAlto = 476
 
-// Validar y transformar datos: Colombia y USA compaginando la misma métrica en millones
-watch(
-  () => [SERIE_COLOMBIA, SERIE_USA],
-  () => {
-    try {
-      validarDatos({ colombia: SERIE_COLOMBIA, usa: SERIE_USA })
-      datosValidados.value = {
-        colombia: SERIE_COLOMBIA.map((d) => ({
-          periodo: d.periodo,
-          valor: d.valor / 1e6,
-          valorReal: d.valor,
-          advertencia: d.advertencia || false,
-        })),
-        usa: SERIE_USA.map((d) => ({
-          periodo: d.periodo,
-          valor: d.valor / 1e6,
-          valorReal: d.valor,
-          ultimoDato: d.ultimoDato || false,
-        })),
-      }
-    } catch (error) {
-      console.error('Datos de gráfica inválidos:', error)
-      datosValidados.value = { colombia: [], usa: [] }
-    }
-  },
-  { immediate: true }
-)
-
-const datosColombia = computed(() => datosValidados.value.colombia)
-const datosUsa = computed(() => datosValidados.value.usa)
+initDatos()
 
 const tooltip = ref({
   visible: false,
@@ -272,23 +234,18 @@ const tooltip = ref({
   izquierda: false,
 })
 
-const maximo = computed(() => {
-  if (paisActivo.value === 'colombia') return 12
-  return 80
-})
-
 const etiquetasY = computed(() => {
   if (paisActivo.value === 'colombia') return ['12M', '9M', '6M', '3M', '0']
   return ['80M', '60M', '40M', '20M', '0']
 })
 
 const pasoXCol = computed(() => {
-  const len = datosColombia.value.length
+  const len = (datosValidados.value?.colombia || []).length
   return len > 1 ? areaAncho / (len - 1) : 0
 })
 
 const pasoXUsa = computed(() => {
-  const len = datosUsa.value.length
+  const len = (datosValidados.value?.usa || []).length
   return len > 1 ? areaAncho / (len - 1) : 0
 })
 
@@ -297,24 +254,24 @@ const pasoX = computed(() => {
   return pasoXUsa.value
 })
 
-const escalaY = (valor) => 476 - (valor / maximo.value) * areaAlto
+const escalaY = (valor) => 340 - (valor / maximo.value) * areaAlto
 
 const lineaColonia = computed(() => {
-  if (paisActivo.value === 'usa' || !datosColonia.value.length) return ''
-  return datosColonia.value
+  if (paisActivo.value === 'usa' || !(datosValidados.value?.colombia || []).length) return ''
+  return (datosValidados.value?.colombia || [])
     .map(
       (p, i) =>
-        `${98 + i * pasoXCol.value},${escalaY(p.valor)}`
+        `${86 + i * pasoXCol.value},${escalaY(p.valor)}`
     )
     .join(' ')
 })
 
 const lineaUsa = computed(() => {
-  if (paisActivo.value === 'colombia' || !datosUsa.value.length) return ''
-  return datosUsa.value
+  if (paisActivo.value === 'colombia' || !(datosValidados.value?.usa || []).length) return ''
+  return (datosValidados.value?.usa || [])
     .map(
       (p, i) =>
-        `${98 + i * pasoXUsa.value},${escalaY(p.valor)}`
+        `${86 + i * pasoXUsa.value},${escalaY(p.valor)}`
     )
     .join(' ')
 })
@@ -325,22 +282,22 @@ const debeRotar = computed(() => {
 
 const etiquetasX = computed(() => {
   if (paisActivo.value === 'colombia') {
-    return datosColonia.value.map((d) => d.periodo)
+    return (datosValidados.value?.colombia || []).map((d) => d.periodo)
   }
   // USA: mostrar label abreviado solo en puntos clave para evitar overlap
-  const allLabels = datosUsa.value.map((d) => d.periodo)
+  const allLabels = (datosValidados.value?.usa || []).map((d) => d.periodo)
   if (esMovil.value && allLabels.length > 8) {
     return allLabels.map((label, i) =>
       i % 3 === 0 || i === allLabels.length - 1 ? label : ''
     )
   }
   return allLabels
-})
+}) 
 
 // Responsive SVG
-const svgWidth = computed(() => (esMovil.value ? '100%' : 840))
+const svgWidth = computed(() => (esMovil.value ? '100%' : 756))
 const svgHeight = computed(() => svgAlto)
-const svgViewBox = computed(() => `0 0 840 ${svgAlto}`)
+const svgViewBox = computed(() => `0 0 756 ${svgAlto}`)
 
 const mostrarTooltip = (event, pais, dato) => {
   if (!contenedorRef.value) return

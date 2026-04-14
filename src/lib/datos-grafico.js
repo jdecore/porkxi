@@ -1,8 +1,11 @@
-import serieColombia from '../data/colombia.js';
-import serieUSA from '../data/usa.js';
+import { SERIE_COLOMBIA, DETALLE_COLOMBIA, PROBLEMA_DATOS_COLOMBIA } from '../data/colombia.js';
+import { SERIE_USA } from '../data/usa.js';
 
-export const SERIE_COLOMBIA = serieColombia;
-export const SERIE_USA = serieUSA;
+export const serieColombia = SERIE_COLOMBIA;
+export const serieUSA = SERIE_USA;
+
+export const DETALLE_COLOMBIA_DATA = DETALLE_COLOMBIA;
+export const PROBLEMA_DATOS_COLOMBIA_DATA = PROBLEMA_DATOS_COLOMBIA;
 
 export const etiquetasMeses = [
   'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
@@ -37,12 +40,12 @@ const processData = (serie) => {
   }));
 };
 
-export const getColombiaPoints = () => processData(serieColombia);
-export const getUsaPoints = () => processData(serieUSA);
+export const getColombiaPoints = () => processData(SERIE_COLOMBIA);
+export const getUsaPoints = () => processData(SERIE_USA);
 
 // Obtener etiquetas de periodos
 export const getPeriodos = () => {
-  return serieColombia.map(d => d.periodo);
+  return SERIE_COLOMBIA.map(d => d.periodo);
 };
 
 // Obtener valor máximo para el eje Y
@@ -67,8 +70,8 @@ export const calculatePoints = (data, areaWidth, areaHeight, maxValue) => {
 
 // Datos normalizados para gráficos - SINGLE SOURCE OF TRUTH
 export const datosGrafico = {
-  serieColombia: processData(serieColombia),
-  serieUSA: processData(serieUSA),
+  serieColombia: processData(SERIE_COLOMBIA),
+  serieUSA: processData(SERIE_USA),
   formatPoints,
   validarDatos,
   getColombiaPoints,

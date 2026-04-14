@@ -1,88 +1,78 @@
 ---
-import { 
-  SERIE_COLOMBIA, 
-  SERIE_USA, 
-  getPeriodos, 
-  getMaxValor, 
-  getColombiaPoints, 
-  getUsaPoints,
-  formatPoints 
-} from '../lib/datos-grafico';
+import { serieColombia, serieUSA } from '../lib/datos-grafico.js';
+import '../styles/grafica.css';
 
-const width = 700;
-const height = 450;
-const padding = 55;
+const width = 756;
+const height = 476;
+const areaAncho = 816;
+const areaAlto = 340;
+const paddingX = 86;
+const paddingY = 56;
 
-const allPeriodos = getPeriodos();
-const maxValor = getMaxValor();
+const maxValor = 80;
+const puntosColombia = serieColombia.map((d, i) => {
+  const x = paddingX + i * (areaAncho / (serieColombia.length - 1));
+  const y = 340 - (d.valor / 1e6 / maxValor) * areaAlto + 56;
+  return { x, y };
+});
 
-const colombiaPoints = getColombiaPoints();
-const usaPoints = getUsaPoints();
+const puntosUsa = serieUSA.map((d, i) => {
+  const x = paddingX + i * (areaAncho / (serieUSA.length - 1));
+  const y = 340 - (d.valor / 1e6 / maxValor) * areaAlto + 56;
+  return { x, y };
+});
 
-const colombiaPoly = formatPoints(colombiaPoints);
-const usaPoly = formatPoints(usaPoints);
+const colombiaPoly = puntosColombia.map(p => `${p.x},${p.y}`).join(' ');
+const usaPoly = puntosUsa.map(p => `${p.x},${p.y}`).join(' ');
+const allPeriodos = serieColombia.map(d => d.periodo);
 ---
 
-<section class="grafica-card">
-  <h2 class="grafica-card__titulo">Inventario histórico comparado</h2>
-  <p class="grafica-card__subtitulo">
-    En millones de cabezas. 
-    <span class="grafica-card__colombia">🟡 Colombia (anual · fuente: Porcinews)</span> ·
-    <span class="grafica-card__usa">🔵 EE.UU. (trimestral · fuente: USDA NASS)</span>
-  </p>
+<section class="grafica-card" aria-labelledby="grafica-titulo">
+  <h2 id="grafica-titulo" class="grafica-card__titulo">Inventario histórico comparado</h2>
+  <p class="grafica-card__subtitulo">En millones de cabezas.</p>
   
   <div class="grafica-contenedor">
     <svg class="grafica-svg" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMidYMid meet" role="img" aria-label="Gráfica de inventario porcino Colombia vs EE.UU.">
       <title>Inventario histórico porcino: Colombia vs EE.UU.</title>
       <desc>Gráfica de líneas que compara el inventario porcino en Colombia (datos anuales) y EE.UU. (datos trimestrales) desde 2015 hasta 2025.</desc>
       
-      <!-- Grid -->
       <g class="grafica-grid">
         {Array.from({ length: 5 }).map((_, i) => (
-          <line x1={padding} y1={padding + (height - padding * 2) * i / 4} x2={width - padding} y2={padding + (height - padding * 2) * i / 4} stroke="#EEC9C4" stroke-dasharray="3,3" />
+          <line x1={paddingX} y1={56 + 340 * i / 4} x2={756} y2={56 + 340 * i / 4} stroke="#EEC9C4" stroke-dasharray="3,3" />
         ))}
       </g>
       
-      <!-- Y axis -->
       <g class="grafica-y-axis">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <text x={padding - 8} y={padding + (height - padding * 2) * i / 4} text-anchor="end" dominant-baseline="middle" font-size="11" fill="#7A4A44">{80 - i * 20}M</text>
+        {['0', '20M', '40M', '60M', '80M'].map((label, i) => (
+          <text x={69} y={56 + 340 * i / 4} text-anchor="end" dominant-baseline="middle" font-size="13" fill="#7A4A44">{label}</text>
         ))}
       </g>
       
-      <!-- X axis -->
       <g class="grafica-x-axis">
-        {allPeriodos.filter((_, i) => i % 2 === 0 || i === allPeriodos.length - 1).map((label, i) => {
-          const originalIdx = allPeriodos.indexOf(label);
-          return (
-            <text x={getX(originalIdx)} y={height - padding + 20} text-anchor="end" dominant-baseline="middle" font-size="9" fill="#7A4A44" transform={`rotate(-30, ${getX(originalIdx)}, ${height - padding + 20})`}>{label}</text>
-          );
-        })}
+        <line x1={86} y1={420} x2={756} y2={420} stroke="#EEC9C4" stroke-width="1" />
+        {allPeriodos.filter((_, i) => i % 2 === 0 || i === allPeriodos.length - 1).map((label, i) => (
+          <text x={86 + i * 94} y={455} text-anchor="middle" font-size="12" fill="#7A4A44" transform={`rotate(-40, ${86 + i * 94}, 455)`}>{label}</text>
+        ))}
       </g>
       
-      <!-- Lines -->
-      <polyline points={colombiaPoly} fill="none" stroke="#F5A800" stroke-width="2.5" stroke-linecap="round" />
-      <polyline points={usaPoly} fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" />
+      <polyline points={usaPoly} fill="none" stroke="#2563EB" stroke-width="3.5" stroke-linecap="round" />
+      <polyline points={colombiaPoly} fill="none" stroke="#F5A800" stroke-width="3.5" stroke-linecap="round" />
       
-      <!-- Dots Colombia -->
-      {colombiaPoints.map((p, i) => (
-        <circle cx={p.x} cy={p.y} r="3" fill="#F5A800" />
+      {puntosColombia.map((p, i) => (
+        <circle cx={p.x} cy={p.y} r="5" fill="#F5A800" />
+      ))}
+      {puntosUsa.map((p, i) => (
+        <circle cx={p.x} cy={p.y} r="5" fill="#2563EB" />
       ))}
       
-      <!-- Dots USA -->
-      {usaPoints.map((p, i) => (
-        <circle cx={p.x} cy={p.y} r="3" fill="#2563EB" />
-      ))}
-      
-      <!-- Legend -->
-      <g transform={`translate(${width - 220}, ${padding - 20})`}>
-        <line x1="0" y1="0" x2="20" y2="0" stroke="#F5A800" stroke-width="2.5" />
-        <circle cx="10" cy="0" r="3" fill="#F5A800" />
-        <text x="28" y="4" font-size="11" fill="#3B1F1C">🇨🇴 Colombia (Porcinews)</text>
+      <g transform="translate(756, 28)">
+        <line x1="0" y1="0" x2="24" y2="0" stroke="#F5A800" stroke-width="3" />
+        <circle cx="12" cy="0" r="4" fill="#F5A800" />
+        <text x="32" y="4" font-size="12" fill="#3B1F1C" font-weight="500">Colombia</text>
         
-        <line x1="160" y1="0" x2="180" y2="0" stroke="#2563EB" stroke-width="2.5" />
-        <circle cx="170" cy="0" r="3" fill="#2563EB" />
-        <text x="188" y="4" font-size="11" fill="#3B1F1C">🇺🇸 EE.UU. (USDA NASS)</text>
+        <line x1="110" y1="0" x2="134" y2="0" stroke="#2563EB" stroke-width="3" />
+        <circle cx="122" cy="0" r="4" fill="#2563EB" />
+        <text x="142" y="4" font-size="12" fill="#3B1F1C" font-weight="500">USA</text>
       </g>
     </svg>
   </div>
