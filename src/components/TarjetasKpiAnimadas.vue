@@ -91,11 +91,12 @@ onMounted(() => {
 }
 
 .tarjeta-kpi {
-  background: var(--crema-oscuro, #F7E0DC);
+  background: white;
   border-radius: var(--radio, 14px);
   padding: 20px;
   box-shadow: var(--sombra, 0 10px 28px rgba(59, 31, 28, 0.08));
   text-align: center;
+  border: 1.5px solid var(--crema-borde, #EEC9C4);
 }
 
 .tarjeta-kpi--colombia {
