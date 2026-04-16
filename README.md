@@ -41,3 +41,10 @@ All commands are run from the root of the project, from a terminal:
 ## 👀 Want to learn more?
 
 Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+
+## Vercel (Hobby) required env vars
+
+Set these in Project Settings -> Environment Variables:
+
+- `GEMINI_API_KEY`: used by `api/analisis.py` to call Gemini server-side.
+- `CRON_SECRET`: used by `api/actualizar.py` to validate Vercel Cron requests (`Authorization: Bearer <CRON_SECRET>`).

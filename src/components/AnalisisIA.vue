@@ -57,23 +57,17 @@ Sé conciso y profesional.
   `
 
   try {
-    // Usamos Gemini Free API cliente-side (sin backend)
-    const respuesta = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyC6fJnZ7eQv0b3cD5eF7gH9jK1lM3nO5pR', {
+    const respuesta = await fetch('/api/analisis', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.3,
-          maxOutputTokens: 300
-        }
-      })
+      body: JSON.stringify({ prompt })
     })
 
-    if (!respuesta.ok) throw new Error()
+    if (!respuesta.ok) throw new Error('No se pudo generar análisis')
 
     const datos = await respuesta.json()
-    analisis.value = datos.candidates[0].content.parts[0].text.trim()
+    if (!datos?.text) throw new Error('Respuesta inválida de IA')
+    analisis.value = datos.text.trim()
   } catch (e) {
     error.value = true
   } finally {

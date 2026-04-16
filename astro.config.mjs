@@ -5,6 +5,7 @@ import vercel from '@astrojs/vercel';
 
 export default defineConfig({
   integrations: [ vue() ],
+  adapter: vercel(),
   output: 'static',
   build: {
     inlineStylesheets: 'always',

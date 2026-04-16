@@ -6,6 +6,9 @@
     }
   ],
   "functions": {
+    "api/analisis.py": {
+      "runtime": "vercel-python@3.12"
+    },
     "api/actualizar.py": {
       "runtime": "vercel-python@3.12"
     }
