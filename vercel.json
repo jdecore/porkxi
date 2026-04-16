@@ -1,0 +1,13 @@
+{
+  "crons": [
+    {
+      "path": "/api/actualizar",
+      "schedule": "0 12 * * *"
+    }
+  ],
+  "functions": {
+    "api/actualizar.py": {
+      "runtime": "vercel-python@3.12"
+    }
+  }
+}

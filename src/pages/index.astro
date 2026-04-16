@@ -1,6 +1,8 @@
 ---
 import GraficaInteractiva from '../components/GraficaInteractiva.vue';
 import TarjetasKpiAnimadas from '../components/TarjetasKpiAnimadas.vue';
+import AnalisisIA from '../components/AnalisisIA.vue';
+import MonitoreoFuentes from '../components/MonitoreoFuentes.vue';
 import GraficaPrincipal from '../components/GraficaPrincipal.astro';
 
 import '../styles/encabezado.css';
@@ -112,6 +114,10 @@ const ultimoDatoUsa = SERIE_USA[SERIE_USA.length - 1];
       <TarjetasKpiAnimadas client:idle />
 
       <GraficaInteractiva client:idle />
+
+      <AnalisisIA client:idle />
+
+      <MonitoreoFuentes client:idle />
 
       <div class="comparativa-frecuencia">
         <div class="frecuencia-card frecuencia-card--colombia">
@@ -266,6 +272,49 @@ const ultimoDatoUsa = SERIE_USA[SERIE_USA.length - 1];
             <a href={DETALLE_USA.enlace} target="_blank" rel="noopener noreferrer" class="pie-pagina__enlace">USDA NASS (23 dic 2025)</a>
           </div>
         </div>
+
+        <section class="sobre-proyecto">
+          <h3 class="sobre-proyecto__titulo">🧑‍💻 Sobre este proyecto</h3>
+          <div class="sobre-proyecto__grid">
+            <div class="sobre-proyecto__item">
+              <div class="sobre-proyecto__icono">⚡</div>
+              <div class="sobre-proyecto__texto">
+                <strong>Renderizado 100% estático</strong>
+                <p>Construido con Astro 6, sin runtime innecesario. Bundle total: ~90KB</p>
+              </div>
+            </div>
+            <div class="sobre-proyecto__item">
+              <div class="sobre-proyecto__icono">💚</div>
+              <div class="sobre-proyecto__texto">
+                <strong>Componentes interactivos Vue 3</strong>
+                <p>Gráfica SVG nativa sin librerías externas. Hidratación diferida</p>
+              </div>
+            </div>
+            <div class="sobre-proyecto__item">
+              <div class="sobre-proyecto__icono">🤖</div>
+              <div class="sobre-proyecto__texto">
+                <strong>Actualización automática</strong>
+                <p>Python + Vercel Cron. Revisa fuentes oficiales diariamente</p>
+              </div>
+            </div>
+            <div class="sobre-proyecto__item">
+              <div class="sobre-proyecto__icono">🧠</div>
+              <div class="sobre-proyecto__texto">
+                <strong>Análisis con IA Generativa</strong>
+                <p>Extrae tendencias y predicciones automáticamente de los datos</p>
+              </div>
+            </div>
+          </div>
+          <div class="sobre-proyecto__tech">
+            <span class="sobre-proyecto__tag">Astro</span>
+            <span class="sobre-proyecto__tag">Vue 3</span>
+            <span class="sobre-proyecto__tag">Python</span>
+            <span class="sobre-proyecto__tag">SVG</span>
+            <span class="sobre-proyecto__tag">Vercel</span>
+            <span class="sobre-proyecto__tag">IA Generativa</span>
+          </div>
+        </section>
+
         <hr class="pie-pagina__separador" />
         <div class="pie-pagina__creditos">Hecho por Juan Enríquez con ayuda de IA</div>
         <p class="pie-pagina__creditos-nota">Todos los datos fueron verificados contra fuentes oficiales.</p>
