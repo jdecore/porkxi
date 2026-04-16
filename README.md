@@ -35,6 +35,8 @@ All commands are run from the root of the project, from a terminal:
 | `npm run dev`             | Starts local dev server at `localhost:4321`      |
 | `npm run build`           | Build your production site to `./dist/`          |
 | `npm run preview`         | Preview your build locally, before deploying     |
+| `npm run check`           | Run Astro type/content checks                    |
+| `npm run update:fuentes`  | Generate `public/estado-fuentes.json` snapshot   |
 | `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
 | `npm run astro -- --help` | Get help using the Astro CLI                     |
 
@@ -47,4 +49,11 @@ Feel free to check [our documentation](https://docs.astro.build) or jump into ou
 Set these in Project Settings -> Environment Variables:
 
 - `GEMINI_API_KEY`: used by `api/analisis.py` to call Gemini server-side.
-- `CRON_SECRET`: used by `api/actualizar.py` to validate Vercel Cron requests (`Authorization: Bearer <CRON_SECRET>`).
+- `CRON_SECRET` (optional): used by `api/actualizar.py` if you invoke that endpoint manually.
+
+## Daily source updates (without Vercel quota burn)
+
+The monitoring UI reads from `public/estado-fuentes.json` (static file).
+
+- `.github/workflows/actualizar-fuentes.yml` updates that snapshot daily using GitHub Actions.
+- This avoids per-visit Vercel Function invocations for source monitoring.

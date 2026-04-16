@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://porkxi.com/sitemap.xml
+Sitemap: https://porkxi.com/sitemap-index.xml

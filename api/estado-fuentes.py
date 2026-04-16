@@ -1,11 +1,8 @@
 from http.server import BaseHTTPRequestHandler
 import json
-from datetime import datetime, timezone
-import sys
+from pathlib import Path
 
-sys.path.append("scripts")
-
-from scraper_usda import actualizar_datos
+ESTADO_PATH = Path(__file__).resolve().parent.parent / "public" / "estado-fuentes.json"
 
 
 class handler(BaseHTTPRequestHandler):
@@ -17,23 +14,14 @@ class handler(BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(payload).encode())
 
     def do_GET(self):
-        usa = actualizar_datos()
-        payload = {
-            "fecha_consulta": datetime.now(timezone.utc).isoformat(),
-            "usa": {
-                "status": usa.get("status", "error"),
-                "ultimo_reporte": usa.get("ultimo_reporte", "sin dato"),
-                "fuente": usa.get("fuente", "USDA NASS"),
-                "proximo_reporte": "Próximo reporte: 26 mar 2026",
-                "error": usa.get("error"),
-            },
-            "colombia": {
-                "status": "warning",
-                "ultimo_reporte": "ene 2026",
-                "fuente": "Porcinews",
-                "proximo_reporte": "Sin fecha programada",
-            },
-        }
+        if not ESTADO_PATH.exists():
+            self._send_json(404, {"error": "Snapshot no encontrado"})
+            return
+        try:
+            payload = json.loads(ESTADO_PATH.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            self._send_json(500, {"error": "Snapshot inválido"})
+            return
         self._send_json(200, payload)
 
     def do_POST(self):

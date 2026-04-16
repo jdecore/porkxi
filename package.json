@@ -9,14 +9,19 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "check": "astro check",
+    "update:fuentes": "python3 scripts/generar_estado_fuentes.py",
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.2",
     "@astrojs/vue": "^6.0.1",
     "astro": "^6.1.2",
     "vue": "^3.5.32"
   },
   "devDependencies": {
-    "@astrojs/vercel": "^10.0.4"
+    "@astrojs/check": "^0.9.8",
+    "@astrojs/vercel": "^10.0.4",
+    "typescript": "^5.9.3"
   }
 }

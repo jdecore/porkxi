@@ -5,7 +5,7 @@ import sys
 
 sys.path.append("scripts")
 
-from scraper_usda import actualizar_datos
+from scraper_usda import construir_estado_fuentes
 
 
 class handler(BaseHTTPRequestHandler):
@@ -25,12 +25,12 @@ class handler(BaseHTTPRequestHandler):
                 self._send_json(401, {"status": "error", "error": "Unauthorized"})
                 return
 
-        resultado = actualizar_datos()
-        if resultado.get("status") != "ok":
-            self._send_json(502, resultado)
+        estado = construir_estado_fuentes()
+        if estado.get("usa", {}).get("status") != "ok":
+            self._send_json(502, estado)
             return
 
-        self._send_json(200, resultado)
+        self._send_json(200, estado)
 
     def do_POST(self):
         self._send_json(405, {"status": "error", "error": "Method Not Allowed"})

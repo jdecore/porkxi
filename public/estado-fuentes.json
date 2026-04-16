@@ -1,0 +1,23 @@
+{
+  "fecha_consulta": "2026-04-16T17:39:20.001211+00:00",
+  "usa": {
+    "status": "ok",
+    "fuente": "USDA NASS RSS",
+    "titulo": "United States hog inventory up slightly",
+    "enlace": "https://www.nass.usda.gov/Newsroom/2025/06-26-2025.php",
+    "ultimo_reporte": "26 jun 2025",
+    "ultimo_reporte_iso": "2025-06-26T20:00:00+00:00",
+    "dias_desde_reporte": 293,
+    "inventario_millones": 75.1,
+    "proximo_reporte": "Próximo reporte estimado: sep 2025 (trimestral)"
+  },
+  "colombia": {
+    "status": "warning",
+    "fuente": "Porcinews",
+    "ultimo_reporte": "ene 2026",
+    "ultimo_reporte_iso": "2026-01-01T00:00:00+00:00",
+    "dias_desde_reporte": 105,
+    "proximo_reporte": "Sin fecha oficial programada",
+    "enlace": "https://www.porcinews.com/actualidad/datos-actuales-del-sector-porcino-en-colombia_21476/"
+  }
+}
