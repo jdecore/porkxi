@@ -1,49 +1,86 @@
 .grafica-card {
-  background: var(--crema-oscuro, #F7E0DC);
-  border: 1.5px solid var(--crema-borde, #EEC9C4);
+  background: #FFFFFF;
+  border: 1.5px solid #E8E4E0;
   border-radius: var(--radio, 14px);
   padding: 28px 32px;
   margin-bottom: 36px;
-  box-shadow: var(--sombra, 0 10px 28px rgba(59, 31, 28, 0.08));
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
 }
 
 .grafica-card__titulo {
   font-family: 'Playfair Display', serif;
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 700;
   margin: 0 0 8px;
-  color: var(--tinta, #3B1F1C);
+  color: var(--tinta, #3A2320);
 }
 
 .grafica-card__subtitulo {
-  font-size: 13px;
-  color: var(--tinta-claro, #7A4A44);
-  margin: 0 0 24px;
+  font-size: 14px;
+  color: var(--tinta-claro, #5A4A45);
+  margin: 0 0 20px;
   line-height: 1.5;
 }
 
-.grafica-card__subtitulo span {
-  margin: 0 4px;
+.grafica-card__colombia {
+  color: var(--colombia, #C96A5B);
+  font-weight: 600;
 }
 
-.grafica-card__colombia {
-  color: var(--colombia, #F5A800);
+.grafica-card__europa {
+  color: var(--europa, #0F766E);
   font-weight: 600;
 }
 
 .grafica-card__usa {
-  color: var(--usa, #2563EB);
+  color: var(--usa, #1D4ED8);
   font-weight: 600;
+}
+
+.grafica-botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.grafica-boton {
+  background: #F5F5F5;
+  border: 1px solid #E0E0E0;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--tinta-claro, #5A4A45);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.grafica-boton:hover {
+  background: #EEEEEE;
+}
+
+.grafica-boton--activo {
+  background: var(--cerdo, #C4320A);
+  border-color: var(--cerdo, #C4320A);
+  color: #FFFFFF;
+}
+
+.grafica-boton--activo:hover {
+  background: var(--cerdo-claro, #D4736B);
 }
 
 .grafica-contenedor {
   width: 100%;
-  height: 529px;
+  height: 420px;
+  position: relative;
+  overflow-x: auto;
 }
 
 .grafica-contenedor svg {
   display: block;
   width: 100%;
+  max-width: 756px;
   height: 100%;
 }
 
@@ -54,14 +91,21 @@
   }
 
   .grafica-card__titulo {
-    font-size: 22px;
+    font-size: 20px;
   }
 
   .grafica-contenedor {
-    height: 430px;
-    min-width: 750px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    height: 340px;
+    min-width: 600px;
+  }
+
+  .grafica-botones {
+    gap: 6px;
+  }
+
+  .grafica-boton {
+    padding: 6px 10px;
+    font-size: 12px;
   }
 }
 
@@ -70,16 +114,7 @@
     padding: 16px 12px;
   }
 
-  .grafica-card__titulo {
-    font-size: 20px;
-  }
-
-  .grafica-card__subtitulo {
-    font-size: 12px;
-    margin-bottom: 16px;
-  }
-
   .grafica-contenedor {
-    height: 380px;
+    height: 300px;
   }
 }

@@ -21,19 +21,19 @@ const tooltip = ref({
   izquierda: false,
 })
 
-const xInicio = 86
-const xFin = 706
-const yInicio = 56
-const yFin = 420
+const xInicio = 56
+const xFin = 716
+const yInicio = 40
+const yFin = 400
 const chartWidth = xFin - xInicio
 const chartHeight = yFin - yInicio
-const svgAlto = 476
-const svgAncho = 756
+const svgAlto = 440
+const svgAncho = 760
 
 const catalogoSeries = {
-  colombia: { key: 'colombia', label: 'Colombia', icono: '🇨🇴', color: '#F5A800' },
-  europa: { key: 'europa', label: 'Europa (UE-27)', icono: '🇪🇺', color: '#0EA5A4' },
-  usa: { key: 'usa', label: 'EE.UU.', icono: '🇺🇸', color: '#2563EB' },
+  colombia: { key: 'colombia', label: 'Colombia', icono: '🇨🇴', color: '#C96A5B' },
+  europa: { key: 'europa', label: 'Europa (UE-27)', icono: '🇪🇺', color: '#0F766E' },
+  usa: { key: 'usa', label: 'EE.UU.', icono: '🇺🇸', color: '#1D4ED8' },
 }
 
 const botones = [
@@ -206,7 +206,7 @@ onUnmounted(() => {
             :y1="yInicio + (chartHeight * (i - 1)) / 4"
             :x2="xFin"
             :y2="yInicio + (chartHeight * (i - 1)) / 4"
-            stroke="#EEC9C4"
+            stroke="#D0CCC8"
             stroke-dasharray="3,3"
           />
         </g>
@@ -215,27 +215,27 @@ onUnmounted(() => {
           <text
             v-for="(valor, i) in etiquetasY"
             :key="`y-${i}`"
-            x="69"
+            x="60"
             :y="yInicio + (chartHeight * i) / 4"
             text-anchor="end"
             dominant-baseline="middle"
             font-size="13"
-            fill="#7A4A44"
+            fill="#5A4A45"
           >
             {{ valor }}
           </text>
         </g>
 
         <g class="grafica-x-axis">
-          <line :x1="xInicio" :y1="yFin" :x2="xFin" :y2="yFin" stroke="#EEC9C4" stroke-width="1" />
+          <line :x1="xInicio" :y1="yFin" :x2="xFin" :y2="yFin" stroke="#D0CCC8" stroke-width="1" />
           <text
             v-for="(label, i) in etiquetasX"
             :key="`x-${i}`"
             :x="xInicio + i * pasoXEtiquetas"
-            y="452"
+            y="425"
             text-anchor="middle"
             font-size="12"
-            fill="#7A4A44"
+            fill="#5A4A45"
             :transform="debeRotar ? `rotate(-40, ${xInicio + i * pasoXEtiquetas}, 452)` : ''"
           >
             {{ label }}

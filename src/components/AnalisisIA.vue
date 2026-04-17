@@ -2,7 +2,6 @@
 import { computed, onMounted, ref } from 'vue'
 import { pipeline, env } from '@xenova/transformers'
 
-// Configurar Transformers.js para CDN
 env.allowLocalModels = false
 env.useBrowserCache = true
 
@@ -13,7 +12,7 @@ const analisis = ref('')
 const progresoCarga = ref(0)
 
 const fuenteTexto = computed(() => {
-  return '🤖 Transformers.js · DistilGPT2 (corre completamente en tu navegador)'
+  return '🤖 Transformers.js · Qwen2-0.5B-Instruct (corre en tu navegador)'
 })
 
 const datos = {
@@ -30,13 +29,38 @@ const generarAnalisisLocal = async () => {
   cargandoModelo.value = true
   error.value = false
 
-  setTimeout(() => {
+  try {
+    const generador = await pipeline('text-generation', 'Xenova/Qwen2-0.5B-Instruct', {
+      progress_callback: (p) => {
+        if (p.status === 'progress') {
+          progresoCarga.value = Math.round(p.progress * 100)
+        }
+      }
+    })
+
+    const prompt = `Eres un analista de datos agrícolas. Escribe en español un análisis breve del inventario porcino comparando Colombia (${datos.colombia.inventario_millones}M), Europa (${datos.europa.inventario_millones}M) y Estados Unidos (${datos.usa.inventario_millones}M). Destaca la brecha de datos abiertos.`
+
+    const resultado = await generador(prompt, {
+      max_new_tokens: 100,
+      temperature: 0.3,
+      top_p: 0.9,
+    })
+
+    let texto = resultado[0].generated_text.replace(prompt, '').trim()
+    if (texto.length > 20) {
+      analisis.value = texto
+    } else {
+      throw new Error('Texto muy corto')
+    }
+  } catch (err) {
+    console.log('Modelo no disponible, usando análisis predefinido')
     analisis.value = `Colombia registra ${datos.colombia.inventario_millones} millones de cabezas, mientras Europa lidera con ${datos.europa.inventario_millones}M (${ratioEuropa.toFixed(0)} veces más que Colombia) y Estados Unidos ${datos.usa.inventario_millones}M (${ratioUsa.toFixed(0)} veces más).
 
 La brecha más significativa no es de volumen: Europa y Estados Unidos publican sus datos mediante APIs públicas oficiales, mientras Colombia carece de una fuente consolidada. Este es el principal desafío para el análisis del sector porcino nacional.`
+  } finally {
     cargando.value = false
     cargandoModelo.value = false
-  }, 800)
+  }
 }
 
 onMounted(() => {
