@@ -1,11 +1,17 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { pipeline, env } from '@xenova/transformers'
+
+env.allowLocalModels = false
 
 const cargando = ref(true)
+const modeloListo = ref(false)
 const error = ref(false)
 const analisis = ref('')
 const descargando = ref(false)
 const datosWeb = ref(null)
+const generando = ref(false)
+let generador = null
 
 const cargarDatosWeb = async () => {
   try {
@@ -17,7 +23,11 @@ const cargarDatosWeb = async () => {
 }
 
 const fuenteTexto = computed(() => {
-  return '📊 Datos oficiales en tiempo real'
+  if (!datosWeb.value) return 'Cargando...'
+  const fecha = new Date(datosWeb.value.actualizado).toLocaleDateString('es-CO', {
+    day: 'numeric', month: 'short', year: 'numeric'
+  })
+  return `Datos actualizados: ${fecha}`
 })
 
 const descargarReporte = async () => {
@@ -38,41 +48,38 @@ const descargarReporte = async () => {
   }
 }
 
-const datosColombia = {
-  total: 10668276,
-  predios: 189198,
-  traspatio: 78.38,
-  familiar: 19.03,
-  industrial: 2.12,
-  tecnificadas: 0.47,
-  carne: 608752,
-  variacionCarne: 7.8,
-}
-
-const datosEuropa = {
-  total: 132135520,
-  variacion: -0.5,
-}
-
-const datosUsa = {
-  total: 75500000,
-  mercado: 69600000,
-  reproductores: 5950000,
-  camada: 11.93,
-  variacion: 1,
-}
-
-const generarAnalisisLocal = async () => {
-  if (cargando.value) return
+const iniciarModelo = async () => {
+  if (generador) return
   
-  cargando.value = true
+  try {
+    generador = await pipeline('text-generation', 'onnx-community/SmolLM2-360M-ONNX', {
+      dtype: 'q4',
+      device: 'webgpu'
+    })
+    modeloListo.value = true
+  } catch (err) {
+    console.error('Error modelo webgpu:', err)
+    try {
+      generador = await pipeline('text-generation', 'onnx-community/SmolLM2-360M-ONNX', {
+        dtype: 'q4'
+      })
+      modeloListo.value = true
+    } catch (err2) {
+      console.error('Error modelo fallback:', err2)
+      error.value = true
+    }
+  }
+}
 
+const generarAnalisisIA = async () => {
+  if (generando.value) return
+  generando.value = true
+  
   await cargarDatosWeb()
-  
   const d = datosWeb.value
   if (!d) {
     analisis.value = 'Error cargando datos'
-    cargando.value = false
+    generando.value = false
     return
   }
 
@@ -83,27 +90,55 @@ const generarAnalisisLocal = async () => {
   const colUlt = col.serie[col.serie.length - 1]
   const colAnt = col.serie[col.serie.length - 2]
   const euUlt = eu.serie[eu.serie.length - 1]
+  const euAnt = eu.serie[eu.serie.length - 2]
   const usaUlt = usa.serie[usa.serie.length - 1]
+  const usaAnt = usa.serie[usa.serie.length - 2]
   
-  const crecimientoCol = ((colUlt.valor - colAnt.valor) / colAnt.valor * 100).toFixed(1)
-  const ratioColEu = (euUlt.valor / colUlt.valor).toFixed(1)
-  const ratioColUsa = (usaUlt.valor / colUlt.valor).toFixed(1)
+  const crecimientoCol = Number(((colUlt.valor - colAnt.valor) / colAnt.valor * 100).toFixed(1))
+  const crecimientoEu = Number(((euUlt.valor - euAnt.valor) / euAnt.valor * 100).toFixed(1))
+  const crecimientoUsa = Number(((usaUlt.valor - usaAnt.valor) / usaAnt.valor * 100).toFixed(1))
+  const ratioColEu = Number((euUlt.valor / colUlt.valor).toFixed(1))
+  const ratioColUsa = Number((usaUlt.valor / colUlt.valor).toFixed(1))
 
-  const analisisBase = `Colombia registra ${(colUlt.valor/1e6).toFixed(1)} millones de cerdas en ${col.detalle.predios.toLocaleString()} predios, con un crecimiento del +${crecimientoCol}% respecto a 2023. La estructura muestra ${col.detalle.traspatio.porcentaje}% en traspatio, ${col.detalle.familiar.porcentaje}% en explotaciones familiares y solo ${col.detalle.industrial.porcentaje}% en industria.`
+  const promptText = `Eres un analista de datos agricolas. Analiza el inventario porcino comparando tres regiones: Colombia 2024 tiene ${colUlt.valor.toLocaleString()} cerdas en ${col.detalle.predios.toLocaleString()} predios con crecimiento del +${crecimientoCol} por ciento. Estructura: ${col.detalle.traspatio.porcentaje} por ciento en traspatio, ${col.detalle.familiar.porcentaje} por ciento familiar, ${col.detalle.industrial.porcentaje} por ciento industrial. La UE-27 tiene ${euUlt.valor.toLocaleString()} cerdas con variacion del ${crecimientoEu} por ciento. USA tiene ${usaUlt.valor.toLocaleString()} cerdas con crecimiento del +${crecimientoUsa} por ciento. Escribe un analisis breve de maximo 80 palabras en espanol comparando los tres mercados.`
 
-  const analisisOpciones = [
-    ` La UE-27 lidera con ${(euUlt.valor/1e6).toFixed(0)} millones (${ratioColEu}x Colombia) mientras EE.UU. alcanza ${(usaUlt.valor/1e6).toFixed(1)} millones (${ratioColUsa}x). La brecha real está en la transparencia: Europa y USA publican datos oficiales vía API, mientras Colombia carece de fuente gubernamental consolidada.`,
-    ` El contraste con ${(euUlt.valor/1e6).toFixed(0)}M de la UE-27 y ${(usaUlt.valor/1e6).toFixed(1)}M de USA evidencia la oportunidad de crecimiento. Sin datos abiertos, los productores colombianostrabajan sin información oficial actualizada.`,
-    ` Mientras Europa y Estados Unidos publican series históricas verificables, Colombia depende de medios especializados. Esta fragmentación limita la capacidad de análisis estratégico del sector porcino nacional.`
-  ]
-
-  analisis.value = analisisBase + analisisOpciones[Math.floor(Math.random() * analisisOpciones.length)]
-  cargando.value = false
+  try {
+    if (!generador) {
+      await iniciarModelo()
+    }
+    
+    if (!generador) {
+      throw new Error('Generador no disponible')
+    }
+    
+    const resultado = await generador(promptText, {
+      max_new_tokens: 120,
+      temperature: 0.7,
+      do_sample: true
+    })
+    
+    const texto = resultado[0]?.generated_text || ''
+    const inicio = promptText.length
+    let analisisGenerado = texto.substring(inicio).trim()
+    
+    if (analisisGenerado.length < 20) {
+      analisisGenerado = `Colombia crece +${crecimientoCol}% vs UE-27 ${crecimientoEu}% y USA +${crecimientoUsa}%. La UE lidera con ${ratioColEu}x mas cerdas que Colombia, seguida por USA con ${ratioColUsa}x. La estructura colombiana es mayoritariamente de traspatio.`
+    }
+    
+    analisis.value = analisisGenerado.replace(/^[:\s]+/, '').substring(0, 300)
+  } catch (err) {
+    console.error('Error generacion:', err)
+    analisis.value = `Colombia cresce +${crecimientoCol}% vs UE-27 ${crecimientoEu}% y USA +${crecimientoUsa}%. La UE lidera con ${ratioColEu}x mas cerdas que Colombia, seguida por USA con ${ratioColUsa}x. Estrutura: ${col.detalle.traspatio.porcentaje}% traspatio.`
+  }
+  
+  generando.value = false
 }
 
 onMounted(async () => {
   await cargarDatosWeb()
-  void generarAnalisisLocal()
+  await iniciarModelo()
+  await generarAnalisisIA()
+  cargando.value = false
 })
 </script>
 
@@ -111,27 +146,27 @@ onMounted(async () => {
   <div class="analisis-ia">
     <div class="analisis-ia__encabezado">
       <span class="analisis-ia__icono">⚡</span>
-      <h3 class="analisis-ia__titulo">Análisis con IA</h3>
-      <button v-if="!cargando" @click="generarAnalisisLocal" class="analisis-ia__boton">
+      <h3 class="analisis-ia__titulo">Analisis con IA</h3>
+      <button v-if="!cargando && !generando" @click="generarAnalisisIA" class="analisis-ia__boton">
         ↻
       </button>
     </div>
 
-    <div v-if="cargando" class="analisis-ia__cargando">
+    <div v-if="cargando || generando" class="analisis-ia__cargando">
       <div class="analisis-ia__spinner"></div>
-      <span>Cargando datos...</span>
+      <span>{{ modeloListo ? 'Generando analisis...' : 'Cargando modelo IA...' }}</span>
     </div>
 
     <div v-else-if="error" class="analisis-ia__error">
-      ⚠️ Error cargando modelo. Usando análisis predefinido.
+      Error cargando modelo IA. Usando analisis basico.
     </div>
 
     <div v-else class="analisis-ia__contenido">
       <p class="analisis-ia__texto">{{ analisis }}</p>
       <div class="analisis-ia__footer">
-        <p class="analisis-ia__meta">✅ {{ fuenteTexto }}</p>
+        <p class="analisis-ia__meta">{{ fuenteTexto }}</p>
         <button class="analisis-ia__descarga" @click="descargarReporte" :disabled="descargando">
-          {{ descargando ? '⬇ Descargando...' : '📄 Descargar reporte' }}
+          {{ descargando ? 'Descargando...' : 'Descargar reporte' }}
         </button>
       </div>
     </div>
