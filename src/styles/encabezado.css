@@ -2,14 +2,16 @@
   padding: 52px 0 28px;
   border-bottom: 2px solid var(--crema-borde);
   margin-bottom: 36px;
+  text-align: center;
 }
 
 .encabezado__logo {
-  font-family: 'Playfair Display', serif;
-  font-size: 72px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 86px;
   font-weight: 900;
-  letter-spacing: -3px;
-  margin: 0 0 12px;
+  letter-spacing: -4px;
+  margin: 0 0 16px;
+  line-height: 1;
 }
 
 .encabezado__logo-parte {
@@ -24,7 +26,7 @@
   font-size: 15px;
   color: var(--tinta-claro);
   max-width: 520px;
-  margin: 0 0 20px;
+  margin: 0 auto 20px;
   line-height: 1.5;
 }
 
@@ -32,6 +34,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  justify-content: center;
 }
 
 .encabezado__badge {
@@ -74,8 +77,8 @@
   }
 
   .encabezado__logo {
-    font-size: 48px;
-    letter-spacing: -2px;
+    font-size: 62px;
+    letter-spacing: -3px;
   }
 
   .encabezado__subtitulo {
@@ -99,7 +102,8 @@
   }
 
   .encabezado__logo {
-    font-size: 40px;
+    font-size: 52px;
+    letter-spacing: -2px;
   }
 
   .encabezado__subtitulo {
