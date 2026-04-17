@@ -19,7 +19,7 @@
 }
 
 .tarjeta-kpi {
-  background: white;
+  background: #FFEBE6;
   border: 1.5px solid var(--crema-borde);
   border-radius: var(--radio);
   padding: 20px 22px;

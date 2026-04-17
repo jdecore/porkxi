@@ -268,7 +268,7 @@ onMounted(() => {
 
 <style scoped>
 .monitoreo {
-  background: white;
+  background: #FFEBE6;
   border-radius: var(--radio);
   padding: 24px;
   margin: 32px 0;

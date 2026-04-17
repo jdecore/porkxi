@@ -326,9 +326,9 @@ onUnmounted(() => {
 
 .grafica-boton {
   padding: 10px 20px;
-  border: 2px solid var(--crema-borde, #EEC9C4);
+  border: 2px solid var(--crema-borde, #FFD1CC);
   border-radius: 8px;
-  background: white;
+  background: #FFEBE6;
   font-size: 14px;
   font-weight: 500;
   color: var(--tinta-claro, #7A4A44);

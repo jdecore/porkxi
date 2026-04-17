@@ -124,7 +124,7 @@ onMounted(() => {
 
 <style scoped>
 .analisis-ia {
-  background: white;
+  background: #FFEBE6;
   border-radius: var(--radio);
   padding: 24px;
   margin: 32px 0;

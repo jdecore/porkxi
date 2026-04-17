@@ -1,5 +1,5 @@
 .banner-alerta {
-  background: white;
+  background: #FFEBE6;
   border: 1.5px solid var(--alerta);
   border-left: 5px solid var(--alerta);
   border-radius: 10px;
