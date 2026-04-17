@@ -23,7 +23,7 @@ const cargarDatosWeb = async () => {
 }
 
 const fuenteTexto = computed(() => {
-  return '🤖 Qwen3.5-0.8B · IA en tu navegador'
+  return '🤖 DistilGPT2 · IA en tu navegador'
 })
 
 const descargarReporte = async () => {
@@ -98,7 +98,7 @@ const generarAnalisisLocal = async () => {
 
   try {
     if (!modeloCache) {
-      modeloCache = await pipeline('text-generation', 'Xenova/Qwen3.5-0.8B-Instruct', {
+      modeloCache = await pipeline('text-generation', 'Xenova/distilgpt2', {
         progress_callback: (p) => {
           if (p.status === 'progress') {
             progresoCarga.value = Math.round(p.progress * 100)
@@ -108,34 +108,19 @@ const generarAnalisisLocal = async () => {
     }
     const generador = modeloCache
 
-    const prompt = `Basado en datos oficiales,haz un análisisExecutive del mercado porcino:
-
-DATOS REALES:
-- Colombia 2024: ${colUlt.valor.toLocaleString()} cerdas (+${crecimientoCol}% vs 2023), ${col.detalle.predios.toLocaleString()} predios
-- Estructura: ${col.detalle.traspatio.porcentaje}% traspatio, ${col.detalle.familiar.porcentaje}% familiar, ${col.detalle.industrial.porcentaje}% industrial
-- UE-27 2024: ${euUlt.valor.toLocaleString()} cerdas (${eu.ultimo.var}% vs 2023)
-- USA 2025: ${usaUlt.valor.toLocaleString()} cerdas (+${usa.ultimo.var}%), ${usa.detalle.mercado.toLocaleString()} mercado
-
-ANÁLISIS REQUERIDO:
-1. Compara escala: Colombia tiene ${ratioColEu}x menos que UE, ${ratioColUsa}x menos que USA
-2. Estructura: 78% traspatio vs producción industrial
-3. Implicación: Sin API pública,no hay transparencia
-
-Escribeen español exactamente 2 oraciones cortas con los números reales arriba.`
+    const prompt = `Colombia ${colUlt.valor/1e6}M, UE ${euUlt.valor/1e6}M, USA ${usaUlt.valor/1e6}M. Colombia 78% traspatio, 12x menos que UE. Análisis:`
 
     const resultado = await generador(prompt, {
-      max_new_tokens: 90,
-      temperature: 0.3,
+      max_new_tokens: 50,
+      temperature: 0.4,
       top_p: 0.9,
-      do_sample: true,
-      repetition_penalty: 1.1
+      do_sample: true
     })
 
     let textoLimpio = resultado[0].generated_text.replace(prompt, '').trim()
-    textoLimpio = textoLimpio.replace(/\n+/g, ' ').replace(/\s{2,}/g, ' ').trim()
     
-    if (textoLimpio.length > 30 && textoLimpio.length < 350) {
-      analisis.value = textoLimpio
+    if (textoLimpio.length > 15) {
+      analisis.value = textoLimpio.slice(0, 200)
     } else {
       throw new Error('Texto inválido')
     }
