@@ -1,5 +1,5 @@
 {
-  "fecha_consulta": "2026-04-17T02:22:26.122122+00:00",
+  "fecha_consulta": "2026-04-17T13:58:36.373665+00:00",
   "usa": {
     "status": "ok",
     "fuente": "USDA NASS RSS",
@@ -36,7 +36,7 @@
   "analisis_ia": {
     "texto": "Europa registra 131.5 millones y EE.UU. 75.1 millones frente a 10.7 millones de Colombia (12.3x y 7.0x). Europa (Eurostat) y EE.UU. (USDA) publican series oficiales trazables, mientras Colombia depende de una fuente periodística especializada sin API gubernamental equivalente. La prioridad para cerrar la brecha es institucionalizar una publicación oficial, periódica y abierta de datos porcinos en Colombia.",
     "fuente": "fallback",
-    "actualizado_en": "2026-04-17T02:22:28.355924+00:00",
+    "actualizado_en": "2026-04-17T13:58:37.479342+00:00",
     "nota": "GEMINI_API_KEY no configurado"
   }
 }
