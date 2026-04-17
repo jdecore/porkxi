@@ -10,10 +10,29 @@ const cargandoModelo = ref(false)
 const error = ref(false)
 const analisis = ref('')
 const progresoCarga = ref(0)
+const descargando = ref(false)
 
 const fuenteTexto = computed(() => {
   return '🤖 Qwen3-0.8B · IA en tu navegador'
 })
+
+const descargarReporte = async () => {
+  descargando.value = true
+  try {
+    const response = await fetch('/reportes/radar-porcino.html')
+    const blob = await response.blob()
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'reporte-porcino-colombia.html'
+    a.click()
+    URL.revokeObjectURL(url)
+  } catch (err) {
+    console.error('Error:', err)
+  } finally {
+    descargando.value = false
+  }
+}
 
 const datosColombia = {
   total: 10668276,
@@ -43,14 +62,14 @@ const generarAnalisisLocal = async () => {
   cargando.value = true
   cargandoModelo.value = true
 
-  const temasvariados = [
-    "produce una perspectiva única sobre",
-    "analiza desde la visión del productor mediano sobre",
-    "explica el impacto comercial de",
-    "destaca la ventaja competitiva de",
-    "compara la eficiencia productiva entre",
+  const enfoques = [
+    "desde la perspectiva del productor mediano",
+    "enfatizando la oportunidad de crecimiento",
+    "analizando el差距 de datos entre países",
+    "sobre la ventaja de tener datos abiertos",
+    "comparando la estructura productiva"
   ]
-  const tema = temasvariados[Math.floor(Math.random() * temasvariados.length)]
+  const enfoque = enfoques[Math.floor(Math.random() * enfoques.length)]
 
   try {
     const generador = await pipeline('text-generation', 'Xenova/Qwen3-0.8B-Instruct', {
@@ -61,39 +80,40 @@ const generarAnalisisLocal = async () => {
       }
     })
 
-    const prompt = `${tema} el mercado porcino:
+    const prompt = `Analiza ${enfoque} en el mercado porcino.
 
-Colombia: 10.7M cerdas, 189K predios (78% traspatio, 19% familiar, 2.1% industrial, 0.5% tecnificadas). UE: 132M (-0.5%). USA: 75.5M (+1%), 69.6M mercado, 5.95M reproductores.
+Datos clave:
+- Colombia: 10.7M cerdas, 189K predios (78% traspatio)
+- UE: 132M (-0.5% vs 2023)
+- USA: 75.5M (+1%), 69.6M mercado
 
-Escribe en español un análisis breve (2-3 oraciones). Enfoca: 1) comparación de escala entre países, 2) diferencias en acceso a datos oficiales, 3) oportunidad para Colombia. No repitas lo mismo que otros análisis.`
+Escribe 2-3 oraciones distintas cada vez. Sé específico con números.`
 
     const resultado = await generador(prompt, {
-      max_new_tokens: 100,
-      temperature: 0.75,
-      top_p: 0.95,
+      max_new_tokens: 80,
+      temperature: 0.85,
+      top_p: 0.9,
       do_sample: true
     })
 
     let textoLimpio = resultado[0].generated_text.replace(prompt, '').trim()
-    textoLimpio = textoLimpio.replace(/\n+/g, ' ').replace(/\s+/g, ' ').trim()
-    textoLimpio = textoLimpio.replace(/^[^a-zA-Záéíóúñ]+/i, '').trim()
+    textoLimpio = textoLimpio.replace(/\n+/g, ' ').replace(/\s{2,}/g, ' ').trim()
     
-    if (textoLimpio.length > 40 && !textoLimpio.startsWith('Escribe')) {
-      analisis.value = textoLimpio.slice(0, 250)
+    if (textoLimpio.length > 30 && textoLimpio.length < 300) {
+      analisis.value = textoLimpio
     } else {
-      throw new Error('Modelo generó texto inválido')
+      throw new Error('Texto fuera de rango')
     }
   } catch (err) {
-    console.log('Error modelo:', err.message)
-    const colM = (datosColombia.total / 1000000).toFixed(1)
-    const euM = (datosEuropa.total / 1000000).toFixed(0)
-    const usaM = (datosUsa.total / 1000000).toFixed(1)
-    
-    analisis.value = `El mercado porcino global presenta disparidades significativas. Colombia registra 10.7 millones de cabezas en 189,198 predios, donde el 78% corresponde a traspatio (explotaciones menores a 10 cerdas), evidenciando alta fragmentación. La UE-27 lidera con 132 millones (-0.5% vs 2023) y Estados Unidos alcanza 75.5 millones con variación positiva de +1%.
-
-La brecha de datos es el problema central: mientras Eurostat y USDA publican APIs públicas con frecuencia regular, Colombia carece de una fuente gubernamental consolidada. Los datos únicamente existen en Porcinews, un medio especializado, lo que limita el análisis estratégico del sector.
-
-Esto implica que productores, industriales y formuladores de política en Colombia operan sin información oficial verificada, a diferencia de sus homólogos europeos y estadounidenses.`;
+    console.log('Modelo fallback:', err.message)
+    const fallbacks = [
+      `La fragmentación del 78% en traspatio limita el análisis. Colombia necesita una API pública como Eurostat.`,
+      `La brecha no es de volumen sino de transparencia. UE y USA publican datos oficiales; Colombia no.`,
+      `El sector porcino colombiano puede innovar con datos abiertos. La oportunidad está en consolidar ICA, DANE y Porkcolombia.`,
+      `Sin datos oficiales, los productores dependen de estimaciones. Una API pública impulsaría inversiones.`,
+      `El comparativo global muestra oportunidad: Colombia tiene 10.7M vs UE 132M vs USA 75.5M.`,
+    ]
+    analisis.value = fallbacks[Math.floor(Math.random() * fallbacks.length)]
   } finally {
     cargando.value = false
     cargandoModelo.value = false
@@ -128,22 +148,22 @@ onMounted(() => {
 
     <div v-else class="analisis-ia__contenido">
       <p class="analisis-ia__texto">{{ analisis }}</p>
-      <p class="analisis-ia__meta">
-        ✅ {{ fuenteTexto }}
-      </p>
-      <p class="analisis-ia__meta">
-        💡 Este modelo corre 100% en tu navegador, no envía datos a ningún servidor.
-      </p>
+      <div class="analisis-ia__footer">
+        <p class="analisis-ia__meta">✅ {{ fuenteTexto }}</p>
+        <button class="analisis-ia__descarga" @click="descargarReporte" :disabled="descargando">
+          {{ descargando ? '⬇ Descargando...' : '📄 Descargar reporte' }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
 .analisis-ia {
-  background: #FFEBE6;
+  background: var(--crema);
   border-radius: var(--radio);
-  padding: 24px;
-  margin: 32px 0;
+  padding: 20px;
+  margin: 24px 0;
   border: 1px solid var(--crema-borde);
 }
 
@@ -225,6 +245,37 @@ onMounted(() => {
   margin: 10px 0 0;
   font-size: 12px;
   color: var(--tinta-claro);
+}
+
+.analisis-ia__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--crema-borde);
+}
+
+.analisis-ia__descarga {
+  background: var(--cerdo);
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.analisis-ia__descarga:hover:not(:disabled) {
+  background: var(--cerdo-claro);
+}
+
+.analisis-ia__descarga:disabled {
+  opacity: 0.7;
 }
 
 @keyframes spin {
