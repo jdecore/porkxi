@@ -1,0 +1,16 @@
+{
+  "generated_at": "2026-04-17T17:57:18.470Z",
+  "unidad": "millones de cabezas (ene-ago)",
+  "fuente": "Eurostat apro_mt_pann",
+  "nota": "Serie parcial usada para mostrar ritmo reciente de sacrificio en UE.",
+  "series": [
+    {
+      "anio": 2023,
+      "valor_millones": 145
+    },
+    {
+      "anio": 2024,
+      "valor_millones": 146
+    }
+  ]
+}
