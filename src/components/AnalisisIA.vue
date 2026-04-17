@@ -12,7 +12,7 @@ const analisis = ref('')
 const progresoCarga = ref(0)
 
 const fuenteTexto = computed(() => {
-  return '🤖 Qwen3-0.8B · análisis en tu navegador'
+  return '🤖 Qwen3-0.8B · IA en tu navegador'
 })
 
 const datosColombia = {
@@ -43,6 +43,15 @@ const generarAnalisisLocal = async () => {
   cargando.value = true
   cargandoModelo.value = true
 
+  const temasvariados = [
+    "produce una perspectiva única sobre",
+    "analiza desde la visión del productor mediano sobre",
+    "explica el impacto comercial de",
+    "destaca la ventaja competitiva de",
+    "compara la eficiencia productiva entre",
+  ]
+  const tema = temasvariados[Math.floor(Math.random() * temasvariados.length)]
+
   try {
     const generador = await pipeline('text-generation', 'Xenova/Qwen3-0.8B-Instruct', {
       progress_callback: (p) => {
@@ -52,30 +61,27 @@ const generarAnalisisLocal = async () => {
       }
     })
 
-    const prompt = `Eres analista senior de mercados agrícolas. Escribe análisis en español sobre mercado porcino:
+    const prompt = `${tema} el mercado porcino:
 
-DATOS: Colombia 10.7M/189K predios (78% traspatio). UE 132M (var -0.5%). USA 75.5M (cerdos mercado 69.6M +5.95M reproductores).
+Colombia: 10.7M cerdas, 189K predios (78% traspatio, 19% familiar, 2.1% industrial, 0.5% tecnificadas). UE: 132M (-0.5%). USA: 75.5M (+1%), 69.6M mercado, 5.95M reproductores.
 
-POINTS (write in Spanish):
-1. Escala y distribución: Colombia fragmentado en traspatio vs concentración en UE/USA.
-2. Brecha datos: Colombia=Porcinews. UE=Eurostat API pública. USA=USDA trimestral. Sin API Colombia.
-3. Implicación: Productores y reguladores no tienen datos oficiales confiables.
-
-Máx 3 oraciones cortas, usa números exactos.`
+Escribe en español un análisis breve (2-3 oraciones). Enfoca: 1) comparación de escala entre países, 2) diferencias en acceso a datos oficiales, 3) oportunidad para Colombia. No repitas lo mismo que otros análisis.`
 
     const resultado = await generador(prompt, {
-      max_new_tokens: 120,
-      temperature: 0.5,
-      top_p: 0.92,
+      max_new_tokens: 100,
+      temperature: 0.75,
+      top_p: 0.95,
       do_sample: true
     })
 
-    const textoLimpio = resultado[0].generated_text.replace(prompt, '').trim().replace(/\n+/g, ' ').replace(/\s+/g, ' ')
+    let textoLimpio = resultado[0].generated_text.replace(prompt, '').trim()
+    textoLimpio = textoLimpio.replace(/\n+/g, ' ').replace(/\s+/g, ' ').trim()
+    textoLimpio = textoLimpio.replace(/^[^a-zA-Záéíóúñ]+/i, '').trim()
     
-    if (textoLimpio.length > 60) {
-      analisis.value = textoLimpio.slice(0, 300) + '...'
+    if (textoLimpio.length > 40 && !textoLimpio.startsWith('Escribe')) {
+      analisis.value = textoLimpio.slice(0, 250)
     } else {
-      throw new Error('Respuesta inválida')
+      throw new Error('Modelo generó texto inválido')
     }
   } catch (err) {
     console.log('Error modelo:', err.message)
@@ -103,9 +109,9 @@ onMounted(() => {
   <div class="analisis-ia">
     <div class="analisis-ia__encabezado">
       <span class="analisis-ia__icono">⚡</span>
-      <h3 class="analisis-ia__titulo">Análisis local con Transformers.js</h3>
+      <h3 class="analisis-ia__titulo">Análisis con IA</h3>
       <button v-if="!cargando" @click="generarAnalisisLocal" class="analisis-ia__boton">
-        Regenerar análisis
+        ↻
       </button>
     </div>
 
