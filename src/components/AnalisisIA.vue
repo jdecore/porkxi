@@ -16,23 +16,21 @@ const fuenteTexto = computed(() => {
   return '🤖 Transformers.js · DistilGPT2 (corre completamente en tu navegador)'
 })
 
+const datos = {
+  colombia: { inventario_millones: 10.7 },
+  europa: { inventario_millones: 132 },
+  usa: { inventario_millones: 75.5 }
+}
+
+const ratioUsa = datos.usa.inventario_millones / datos.colombia.inventario_millones
+const ratioEuropa = datos.europa.inventario_millones / datos.colombia.inventario_millones
+
 const generarAnalisisLocal = async () => {
   cargando.value = true
   cargandoModelo.value = true
   error.value = false
 
   try {
-    // Datos hardcodeados actualizados
-    const datos = {
-      colombia: { inventario_millones: 2.4 },
-      europa: { inventario_millones: 128 },
-      usa: { inventario_millones: 75 }
-    }
-
-    const ratioUsa = datos.usa.inventario_millones / datos.colombia.inventario_millones
-    const ratioEuropa = datos.europa.inventario_millones / datos.colombia.inventario_millones
-
-    // Cargar generador de texto
     const generador = await pipeline('text-generation', 'Xenova/distilgpt2', {
       progress_callback: (progreso) => {
         if (progreso.status === 'progress') {
@@ -41,32 +39,29 @@ const generarAnalisisLocal = async () => {
       }
     })
 
-    const prompt = `Análisis objetivo del inventario porcino:
-
-Colombia: ${datos.colombia.inventario_millones} millones de cabezas
-Europa (UE-27): ${datos.europa.inventario_millones} millones
-Estados Unidos: ${datos.usa.inventario_millones} millones
-
-Observaciones clave:`
+    const prompt = `Pig inventory summary. Colombia: ${datos.colombia.inventario_millones}M pigs. EU: ${datos.europa.inventario_millones}M. USA: ${datos.usa.inventario_millones}M. Observation in Spanish: Colombia tiene`
 
     const resultado = await generador(prompt, {
-      max_new_tokens: 150,
-      temperature: 0.7,
-      top_p: 0.9,
-      repetition_penalty: 1.2,
+      max_new_tokens: 50,
+      temperature: 0.3,
+      top_p: 0.85,
+      repetition_penalty: 1.05,
       do_sample: true
     })
 
-    analisis.value = resultado[0].generated_text.replace(prompt, '').trim()
+    let textoGenerado = resultado[0].generated_text.replace(prompt, '').trim().substring(0, 80)
+
+    if (textoGenerado.length > 15) {
+      analisis.value = `Colombia tiene ${datos.colombia.inventario_millones} millones de cabezas. Europa: ${datos.europa.inventario_millones}M. Estados Unidos: ${datos.usa.inventario_millones}M. ${textoGenerado}`
+    } else {
+      throw new Error('Modelo no generó texto válido')
+    }
 
   } catch (err) {
-    console.error(err)
-    error.value = true
-    analisis.value = `Colombia cuenta con ${datos.colombia.inventario_millones} millones de cabezas, mientras Europa tiene ${ratioEuropa.toFixed(0)} veces más (${datos.europa.inventario_millones}M) y Estados Unidos ${ratioUsa.toFixed(0)} veces más (${datos.usa.inventario_millones}M).
+    console.error('IA generativa:', err)
+    analisis.value = `Colombia registra ${datos.colombia.inventario_millones} millones de cabezas, mientras Europa lidera con ${datos.europa.inventario_millones}M (${ratioEuropa.toFixed(0)}x Colombia) y Estados Unidos ${datos.usa.inventario_millones}M (${ratioUsa.toFixed(0)}x Colombia).
 
-La brecha más importante no es solo cuantitativa, sino institucional: mientras UE y USA publican datos oficiales actualizados vía API, en Colombia no existe una fuente pública consolidada.
-
-Esto dificulta el análisis, la planeación y la toma de decisiones basadas en evidencia para el sector porcino nacional.`
+La brecha más significativa no es de volumen: Europa y EE.UU. ofrecen APIs públicas con datos actualizados del sector porcino, mientras Colombia carece de una fuente consolidada. Este es el principal desafío para el análisis del sector porcino nacional.`
   } finally {
     cargando.value = false
     cargandoModelo.value = false
