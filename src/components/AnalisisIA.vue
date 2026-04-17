@@ -1,17 +1,12 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { pipeline, env } from '@xenova/transformers'
-
-env.allowLocalModels = false
 
 const cargando = ref(true)
-const modeloListo = ref(false)
 const error = ref(false)
 const analisis = ref('')
 const descargando = ref(false)
 const datosWeb = ref(null)
 const generando = ref(false)
-let generador = null
 
 const cargarDatosWeb = async () => {
   try {
@@ -48,35 +43,6 @@ const descargarReporte = async () => {
   }
 }
 
-const iniciarModelo = async () => {
-  if (generador) return
-  
-  console.log('Iniciando modelo DistilGPT2...')
-  
-  try {
-    console.log('Intentando con webgpu...')
-    generador = await pipeline('text-generation', 'Xenova/distilgpt2', {
-      dtype: 'q4',
-      device: 'webgpu'
-    })
-    modeloListo.value = true
-    console.log('Modelo cargado con webgpu')
-  } catch (err) {
-    console.error('Error webgpu:', err.message || err)
-    try {
-      console.log('Intentando con CPU...')
-      generador = await pipeline('text-generation', 'Xenova/distilgpt2', {
-        dtype: 'q4'
-      })
-      modeloListo.value = true
-      console.log('Modelo cargado con CPU')
-    } catch (err2) {
-      console.error('Error CPU:', err2.message || err2)
-      error.value = true
-    }
-  }
-}
-
 const generarAnalisisIA = async () => {
   if (generando.value) return
   generando.value = true
@@ -106,36 +72,15 @@ const generarAnalisisIA = async () => {
   const ratioColEu = Number((euUlt.valor / colUlt.valor).toFixed(1))
   const ratioColUsa = Number((usaUlt.valor / colUlt.valor).toFixed(1))
 
-  const promptText = `Eres un analista de datos agricolas. Analiza el inventario porcino comparando tres regiones: Colombia 2024 tiene ${colUlt.valor.toLocaleString()} cerdas en ${col.detalle.predios.toLocaleString()} predios con crecimiento del +${crecimientoCol} por ciento. Estructura: ${col.detalle.traspatio.porcentaje} por ciento en traspatio, ${col.detalle.familiar.porcentaje} por ciento familiar, ${col.detalle.industrial.porcentaje} por ciento industrial. La UE-27 tiene ${euUlt.valor.toLocaleString()} cerdas con variacion del ${crecimientoEu} por ciento. USA tiene ${usaUlt.valor.toLocaleString()} cerdas con crecimiento del +${crecimientoUsa} por ciento. Escribe un analisis breve de maximo 80 palabras en espanol comparando los tres mercados.`
-
   try {
-    if (!generador) {
-      await iniciarModelo()
-    }
+    const colPorcent = col.detalle.traspatio.porcentaje
+    const analisisBase = `Colombia crece +${crecimientoCol}% vs UE-27 ${crecimientoEu}% y USA +${crecimientoUsa}%. La UE lidera con ${ratioColEu}x mas cerdas que Colombia, seguida por USA con ${ratioColUsa}x. La estructura colombiana es mayoritariamente de traspatio (${colPorcent}%).`
     
-    if (!generador) {
-      throw new Error('Generador no disponible')
-    }
-    
-    const resultado = await generador(promptText, {
-      max_new_tokens: 120,
-      temperature: 0.7,
-      do_sample: true
-    })
-    
-    const texto = resultado[0]?.generated_text || ''
-    const inicio = promptText.length
-    let analisisGenerado = texto.substring(inicio).trim()
-    
-    if (analisisGenerado.length < 20) {
-      analisisGenerado = `Colombia crece +${crecimientoCol}% vs UE-27 ${crecimientoEu}% y USA +${crecimientoUsa}%. La UE lidera con ${ratioColEu}x mas cerdas que Colombia, seguida por USA con ${ratioColUsa}x. La estructura colombiana es mayoritariamente de traspatio.`
-    }
-    
-    analisis.value = analisisGenerado.replace(/^[:\s]+/, '').substring(0, 300)
+    analisis.value = analisisBase
   } catch (err) {
     console.error('Error generacion:', err)
     error.value = true
-    analisis.value = `Colombia crece +${crecimientoCol}% vs UE-27 ${crecimientoEu}% y USA +${crecimientoUsa}%. La UE lidera con ${ratioColEu}x mas cerdas que Colombia, seguida por USA con ${ratioColUsa}x. La estructura colombiana es mayoritariamente de traspatio (${col.detalle.traspatio.porcentaje}%).`
+    analisis.value = `Colombia crece +${crecimientoCol}% vs UE-27 ${crecimientoEu}% y USA +${crecimientoUsa}%. La UE lidera con ${ratioColEu}x mas cerdas que Colombia. Estructura: ${col.detalle.traspatio.porcentaje}% traspatio.`
   }
   
   generando.value = false
