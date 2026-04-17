@@ -2,6 +2,7 @@
 import GraficaInteractiva from '../components/GraficaInteractiva.vue';
 import TarjetasKpiAnimadas from '../components/TarjetasKpiAnimadas.vue';
 import AnalisisIA from '../components/AnalisisIA.vue';
+import DescargarReporte from '../components/DescargarReporte.vue';
 import MonitoreoFuentes from '../components/MonitoreoFuentes.vue';
 import InsightsComparativas from '../components/InsightsComparativas.vue';
 
@@ -114,6 +115,7 @@ const metodosEncuestaUsa = Array.isArray(DETALLE_USA.metodosEncuesta)
       <TarjetasKpiAnimadas client:idle />
       <GraficaInteractiva client:idle />
       <AnalisisIA client:idle />
+      <DescargarReporte client:visible />
       <MonitoreoFuentes client:idle />
       <InsightsComparativas client:visible />
 
