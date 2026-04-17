@@ -117,7 +117,7 @@ const iniciarModelo = async () => {
   } catch (err) {
     console.error('Error WebGPU, usando CPU:', err)
     try {
-      generador = await pipeline('text-generation', modelId, { dtype: 'q4f16' })
+      generador = await pipeline('text-generation', modelId, { dtype: 'q4' })
       modeloListo.value = true
     } catch (errLigero) {
       console.error('Error modelo principal, usando respaldo:', errLigero)
@@ -180,6 +180,20 @@ const generarAnalisisIA = async () => {
     if (!generador) await iniciarModelo()
     if (!generador) throw new Error('Generador no disponible')
 
+    const usaFormatoChat = Boolean(
+      typeof generador?.tokenizer?.chat_template === 'string'
+      && generador.tokenizer.chat_template.trim(),
+    )
+    const promptPlano =
+      `Eres analista de datos agropecuarios. Responde en español claro y profesional, máximo 80 palabras, sin listas y en 3 frases.\n` +
+      `Usa únicamente estos datos:\n` +
+      `Colombia: ${colUlt.valor.toLocaleString()} cerdas, variación ${crecimientoCol}%.\n` +
+      `UE-27: ${euUlt.valor.toLocaleString()} cerdas, variación ${crecimientoEu}%.\n` +
+      `USA: ${usaUlt.valor.toLocaleString()} cerdas, variación ${crecimientoUsa}%.\n` +
+      `Relación de escala: UE-27/Colombia ${ratioColEu}x, USA/Colombia ${ratioColUsa}x.\n` +
+      `Estructura Colombia: traspatio ${col.detalle.traspatio.porcentaje}%, familiar ${col.detalle.familiar.porcentaje}%, industrial ${col.detalle.industrial.porcentaje}%.\n` +
+      `Debes mencionar explícitamente Colombia, UE-27 y USA, e incluir porcentajes y relaciones en x.`
+
     const mensajes = [
       {
         role: 'system',
@@ -201,7 +215,8 @@ const generarAnalisisIA = async () => {
 
     let texto = ''
     for (let intento = 0; intento < 2; intento += 1) {
-      const resultado = await generador(mensajes, {
+      const entrada = usaFormatoChat ? mensajes : promptPlano
+      const resultado = await generador(entrada, {
         max_new_tokens: 140,
         do_sample: intento === 0,
         temperature: 0.35,
@@ -210,6 +225,10 @@ const generarAnalisisIA = async () => {
         no_repeat_ngram_size: 3,
       })
       texto = quitarThink(extraerTextoGenerado(resultado))
+      if (!usaFormatoChat && texto.startsWith(promptPlano)) {
+        texto = texto.slice(promptPlano.length).trim()
+      }
+      texto = texto
         .replace(/^assistant[:\s-]*/i, '')
         .replace(/\s+/g, ' ')
         .trim()
@@ -217,7 +236,6 @@ const generarAnalisisIA = async () => {
     }
 
     if (!esAnalisisValido(texto)) {
-      error.value = true
       texto = fallback
     }
 

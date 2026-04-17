@@ -328,26 +328,35 @@ onUnmounted(() => {
 
 .grafica-boton {
   padding: 10px 20px;
-  border: 2px solid var(--crema-borde, #FFD1CC);
+  border: 2px solid #E8D6CF;
   border-radius: 8px;
-  background: #FFEBE6;
+  background: #F7ECE6;
   font-size: 14px;
   font-weight: 500;
-  color: var(--tinta-claro, #7A4A44);
+  color: #5A3A3A;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 150ms ease;
   font-family: 'DM Sans', sans-serif;
 }
 
 .grafica-boton:hover {
-  border-color: var(--tinta, #3B1F1C);
-  background: var(--crema-oscuro, #F7E0DC);
+  background: #A12D2D !important;
+  border-color: #A12D2D !important;
+  color: white !important;
+  opacity: 1 !important;
 }
 
 .grafica-boton--activo {
-  border-color: var(--tinta, #3B1F1C);
-  background: var(--tinta, #3B1F1C);
-  color: white;
+  background: #7A1F1F !important;
+  border-color: #7A1F1F !important;
+  color: white !important;
+}
+
+.grafica-boton--activo:hover {
+  background: #7A1F1F !important;
+  border-color: #7A1F1F !important;
+  color: white !important;
+  opacity: 1 !important;
 }
 
 .grafica-contenedor {
