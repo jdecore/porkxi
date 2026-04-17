@@ -112,35 +112,22 @@ body { margin: 0; padding: 0; font-family: 'Sora', 'DM Sans', sans-serif; backgr
         <p class="encabezado__subtitulo">Inventario porcino de Colombia, UE-27 y EE.UU. en un solo lugar, con fuente.</p>
       </header>
       <section class="explicacion">
-        <h2 class="explicacion__titulo">¿Por qué existe esta brecha?</h2>
+        <h2 class="explicacion__titulo">¿Por qué en Colombia es más difícil acceder a los datos?</h2>
         <div class="explicacion__grid">
           <div class="explicacion-columna explicacion-columna--colombia">
             <h3 class="explicacion-columna__titulo">🇨🇴 Colombia</h3>
-            <p class="explicacion-columna__texto">En Colombia, acceder a información porcina oficial actualizada es prácticamente imposible por canales directos. Los datos están fragmentados entre varias entidades que no se comunican entre sí.</p>
-            <p class="explicacion-columna__texto">No existe una fuente gubernamental que ofrezca una API funcional para la serie consolidada nacional.</p>
-            <div class="explicacion-destacado">Por eso, los datos de esta visualización provienen de Porcinews, un medio periodístico especializado — no de fuentes gubernamentales directas.</div>
-            <div class="explicacion-tabla">
-              <table>
-                <thead><tr><th>Entidad</th><th>Qué publica</th><th>Problema</th></tr></thead>
-                <tbody>
-                  {PROBLEMA_DATOS_COLOMBIA.problemas && PROBLEMA_DATOS_COLOMBIA.problemas.length > 0 ? PROBLEMA_DATOS_COLOMBIA.problemas.map((prob) => (
-                    <tr><td>{prob.entidad}</td><td>{prob.dato}</td><td><div class="explicacion-tabla__problema"><span class="explicacion-tabla__problema-icono">⚠️</span><span>{prob.problema}</span></div></td></tr>
-                  )) : <tr><td colspan="3">No hay datos disponibles.</td></tr>}
-                </tbody>
-              </table>
-            </div>
+            <p class="explicacion-columna__texto">No existe una fuente gubernamental con API pública. Los datos están fragmentados entre ICA, DANE, Porkcolombia e INVIMA — sin централизada y sin acceso.programático.</p>
+            <div class="explicacion-destacado">Por eso usamos Porcinews como fuente.</div>
           </div>
 
           <div class="explicacion-columna explicacion-columna--europa">
-            <h3 class="explicacion-columna__titulo">🇪🇺 Europa (UE-27)</h3>
-            <p class="explicacion-columna__texto">Eurostat publica la serie oficial mediante API abierta (`apro_mt_lspig`) con dimensiones estandarizadas.</p>
-            <p class="explicacion-columna__texto">Esto permite trazabilidad, automatización y comparabilidad entre países sin depender de scraping manual de PDFs.</p>
+            <h3 class="explicacion-columna__titulo">🇪🇺 Europa</h3>
+            <p class="explicacion-columna__texto">Eurostat ofrece API abierta con datos consolidados. Automatización directa sin intervención humana.</p>
           </div>
 
           <div class="explicacion-columna explicacion-columna--usa">
-            <h3 class="explicacion-columna__titulo">🇺🇸 EE.UU.</h3>
-            <p class="explicacion-columna__texto">La Livestock Mandatory Reporting Act obliga a reportar al USDA. Hay publicaciones periódicas, verificables y con calendario público.</p>
-            <p class="explicacion-columna__texto">La disponibilidad trimestral facilita monitoreo continuo y análisis oportuno del sector porcino.</p>
+            <h3 class="explicacion-columna__titulo">🇺🇸 USA</h3>
+            <p class="explicacion-columna__texto">Ley obligatoria de reporte al USDA. Datos públicos, verificables y con calendario fijo cada 3 meses.</p>
           </div>
         </div>
       </section>
