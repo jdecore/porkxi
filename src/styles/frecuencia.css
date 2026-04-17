@@ -3,7 +3,7 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   margin-bottom: 24px;
-  background: #4A5348;
+  background: #C97B7B;
   border-radius: 14px;
   padding: 16px 20px;
 }
@@ -76,26 +76,18 @@
 }
 
 .frecuencia-card {
-  background: #757D70;
-  border: 1px solid #8A9185;
+  background: #C97B7B;
+  border: 1px solid #DCA0A0;
   border-radius: 10px;
   padding: 14px 16px;
   box-shadow: none;
 }
 
-.frecuencia-card--colombia {
-  background: #A65D3F;
-  border-color: #C2704A;
-}
-
-.frecuencia-card--europa {
-  background: #5D6658;
-  border-color: #7A8073;
-}
-
+.frecuencia-card--colombia,
+.frecuencia-card--europa,
 .frecuencia-card--usa {
-  background: #4A5348;
-  border-color: #6B7368;
+  background: #C97B7B;
+  border-color: #DCA0A0;
 }
 
 .frecuencia-card__encabezado {
@@ -115,30 +107,13 @@
   font-weight: 700;
 }
 
-.frecuencia-card--colombia .frecuencia-card__titulo,
-.frecuencia-card--usa .frecuencia-card__titulo,
-.frecuencia-card--europa .frecuencia-card__titulo {
-  color: #FFFFFF;
-}
 
-.frecuencia-card__pildora {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 10px;
-  font-size: 10px;
-  font-weight: 600;
-  margin-bottom: 10px;
-}
+
+
 
 .frecuencia-card--colombia .frecuencia-card__pildora,
-.frecuencia-card--usa .frecuencia-card__pildora,
-.frecuencia-card--europa .frecuencia-card__pildora {
-  background: #5D6658;
-  color: #FFFFFF;
-  border: 1px solid #8A9185;
-}
-
-.frecuencia-card--colombia .frecuencia-card__pildora {
+.frecuencia-card--europa .frecuencia-card__pildora,
+.frecuencia-card--usa .frecuencia-card__pildora {
   background: #B86B4A;
   border-color: #C2704A;
 }
@@ -173,39 +148,27 @@
 
 .frecuencia-card__descripcion {
   font-size: 12px;
-  color: #EAECE6;
+  color: #F5E6D8;
   line-height: 1.5;
   margin-bottom: 14px;
 }
 
-.frecuencia-card--colombia .frecuencia-card__descripcion {
+.frecuencia-card--colombia .frecuencia-card__descripcion,
+.frecuencia-card--europa .frecuencia-card__descripcion,
+.frecuencia-card--usa .frecuencia-card__descripcion {
   color: #F5E6D8;
 }
 
-.frecuencia-card--europa .frecuencia-card__descripcion {
-  color: #D4D9D0;
-}
-
-.frecuencia-card--usa .frecuencia-card__descripcion {
-  color: #D4D9D0;
-}
-
 .frecuencia-timeline {
-  border-left: 2px solid #8A9185;
+  border-left: 2px solid #CD853F;
   padding-left: 16px;
   margin-bottom: 12px;
 }
 
-.frecuencia-card--colombia .frecuencia-timeline {
-  border-left-color: #CD853F;
-}
-
-.frecuencia-card--europa .frecuencia-timeline {
-  border-left-color: #7A8073;
-}
-
+.frecuencia-card--colombia .frecuencia-timeline,
+.frecuencia-card--europa .frecuencia-timeline,
 .frecuencia-card--usa .frecuencia-timeline {
-  border-left-color: #6B7368;
+  border-left-color: #CD853F;
 }
 
 .frecuencia-timeline__item {
@@ -224,29 +187,17 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  border: 2px solid #757D70;
+  border: 2px solid #8B4513;
 }
 
-.frecuencia-card--colombia .frecuencia-timeline__punto {
+.frecuencia-card--colombia .frecuencia-timeline__punto,
+.frecuencia-card--europa .frecuencia-timeline__punto,
+.frecuencia-card--usa .frecuencia-timeline__punto {
   border-color: #8B4513;
 }
 
-.frecuencia-card--europa .frecuencia-timeline__punto {
-  border-color: #5D6658;
-}
-
-.frecuencia-card--usa .frecuencia-timeline__punto {
-  border-color: #4A5348;
-}
-
-.frecuencia-timeline__punto--colombia {
-  background: #FFFFFF;
-}
-
-.frecuencia-timeline__punto--usa {
-  background: #FFFFFF;
-}
-
+.frecuencia-timeline__punto--colombia,
+.frecuencia-timeline__punto--usa,
 .frecuencia-timeline__punto--europa {
   background: #FFFFFF;
 }
@@ -267,12 +218,20 @@
   margin-bottom: 2px;
 }
 
-.frecuencia-timeline__valor {
-  font-size: 10px;
-  color: #EAECE6;
+.frecuencia-card--colombia .frecuencia-timeline__periodo,
+.frecuencia-card--europa .frecuencia-timeline__periodo,
+.frecuencia-card--usa .frecuencia-timeline__periodo {
+  color: #FFFFFF;
 }
 
-.frecuencia-card--colombia .frecuencia-timeline__valor {
+.frecuencia-timeline__valor {
+  font-size: 10px;
+  color: #F5E6D8;
+}
+
+.frecuencia-card--colombia .frecuencia-timeline__valor,
+.frecuencia-card--europa .frecuencia-timeline__valor,
+.frecuencia-card--usa .frecuencia-timeline__valor {
   color: #F5E6D8;
 }
 
@@ -282,11 +241,13 @@
 
 .frecuencia-card__fuente {
   font-size: 10px;
-  color: #EAECE6;
+  color: #F5E6D8;
   font-style: italic;
   text-align: right;
 }
 
-.frecuencia-card--colombia .frecuencia-card__fuente {
+.frecuencia-card--colombia .frecuencia-card__fuente,
+.frecuencia-card--europa .frecuencia-card__fuente,
+.frecuencia-card--usa .frecuencia-card__fuente {
   color: #F5E6D8;
 }
