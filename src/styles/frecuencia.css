@@ -135,11 +135,6 @@
   font-size: 10px;
   font-weight: 600;
   margin-bottom: 10px;
-}
-
-.frecuencia-card--colombia .frecuencia-card__pildora,
-.frecuencia-card--usa .frecuencia-card__pildora,
-.frecuencia-card--europa .frecuencia-card__pildora {
   background: #f0e0e0;
   color: #6b2c31;
   border: 1px solid #9a5260;

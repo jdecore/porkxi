@@ -27,7 +27,6 @@ Aplicación web para visualizar y comparar inventario porcino entre Colombia, Eu
 ## Monitoreo de fuentes
 - `MonitoreoFuentes.vue` consume `public/estado-fuentes.json` como snapshot diario
 - El snapshot se actualiza por script (`scripts/generar_estado_fuentes.py`) y workflow diario
-- El botón "Sincronizar datos" dispara `/api/sincronizar-fuentes` para lanzar actualización manual
 
 ## Fondos y Diseño
 - Fondo unificado: #F9F6F1 (blanco hueso)
@@ -35,7 +34,7 @@ Aplicación web para visualizar y comparar inventario porcino entre Colombia, Eu
 - Tarjetas y gráfica con mismo fondo
 
 ## Limpieza
-- Se mantiene endpoint puntual `/api/sincronizar-fuentes` para sincronización manual
+- API folder eliminada
 - JSONs no utilizados eliminados
 - InsightsComparativas eliminado
 - Sin referencias a Gemini

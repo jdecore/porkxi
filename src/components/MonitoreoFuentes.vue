@@ -5,9 +5,6 @@ import { withBase } from '../lib/paths.js'
 const emit = defineEmits(['actualizado', 'reload'])
 
 const cargando = ref(false)
-const sincronizando = ref(false)
-const mensajeSincronizacion = ref('')
-const fechaConsultaIso = ref('')
 const fechaActualizacion = ref('sin datos')
 
 const usaUltimoReporte = ref('sin dato')
@@ -42,18 +39,6 @@ const colombiaEnlace = ref('')
 const colombiaDiasTexto = ref('—')
 const colombiaFuente = ref('Porcinews')
 const colombiaStatusTecnico = ref('warning')
-const snapshotRemotoUrl = ref(
-  import.meta.env.PUBLIC_REMOTE_SNAPSHOT_URL
-  || 'https://raw.githubusercontent.com/jdecore/porkxi/main/public/estado-fuentes.json',
-)
-
-const textoBoton = computed(() => {
-  if (sincronizando.value) return 'Sincronizando...'
-  if (cargando.value) return 'Actualizando...'
-  return '🔄 Sincronizar datos'
-})
-
-const botonBloqueado = computed(() => cargando.value || sincronizando.value)
 
 const claseIndicadorUsa = computed(() => {
   if (cargando.value) return 'monitoreo__indicador--warning'
@@ -96,10 +81,6 @@ const normalizarDias = (valor) => {
   return Number.isFinite(numero) ? Math.max(0, Math.floor(numero)) : null
 }
 
-const esperar = (ms) => new Promise((resolve) => {
-  setTimeout(resolve, ms)
-})
-
 const obtenerEstadoFuente = (
   status,
   dias,
@@ -130,17 +111,8 @@ const obtenerEstadoFuente = (
   }
 }
 
-const obtenerSnapshot = async (forzarRecarga = false) => {
-  if (forzarRecarga) {
-    const separador = snapshotRemotoUrl.value.includes('?') ? '&' : '?'
-    const urlRemota = `${snapshotRemotoUrl.value}${separador}v=${Date.now()}`
-    const respuestaRemota = await fetch(urlRemota, { method: 'GET', cache: 'no-store' })
-    if (respuestaRemota.ok) return respuestaRemota.json()
-  }
-
-  const url = forzarRecarga
-    ? withBase(`estado-fuentes.json?v=${Date.now()}`)
-    : withBase('estado-fuentes.json')
+const obtenerSnapshot = async () => {
+  const url = withBase(`estado-fuentes.json?v=${Date.now()}`)
   const respuesta = await fetch(url, { method: 'GET', cache: 'no-store' })
   if (!respuesta.ok) throw new Error('No se pudo cargar el snapshot de fuentes')
   return respuesta.json()
@@ -158,7 +130,6 @@ const aplicarEstado = (datos) => {
   const estadoUsa = obtenerEstadoFuente(usa?.status, usaDias, 60, 120)
   const estadoEuropa = obtenerEstadoFuente(europa?.status, europaDias, 450, 700)
 
-  fechaConsultaIso.value = typeof datos?.fecha_consulta === 'string' ? datos.fecha_consulta : ''
   fechaActualizacion.value = formatearFechaHora(datos?.fecha_consulta)
 
   usaUltimoReporte.value = formatearFecha(usa?.ultimo_reporte_iso || usa?.ultimo_reporte)
@@ -208,15 +179,14 @@ const marcarErrorCarga = () => {
   europaError.value = 'No se pudo cargar el snapshot de monitoreo'
 }
 
-const cargarEstado = async (forzarRecarga = false, limpiarMensaje = true) => {
+const cargarEstado = async () => {
   cargando.value = true
   usaError.value = ''
   europaError.value = ''
 
   try {
-    const datos = await obtenerSnapshot(forzarRecarga)
+    const datos = await obtenerSnapshot()
     aplicarEstado(datos)
-    if (limpiarMensaje) mensajeSincronizacion.value = ''
   } catch (_error) {
     marcarErrorCarga()
   } finally {
@@ -224,60 +194,8 @@ const cargarEstado = async (forzarRecarga = false, limpiarMensaje = true) => {
   }
 }
 
-const esperarSnapshotNuevo = async (fechaAnteriorMs, timeoutMs = 180000, intervaloMs = 5000) => {
-  const inicio = Date.now()
-  while (Date.now() - inicio < timeoutMs) {
-    await esperar(intervaloMs)
-    const datos = await obtenerSnapshot(true)
-    const fechaNuevaMs = Date.parse(datos?.fecha_consulta ?? '')
-    if (Number.isFinite(fechaNuevaMs) && (!Number.isFinite(fechaAnteriorMs) || fechaNuevaMs > fechaAnteriorMs)) {
-      return datos
-    }
-  }
-  throw new Error('La actualización tardó más de lo esperado')
-}
-
-const sincronizarDatos = async () => {
-  if (botonBloqueado.value) return
-  sincronizando.value = true
-  mensajeSincronizacion.value = 'Lanzando actualización de fuentes...'
-
-  const fechaAnteriorMs = Date.parse(fechaConsultaIso.value)
-
-  try {
-    const respuesta = await fetch('/api/sincronizar-fuentes', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      cache: 'no-store',
-      body: JSON.stringify({}),
-    })
-
-    if (!respuesta.ok) {
-      const payload = await respuesta.json().catch(() => null)
-      throw new Error(payload?.error || 'No se pudo iniciar la sincronización')
-    }
-
-    const payload = await respuesta.json().catch(() => null)
-    if (typeof payload?.snapshot_url === 'string' && payload.snapshot_url) {
-      snapshotRemotoUrl.value = payload.snapshot_url
-    }
-
-    mensajeSincronizacion.value = 'Sincronización iniciada. Esperando snapshot actualizado...'
-    const datosActualizados = await esperarSnapshotNuevo(fechaAnteriorMs)
-    aplicarEstado(datosActualizados)
-    mensajeSincronizacion.value = 'Datos sincronizados correctamente.'
-  } catch (errorSync) {
-    console.error('Error sincronizando datos:', errorSync)
-    const detalle = errorSync instanceof Error ? errorSync.message : 'Error desconocido'
-    mensajeSincronizacion.value = `No se pudo completar la sincronización: ${detalle}`
-    await cargarEstado(true, false)
-  } finally {
-    sincronizando.value = false
-  }
-}
-
 onMounted(() => {
-  void cargarEstado(false)
+  void cargarEstado()
 })
 </script>
 
@@ -289,13 +207,7 @@ onMounted(() => {
         <h3 class="monitoreo__titulo">Monitoreo de fuentes</h3>
         <span class="monitoreo__auto">Snapshot diario: {{ fechaActualizacion || 'cargando...' }}</span>
       </div>
-      <div class="monitoreo__acciones">
-        <button class="monitoreo__boton" :disabled="botonBloqueado" @click="sincronizarDatos">
-          {{ textoBoton }}
-        </button>
-      </div>
     </div>
-    <p v-if="mensajeSincronizacion" class="monitoreo__sync">{{ mensajeSincronizacion }}</p>
 
     <div class="monitoreo__grid">
       <div class="monitoreo__fuente monitoreo__fuente--colombia">
@@ -376,14 +288,9 @@ onMounted(() => {
 .monitoreo__encabezado {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.monitoreo__acciones {
-  display: flex;
-  align-items: center;
+  justify-content: flex-start;
   gap: 8px;
+  margin-bottom: 12px;
 }
 
 .monitoreo__icono {
@@ -403,32 +310,6 @@ onMounted(() => {
   color: #6B3A2C;
   display: block;
   margin-top: 4px;
-}
-
-.monitoreo__actualizacion {
-  font-size: 12px;
-  color: var(--tinta-claro);
-}
-
-.monitoreo__boton {
-  background: #FEF0EB;
-  border: 1px solid #E8C4BC;
-  color: #A64028;
-  border-radius: 6px;
-  padding: 5px 8px;
-  font-size: 10px;
-  cursor: pointer;
-}
-
-.monitoreo__boton:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.monitoreo__sync {
-  margin: -2px 0 12px;
-  font-size: 11px;
-  color: #6B3A2C;
 }
 
 .monitoreo__grid {
@@ -554,11 +435,6 @@ onMounted(() => {
 
   .monitoreo__titulo {
     font-size: 14px;
-  }
-
-  .monitoreo__acciones {
-    width: 100%;
-    justify-content: space-between;
   }
 }
 </style>

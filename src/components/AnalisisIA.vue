@@ -5,8 +5,23 @@ import { withBase } from '../lib/paths.js'
 
 env.allowLocalModels = false
 
-const MODELO_ID = 'onnx-community/Qwen3-0.6B-DQ-ONNX'
-const MODELO_RESPALDO_ID = 'onnx-community/Qwen3-0.6B-ONNX'
+// Modelos optimizados para navegador
+const MODELOS = {
+  pequeno: {
+    id: 'onnx-community/SmolLM2-135M-ONNX',
+    nombre: 'Pequeño (rápido)',
+    descripcion: 'Ideal para dispositivos limitados. Carga en ~30s.',
+    tamaño: '~85MB'
+  },
+  mediano: {
+    id: 'onnx-community/LFM2.5-350M-ONNX',
+    nombre: 'Mediano (equilibrado)',
+    descripcion: 'Mejor calidad. Carga en ~90s.',
+    tamaño: '~240MB'
+  }
+}
+
+const MODELO_RESPALDO_FINAL = 'onnx-community/gpt2-medium-ONNX'
 
 const cargando = ref(true)
 const modeloListo = ref(false)
@@ -16,6 +31,8 @@ const descargando = ref(false)
 const datosWeb = ref(null)
 const generando = ref(false)
 let generador = null
+const modeloSeleccionado = ref(null)
+const mostrarSelector = ref(false)
 
 const quitarThink = (texto) => texto.replace(/<think>[\s\S]*?<\/think>/gi, ' ').replace(/\s+/g, ' ').trim()
 
@@ -89,28 +106,30 @@ const descargarReporte = async () => {
 const iniciarModelo = async () => {
   if (generador) return
 
+  const modelId = modeloSeleccionado.value
+
   try {
-    generador = await pipeline('text-generation', MODELO_ID, {
+    generador = await pipeline('text-generation', modelId, {
       device: 'webgpu',
       dtype: 'q4f16',
     })
     modeloListo.value = true
   } catch (err) {
-    console.error('Error WebGPU en modelo ligero, usando CPU:', err)
+    console.error('Error WebGPU, usando CPU:', err)
     try {
-      generador = await pipeline('text-generation', MODELO_ID, { dtype: 'q4f16' })
+      generador = await pipeline('text-generation', modelId, { dtype: 'q4f16' })
       modeloListo.value = true
     } catch (errLigero) {
-      console.error('Error en modelo ligero, usando respaldo:', errLigero)
+      console.error('Error modelo principal, usando respaldo:', errLigero)
       try {
-        generador = await pipeline('text-generation', MODELO_RESPALDO_ID, {
+        generador = await pipeline('text-generation', MODELO_RESPALDO_FINAL, {
           device: 'webgpu',
           dtype: 'q4f16',
         })
         modeloListo.value = true
       } catch (errRespaldoWebgpu) {
         console.error('Error respaldo WebGPU, usando CPU:', errRespaldoWebgpu)
-        generador = await pipeline('text-generation', MODELO_RESPALDO_ID, { dtype: 'q4' })
+        generador = await pipeline('text-generation', MODELO_RESPALDO_FINAL, { dtype: 'q4' })
         modeloListo.value = true
       }
     }
@@ -212,10 +231,24 @@ const generarAnalisisIA = async () => {
   }
 }
 
+const seleccionarModelo = (tamaño) => {
+  const modeloConfig = MODELOS[tamaño]
+  modeloSeleccionado.value = modeloConfig.id
+  localStorage.setItem('modeloIA', tamaño)
+  mostrarSelector.value = false
+}
+
 onMounted(async () => {
   await cargarDatosWeb()
-  analisis.value = 'Presiona ↻ para generar análisis con IA'
+  analisis.value = 'Selecciona el tamaño del modelo para generar el análisis'
   cargando.value = false
+
+  const guardado = localStorage.getItem('modeloIA')
+  if (guardado && MODELOS[guardado]) {
+    modeloSeleccionado.value = MODELOS[guardado].id
+  } else {
+    mostrarSelector.value = true
+  }
 })
 </script>
 
@@ -224,12 +257,36 @@ onMounted(async () => {
     <div class="analisis-ia__encabezado">
       <span class="analisis-ia__icono">⚡</span>
       <h3 class="analisis-ia__titulo">Analisis con IA</h3>
-      <button v-if="!cargando && !generando" @click="generarAnalisisIA" class="analisis-ia__boton">
+      <button
+        v-if="!cargando && !generando && modeloSeleccionado"
+        @click="generarAnalisisIA"
+        class="analisis-ia__boton"
+      >
         ↻
       </button>
     </div>
 
-    <div v-if="cargando || generando" class="analisis-ia__cargando">
+    <!-- Selector de modelo (solo primera vez) -->
+    <div v-if="mostrarSelector" class="analisis-ia__selector">
+      <p class="analisis-ia__selector-texto">
+        Elige el tamaño del modelo. Más pequeño = más rápido, más grande = mejor calidad.
+      </p>
+      <div class="analisis-ia__opciones">
+        <button
+          v-for="(modelo, key) in MODELOS"
+          :key="key"
+          @click="seleccionarModelo(key)"
+          class="analisis-ia__opcion"
+          :class="`analisis-ia__opcion--${key}`"
+        >
+          <span class="analisis-ia__opcion-nombre">{{ modelo.nombre }}</span>
+          <span class="analisis-ia__opcion-desc">{{ modelo.descripcion }}</span>
+          <span class="analisis-ia__opcion-tamaño">{{ modelo.tamaño }}</span>
+        </button>
+      </div>
+    </div>
+
+    <div v-else-if="cargando || generando" class="analisis-ia__cargando">
       <div class="analisis-ia__spinner"></div>
       <span>{{ modeloListo ? 'Generando analisis...' : 'Cargando modelo IA...' }}</span>
     </div>
@@ -369,6 +426,71 @@ onMounted(async () => {
   opacity: 0.6;
 }
 
+/* Selector de modelo */
+.analisis-ia__selector {
+  background: #FEF0EB;
+  border-radius: 8px;
+  padding: 14px;
+  border: 1px solid #E8C4BC;
+}
+
+.analisis-ia__selector-texto {
+  font-size: 12px;
+  color: #6B3A2C;
+  margin: 0 0 12px;
+  line-height: 1.5;
+}
+
+.analisis-ia__opciones {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.analisis-ia__opcion {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 2px solid #E8C4BC;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.analisis-ia__opcion:hover {
+  border-color: #C96A5B;
+  background: #FDF6F4;
+}
+
+.analisis-ia__opcion--pequeno {
+  border-left: 4px solid #10B981;
+}
+
+.analisis-ia__opcion--mediano {
+  border-left: 4px solid #3B82F6;
+}
+
+.analisis-ia__opcion-nombre {
+  font-weight: 600;
+  font-size: 13px;
+  color: #5C3026;
+}
+
+.analisis-ia__opcion-desc {
+  font-size: 11px;
+  color: #6B3A2C;
+}
+
+.analisis-ia__opcion-tamaño {
+  font-size: 10px;
+  color: #B8482D;
+  font-weight: 600;
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
@@ -381,6 +503,10 @@ onMounted(async () => {
     flex-direction: column;
     gap: 12px;
     align-items: flex-start;
+  }
+
+  .analisis-ia__opciones {
+    grid-template-columns: 1fr;
   }
 }
 </style>
