@@ -54,20 +54,17 @@
   font-weight: 500;
   color: #4A2E2E;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, border-color 0.2s;
 }
 
 .grafica-boton:hover {
-  background: #F7EDE6;
+  background: #F5D5D5;
+  border-color: #C05050;
 }
 
 .grafica-boton:focus {
   outline: 2px solid #A0522D;
   outline-offset: 2px;
-}
-
-.grafica-boton:active {
-  background: #4A2C31;
 }
 
 .grafica-boton--activo {
@@ -77,12 +74,8 @@
 }
 
 .grafica-boton--activo:hover {
-  background: #3A2424;
-}
-
-.grafica-boton--activo:focus {
-  outline: 2px solid #A0522D;
-  outline-offset: 2px;
+  background: #6B2C31;
+  border-color: #6B2C31;
 }
 
 .grafica-contenedor {
