@@ -23,11 +23,14 @@
 }
 
 .encabezado__subtitulo {
-  font-size: 15px;
-  color: var(--tinta-claro);
-  max-width: 520px;
-  margin: 0 auto 20px;
-  line-height: 1.5;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 19px;
+  color: #000000;
+  font-weight: 500;
+  max-width: 640px;
+  margin: 0 auto 24px;
+  line-height: 1.65;
+  letter-spacing: -0.2px;
 }
 
 .encabezado__badges {
