@@ -13,7 +13,7 @@ const progresoCarga = ref(0)
 const descargando = ref(false)
 
 const fuenteTexto = computed(() => {
-  return '🤖 Qwen3-0.8B · IA en tu navegador'
+  return '🤖 Qwen3.5-0.8B · IA en tu navegador'
 })
 
 const descargarReporte = async () => {
@@ -58,51 +58,60 @@ const datosUsa = {
   variacion: 1,
 }
 
+let modeloCache = null
+
 const generarAnalisisLocal = async () => {
+  if (cargando.value) return
+  
   cargando.value = true
   cargandoModelo.value = true
 
   const enfoques = [
-    "desde la perspectiva del productor mediano",
-    "enfatizando la oportunidad de crecimiento",
-    "analizando el差距 de datos entre países",
-    "sobre la ventaja de tener datos abiertos",
-    "comparando la estructura productiva"
+    "explica por qué los datos abiertos benef prejuí al productor colombiano",
+    "compara la productividad por cerdo entre Colombia y USA",
+    "analiza el riesgo de no tener un sistema de información oficial",
+    "propondré una solución para mejorar la transparencia",
+    "destaca qué país tiene mejor estructura de datos",
+    "evalúa el impacto económico de la fragmentación"
   ]
   const enfoque = enfoques[Math.floor(Math.random() * enfoques.length)]
 
   try {
-    const generador = await pipeline('text-generation', 'Xenova/Qwen3-0.8B-Instruct', {
-      progress_callback: (p) => {
-        if (p.status === 'progress') {
-          progresoCarga.value = Math.round(p.progress * 100)
+    if (!modeloCache) {
+      modeloCache = await pipeline('text-generation', 'Xenova/Qwen3.5-0.8B-Instruct', {
+        progress_callback: (p) => {
+          if (p.status === 'progress') {
+            progresoCarga.value = Math.round(p.progress * 100)
+          }
         }
-      }
-    })
+      })
+    }
+    const generador = modeloCache
 
-    const prompt = `Analiza ${enfoque} en el mercado porcino.
+    const prompt = `${enfoque}.
 
-Datos clave:
-- Colombia: 10.7M cerdas, 189K predios (78% traspatio)
-- UE: 132M (-0.5% vs 2023)
-- USA: 75.5M (+1%), 69.6M mercado
+Colombia: 10.7M cerdas en 189K predios (78% traspatio, 19% familiar, 2% industrial).
+UE-27: 132M cerdas (-0.5%).
+USA: 75.5M cerdas (+1%).
 
-Escribe 2-3 oraciones distintas cada vez. Sé específico con números.`
+Responde en español, máximo 2 oraciones, incluye datos específicos.`
 
     const resultado = await generador(prompt, {
-      max_new_tokens: 80,
-      temperature: 0.85,
-      top_p: 0.9,
-      do_sample: true
+      max_new_tokens: 60,
+      temperature: 0.9,
+      top_p: 0.85,
+      do_sample: true,
+      repetition_penalty: 1.1
     })
 
     let textoLimpio = resultado[0].generated_text.replace(prompt, '').trim()
     textoLimpio = textoLimpio.replace(/\n+/g, ' ').replace(/\s{2,}/g, ' ').trim()
+    textoLimpio = textoLimpio.replace(/^[A-Z][^.!?]*[.!?]\s*/i, '').trim()
     
-    if (textoLimpio.length > 30 && textoLimpio.length < 300) {
+    if (textoLimpio.length > 25 && textoLimpio.length < 250) {
       analisis.value = textoLimpio
     } else {
-      throw new Error('Texto fuera de rango')
+      throw new Error('Texto inválido')
     }
   } catch (err) {
     console.log('Modelo fallback:', err.message)
