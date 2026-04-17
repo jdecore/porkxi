@@ -231,23 +231,29 @@ const generarAnalisisIA = async () => {
   }
 }
 
-const seleccionarModelo = (tamaño) => {
+const seleccionarModelo = async (tamaño) => {
   const modeloConfig = MODELOS[tamaño]
   modeloSeleccionado.value = modeloConfig.id
   localStorage.setItem('modeloIA', tamaño)
   mostrarSelector.value = false
+  generador = null
+  modeloListo.value = false
+  analisis.value = ''
+  error.value = false
+  await generarAnalisisIA()
 }
 
 onMounted(async () => {
   await cargarDatosWeb()
-  analisis.value = 'Selecciona el tamaño del modelo para generar el análisis'
   cargando.value = false
 
   const guardado = localStorage.getItem('modeloIA')
   if (guardado && MODELOS[guardado]) {
     modeloSeleccionado.value = MODELOS[guardado].id
+    await generarAnalisisIA()
   } else {
     mostrarSelector.value = true
+    analisis.value = 'Selecciona el tamaño del modelo para generar el análisis'
   }
 })
 </script>
@@ -257,16 +263,9 @@ onMounted(async () => {
     <div class="analisis-ia__encabezado">
       <span class="analisis-ia__icono">⚡</span>
       <h3 class="analisis-ia__titulo">Analisis con IA</h3>
-      <button
-        v-if="!cargando && !generando && modeloSeleccionado"
-        @click="generarAnalisisIA"
-        class="analisis-ia__boton"
-      >
-        ↻
-      </button>
     </div>
 
-    <!-- Selector de modelo (solo primera vez) -->
+    <!-- Selector de modelo (primera vez o al cambiar) -->
     <div v-if="mostrarSelector" class="analisis-ia__selector">
       <p class="analisis-ia__selector-texto">
         Elige el tamaño del modelo. Más pequeño = más rápido, más grande = mejor calidad.
@@ -278,6 +277,7 @@ onMounted(async () => {
           @click="seleccionarModelo(key)"
           class="analisis-ia__opcion"
           :class="`analisis-ia__opcion--${key}`"
+          :disabled="generando"
         >
           <span class="analisis-ia__opcion-nombre">{{ modelo.nombre }}</span>
           <span class="analisis-ia__opcion-desc">{{ modelo.descripcion }}</span>
@@ -286,21 +286,29 @@ onMounted(async () => {
       </div>
     </div>
 
-    <div v-else-if="cargando || generando" class="analisis-ia__cargando">
-      <div class="analisis-ia__spinner"></div>
-      <span>{{ modeloListo ? 'Generando analisis...' : 'Cargando modelo IA...' }}</span>
-    </div>
+    <!-- Contenido normal (cuando no se muestra selector) -->
+    <div v-else>
+      <div v-if="cargando || generando" class="analisis-ia__cargando">
+        <div class="analisis-ia__spinner"></div>
+        <span>{{ modeloListo ? 'Generando analisis...' : 'Cargando modelo IA...' }}</span>
+      </div>
 
-    <div v-else class="analisis-ia__contenido">
-      <p v-if="error" class="analisis-ia__error">
-        Modelo IA no disponible temporalmente. Mostrando análisis de respaldo.
-      </p>
-      <p class="analisis-ia__texto">{{ analisis }}</p>
-      <div class="analisis-ia__footer">
-        <p class="analisis-ia__meta">{{ fuenteTexto }}</p>
-        <button class="analisis-ia__descarga" @click="descargarReporte" :disabled="descargando">
-          {{ descargando ? 'Descargando...' : 'Descargar reporte' }}
-        </button>
+      <div v-else class="analisis-ia__contenido">
+        <p v-if="error" class="analisis-ia__error">
+          Modelo IA no disponible temporalmente. Mostrando análisis de respaldo.
+        </p>
+        <p class="analisis-ia__texto">{{ analisis }}</p>
+        <div class="analisis-ia__footer">
+          <p class="analisis-ia__meta">{{ fuenteTexto }}</p>
+          <div class="analisis-ia__acciones">
+            <button class="analisis-ia__descarga" @click="descargarReporte" :disabled="descargando">
+              {{ descargando ? 'Descargando...' : 'Descargar reporte' }}
+            </button>
+            <button class="analisis-ia__cambiar" @click="mostrarSelector = true">
+              Cambiar modelo
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -426,6 +434,27 @@ onMounted(async () => {
   opacity: 0.6;
 }
 
+.analisis-ia__acciones {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.analisis-ia__cambiar {
+  background: transparent;
+  color: #6B3A2C;
+  border: none;
+  padding: 6px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.analisis-ia__cambiar:hover {
+  color: #B8482D;
+}
+
 /* Selector de modelo */
 .analisis-ia__selector {
   background: #FEF0EB;
@@ -489,6 +518,11 @@ onMounted(async () => {
   font-size: 10px;
   color: #B8482D;
   font-weight: 600;
+}
+
+.analisis-ia__opcion:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 @keyframes spin {
