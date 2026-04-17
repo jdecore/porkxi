@@ -70,7 +70,6 @@
   }
 
   .frecuencia-card__pildora {
-    font-size: 10px;
     padding: 3px 10px;
   }
 }
@@ -130,14 +129,14 @@
 
 .frecuencia-card__pildora {
   display: inline-block;
-  padding: 3px 10px;
-  border-radius: 10px;
+  padding: 4px 12px;
+  border-radius: 9999px;
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: 10px;
-  background: #6b2c31;
-  color: #f0e0e0;
-  border: 1px solid #9a5260;
+  background: #FFFFFF;
+  color: #4A2E2E;
+  border: none;
 }
 
 .frecuencia-card__descripcion {

@@ -31,9 +31,9 @@ const svgAlto = 440
 const svgAncho = 760
 
 const catalogoSeries = {
-  colombia: { key: 'colombia', label: 'Colombia', icono: '🇨🇴', color: '#f0a0a8' },
-  europa: { key: 'europa', label: 'Europa (UE-27)', icono: '🇪🇺', color: '#a8e0a8' },
-  usa: { key: 'usa', label: 'EE.UU.', icono: '🇺🇸', color: '#a8a8f0' },
+  colombia: { key: 'colombia', label: 'Colombia', icono: '🇨🇴', color: '#A0522D' },
+  europa: { key: 'europa', label: 'Europa (UE-27)', icono: '🇪🇺', color: '#2E7D32' },
+  usa: { key: 'usa', label: 'EE.UU.', icono: '🇺🇸', color: '#1565C0' },
 }
 
 const botones = [
@@ -206,8 +206,8 @@ onUnmounted(() => {
             :y1="yInicio + (chartHeight * (i - 1)) / 4"
             :x2="xFin"
             :y2="yInicio + (chartHeight * (i - 1)) / 4"
-            stroke="#9a5260"
-            stroke-dasharray="3,3"
+            stroke="#D4C5C5"
+            stroke-dasharray="4 4"
           />
         </g>
 
@@ -219,15 +219,16 @@ onUnmounted(() => {
             :y="yInicio + (chartHeight * i) / 4"
             text-anchor="end"
             dominant-baseline="middle"
-            font-size="13"
-            fill="#b8a8a8"
+            font-size="12"
+            font-weight="500"
+            fill="#4A2E2E"
           >
             {{ valor }}
           </text>
         </g>
 
         <g class="grafica-x-axis">
-          <line :x1="xInicio" :y1="yFin" :x2="xFin" :y2="yFin" stroke="#9a5260" stroke-width="1" />
+          <line :x1="xInicio" :y1="yFin" :x2="xFin" :y2="yFin" stroke="#D4C5C5" stroke-width="1" />
           <text
             v-for="(label, i) in etiquetasX"
             :key="`x-${i}`"
@@ -235,7 +236,8 @@ onUnmounted(() => {
             y="425"
             text-anchor="middle"
             font-size="12"
-            fill="#b8a8a8"
+            font-weight="500"
+            fill="#4A2E2E"
             :transform="debeRotar ? `rotate(-40, ${xInicio + i * pasoXEtiquetas}, 452)` : ''"
           >
             {{ label }}
@@ -247,7 +249,7 @@ onUnmounted(() => {
             :points="polylineSerie(serie.data)"
             fill="none"
             :stroke="serie.color"
-            stroke-width="3.5"
+            stroke-width="3"
             stroke-linecap="round"
             stroke-linejoin="round"
           />
@@ -256,7 +258,7 @@ onUnmounted(() => {
             :key="`${serie.key}-${idx}`"
             :cx="xInicio + idx * obtenerPasoX(serie.data)"
             :cy="escalarY(punto.valor)"
-            r="6"
+            r="4"
             :fill="serie.color"
             class="grafica-punto"
             tabindex="0"
@@ -272,7 +274,7 @@ onUnmounted(() => {
           <g v-for="(serie, idx) in seriesActivas" :key="`legend-${serie.key}`" :transform="`translate(${idx * 180}, 0)`">
             <line x1="0" y1="0" x2="24" y2="0" :stroke="serie.color" stroke-width="3" />
             <circle cx="12" cy="0" r="4" :fill="serie.color" />
-            <text x="32" y="4" font-size="12" fill="#f0e0e0" font-weight="500">{{ serie.label }}</text>
+            <text x="32" y="4" font-size="12" font-weight="500" fill="#4A2E2E">{{ serie.label }}</text>
           </g>
         </g>
       </svg>
@@ -371,14 +373,15 @@ onUnmounted(() => {
 
 .grafica-tooltip {
   position: absolute;
-  background: var(--tinta, #3B1F1C);
-  color: white;
+  background: #FFFFFF;
+  color: #3A2424;
   padding: 10px 14px;
   border-radius: 8px;
   font-size: 12px;
   pointer-events: none;
   z-index: 10;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: none;
+  border: 1px solid #E0D0C0;
   white-space: nowrap;
   max-width: 220px;
 }

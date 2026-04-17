@@ -18,7 +18,7 @@
 
 .grafica-card__subtitulo {
   font-size: 13px;
-  color: #b8a8a8;
+  color: #d8c8c8;
   margin: 0 0 16px;
   line-height: 1.5;
 }
@@ -29,12 +29,12 @@
 }
 
 .grafica-card__europa {
-  color: #a8e0a8;
+  color: #a8d8a8;
   font-weight: 600;
 }
 
 .grafica-card__usa {
-  color: #a8a8f0;
+  color: #a8c8f0;
   font-weight: 600;
 }
 
@@ -46,29 +46,43 @@
 }
 
 .grafica-boton {
-  background: #f0e0e0;
-  border: 1px solid #9a5260;
+  background: #FFFFFF;
+  border: 1px solid #E5D5C8;
   border-radius: 6px;
   padding: 6px 12px;
   font-size: 12px;
   font-weight: 500;
-  color: #6b2c31;
+  color: #4A2E2E;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.2s;
 }
 
 .grafica-boton:hover {
-  background: #d8c8c8;
+  background: #F7EDE6;
+}
+
+.grafica-boton:focus {
+  outline: 2px solid #A0522D;
+  outline-offset: 2px;
+}
+
+.grafica-boton:active {
+  background: #4A2C31;
 }
 
 .grafica-boton--activo {
-  background: #9a5260;
-  border-color: #f0e0e0;
-  color: #f0e0e0;
+  background: #4A2E2E;
+  border-color: #4A2E2E;
+  color: #FFFFFF;
 }
 
 .grafica-boton--activo:hover {
-  background: #b87080;
+  background: #3A2424;
+}
+
+.grafica-boton--activo:focus {
+  outline: 2px solid #A0522D;
+  outline-offset: 2px;
 }
 
 .grafica-contenedor {
