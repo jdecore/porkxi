@@ -101,8 +101,8 @@ const metodosEncuestaUsa = Array.isArray(DETALLE_USA.metodosEncuesta)
       *, *::before, *::after { box-sizing: border-box; }
       html { -webkit-text-size-adjust: 100%; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; scroll-behavior: smooth; }
       body { margin: 0; padding: 0; font-family: 'Sora', 'DM Sans', sans-serif; background-color: #FFFFFF; color: var(--tinta); min-height: 100vh; position: relative; }
-      body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); opacity: 0.02; pointer-events: none; z-index: 0; }
-      .hero-bg { background: linear-gradient(180deg, var(--crema) 0%, var(--crema) 70%, #FFFFFF 100%); }
+      body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); opacity: 0.015; pointer-events: none; z-index: 0; }
+      .hero-bg { background: var(--crema); }
       .contenedor { max-width: 1140px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
       img, svg { max-width: 100%; height: auto; }
       @media (max-width: 700px) { .contenedor { padding: 0 16px; } }
