@@ -12,22 +12,36 @@ const analisis = ref('')
 const progresoCarga = ref(0)
 
 const fuenteTexto = computed(() => {
-  return '🤖 Transformers.js · Qwen3-0.8B-Instruct (corre en tu navegador)'
+  return '🤖 Qwen3-0.8B · análisis en tu navegador'
 })
 
-const datos = {
-  colombia: { inventario_millones: 10.7 },
-  europa: { inventario_millones: 132 },
-  usa: { inventario_millones: 75.5 }
+const datosColombia = {
+  total: 10668276,
+  predios: 189198,
+  traspatio: 78.38,
+  familiar: 19.03,
+  industrial: 2.12,
+  tecnificadas: 0.47,
+  carne: 608752,
+  variacionCarne: 7.8,
 }
 
-const ratioUsa = datos.usa.inventario_millones / datos.colombia.inventario_millones
-const ratioEuropa = datos.europa.inventario_millones / datos.colombia.inventario_millones
+const datosEuropa = {
+  total: 132135520,
+  variacion: -0.5,
+}
+
+const datosUsa = {
+  total: 75500000,
+  mercado: 69600000,
+  reproductores: 5950000,
+  camada: 11.93,
+  variacion: 1,
+}
 
 const generarAnalisisLocal = async () => {
   cargando.value = true
   cargandoModelo.value = true
-  error.value = false
 
   try {
     const generador = await pipeline('text-generation', 'Xenova/Qwen3-0.8B-Instruct', {
@@ -38,25 +52,41 @@ const generarAnalisisLocal = async () => {
       }
     })
 
-    const prompt = `Eres un analista de datos agrícolas. Escribe en español un análisis breve del inventario porcino comparando Colombia (${datos.colombia.inventario_millones}M), Europa (${datos.europa.inventario_millones}M) y Estados Unidos (${datos.usa.inventario_millones}M). Destaca la brecha de datos abiertos.`
+    const prompt = `Analiza el mercado porcino en 3 puntos cortos:
+
+1. Inventario actual: Colombia tiene 10.7M en 189K predios (78% traspatio). UE tiene 132M (-0.5% vs 2023). USA tiene 75.5M con 69.6M cerdos de mercado y 5.95M reproductores. La escala UE es 12x Colombia.
+
+2. Brecha de datos: Only Colombia depends on press (Porcinews). UE has Eurostat API, USA has USDA quarterly reports. Colombia lacks public API from ICA/DANE.
+
+3. Action item: Colombia needs consolidated data from ICA, DANE, Porkcolombia via open API like Eurostat.
+
+Write in Spanish, 2-3 sentences per point. Be specific with numbers.`
 
     const resultado = await generador(prompt, {
-      max_new_tokens: 100,
-      temperature: 0.3,
-      top_p: 0.9,
+      max_new_tokens: 120,
+      temperature: 0.5,
+      top_p: 0.92,
+      do_sample: true
     })
 
-    let texto = resultado[0].generated_text.replace(prompt, '').trim()
-    if (texto.length > 20) {
-      analisis.value = texto
+    const textoLimpio = resultado[0].generated_text.replace(prompt, '').trim()
+    
+    if (textoLimpio.length > 50 && !textoLimpio.includes('I cannot') && !textoLimpio.includes('No puedo')) {
+      analisis.value = textoLimpio
     } else {
-      throw new Error('Texto muy corto')
+      throw new Error('Respuesta inválida')
     }
   } catch (err) {
-    console.log('Modelo no disponible, usando análisis predefinido')
-    analisis.value = `Colombia registra ${datos.colombia.inventario_millones} millones de cabezas, mientras Europa lidera con ${datos.europa.inventario_millones}M (${ratioEuropa.toFixed(0)} veces más que Colombia) y Estados Unidos ${datos.usa.inventario_millones}M (${ratioUsa.toFixed(0)} veces más).
+    console.log('Error modelo:', err.message)
+    const colM = (datosColombia.total / 1000000).toFixed(1)
+    const euM = (datosEuropa.total / 1000000).toFixed(0)
+    const usaM = (datosUsa.total / 1000000).toFixed(1)
+    
+    analisis.value = `${colM}M de cerdos en Colombia (78% traspatio) vs ${euM}M en UE-27 y ${usaM}M en EE.UU. UE tiene 12x más que Colombia.
 
-La brecha más significativa no es de volumen: Europa y Estados Unidos publican sus datos mediante APIs públicas oficiales, mientras Colombia carece de una fuente consolidada. Este es el principal desafío para el análisis del sector porcino nacional.`
+La brecha real: mientras Eurostat y USDA publican datos oficiales con APIs, Colombia solo tiene medios especializados. No existe una fuente pública consolidada del gobierno.
+
+Lo que falta: un observatorio porcino colombiano con datos abiertos de ICA, DANE y Porkcolombia.`;
   } finally {
     cargando.value = false
     cargandoModelo.value = false
