@@ -280,36 +280,36 @@ onMounted(() => {
 
 <style scoped>
 .monitoreo {
-  background: #FFEBE6;
-  border-radius: var(--radio);
-  padding: 24px;
-  margin: 32px 0;
-  border: 1px solid var(--crema-borde);
+  background: #FDF6F4;
+  border: 1.5px solid #E8C4BC;
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin: 0 0 24px;
 }
 
 .monitoreo__encabezado {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .monitoreo__acciones {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .monitoreo__icono {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .monitoreo__titulo {
   font-family: 'Playfair Display', serif;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
-  color: var(--tinta);
   margin: 0;
+  color: #B8482D;
 }
 
 .monitoreo__actualizacion {
@@ -318,30 +318,31 @@ onMounted(() => {
 }
 
 .monitoreo__boton {
-  background: var(--crema);
-  border: 1px solid var(--crema-borde);
-  color: var(--tinta);
-  border-radius: 8px;
-  padding: 6px 10px;
-  font-size: 11px;
+  background: #FEF0EB;
+  border: 1px solid #E8C4BC;
+  color: #A64028;
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 10px;
   cursor: pointer;
 }
 
 .monitoreo__boton:disabled {
-  opacity: 0.7;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
 .monitoreo__grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: 12px;
 }
 
 .monitoreo__fuente {
-  padding: 16px;
-  border-radius: 10px;
-  border: 1px solid var(--crema-borde);
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #E8C4BC;
+  background: #FEF0EB;
 }
 
 .monitoreo__fuente--usa {
@@ -359,13 +360,13 @@ onMounted(() => {
 .monitoreo__estado {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 6px;
+  margin-bottom: 6px;
 }
 
 .monitoreo__indicador {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
 }
 
@@ -378,65 +379,70 @@ onMounted(() => {
 }
 
 .monitoreo__indicador--error {
-  background: var(--alerta);
+  background: #C0392B;
 }
 
 .monitoreo__nombre {
   font-weight: 600;
-  font-size: 14px;
+  font-size: 12px;
+  color: #A64028;
 }
 
 .monitoreo__badge {
   margin-left: auto;
-  font-size: 10px;
-  border: 1px solid var(--crema-borde);
+  font-size: 9px;
+  border: 1px solid #E8C4BC;
   border-radius: 999px;
-  padding: 2px 7px;
-  color: var(--tinta-claro);
+  padding: 2px 6px;
+  color: #6B3A2C;
 }
 
 .monitoreo__detalle {
   display: flex;
   justify-content: space-between;
-  font-size: 12px;
-  color: var(--tinta-claro);
-  margin-bottom: 8px;
+  font-size: 11px;
+  color: #6B3A2C;
+  margin-bottom: 6px;
 }
 
 .monitoreo__proximo {
-  font-size: 11px;
-  color: var(--tinta-claro);
+  font-size: 10px;
+  color: #6B3A2C;
   font-style: italic;
 }
 
 .monitoreo__meta {
-  font-size: 11px;
-  color: var(--tinta-claro);
-  margin-bottom: 4px;
+  font-size: 10px;
+  color: #6B3A2C;
+  margin-bottom: 3px;
 }
 
 .monitoreo__enlace {
   display: inline-block;
-  margin-top: 6px;
-  font-size: 11px;
-  color: var(--tinta-claro);
+  margin-top: 4px;
+  font-size: 10px;
+  color: #6B3A2C;
   text-decoration: none;
 }
 
 .monitoreo__enlace:hover {
-  color: var(--tinta);
+  color: #A64028;
   text-decoration: underline;
 }
 
 .monitoreo__error {
-  margin-top: 8px;
-  font-size: 11px;
-  color: var(--alerta);
+  margin-top: 6px;
+  font-size: 10px;
+  color: #C0392B;
 }
 
 @media (max-width: 900px) {
+  .monitoreo {
+    padding: 12px 14px;
+  }
   .monitoreo__grid {
     grid-template-columns: 1fr;
+    gap: 10px;
   }
 }
 
@@ -444,7 +450,11 @@ onMounted(() => {
   .monitoreo__encabezado {
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
+    gap: 8px;
+  }
+
+  .monitoreo__titulo {
+    font-size: 14px;
   }
 
   .monitoreo__acciones {

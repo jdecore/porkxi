@@ -228,91 +228,91 @@ onMounted(async () => {
 
 <style scoped>
 .analisis-ia {
-  background: var(--crema);
-  border-radius: var(--radio);
-  padding: 20px;
-  margin: 24px 0;
-  border: 1px solid var(--crema-borde);
+  background: #FDF6F4;
+  border: 1.5px solid #E8C4BC;
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin: 0 0 24px;
 }
 
 .analisis-ia__encabezado {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .analisis-ia__icono {
-  font-size: 24px;
+  font-size: 18px;
 }
 
 .analisis-ia__titulo {
   font-family: 'Playfair Display', serif;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 700;
-  color: var(--tinta);
+  color: #B8482D;
   margin: 0;
 }
 
 .analisis-ia__boton {
-  background: var(--cerdo);
+  background: #C96A5B;
   color: white;
   border: none;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
   font-weight: 500;
   cursor: pointer;
   transition: background 0.2s;
 }
 
 .analisis-ia__boton:hover {
-  background: var(--cerdo-claro);
+  background: #D4736B;
 }
 
 .analisis-ia__cargando {
   display: flex;
   align-items: center;
-  gap: 12px;
-  color: var(--tinta-claro);
-  font-size: 14px;
+  gap: 10px;
+  color: #6B3A2C;
+  font-size: 12px;
 }
 
 .analisis-ia__spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--crema-borde);
-  border-top-color: var(--cerdo);
+  width: 16px;
+  height: 16px;
+  border: 2px solid #E8C4BC;
+  border-top-color: #C96A5B;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
 .analisis-ia__error {
-  color: var(--alerta);
-  font-size: 14px;
-  padding: 12px;
-  background: var(--alerta-fondo);
-  border-radius: 8px;
+  color: #C0392B;
+  font-size: 12px;
+  padding: 10px;
+  background: #FEF0EB;
+  border-radius: 6px;
 }
 
 .analisis-ia__contenido {
-  background: var(--crema);
-  padding: 16px;
+  background: #FEF0EB;
+  padding: 12px;
   border-radius: 8px;
-  border-left: 4px solid var(--cerdo);
+  border-left: 4px solid #C96A5B;
 }
 
 .analisis-ia__texto {
   margin: 0;
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--tinta);
+  font-size: 13px;
+  line-height: 1.5;
+  color: #5C3026;
 }
 
 .analisis-ia__meta {
-  margin: 10px 0 0;
-  font-size: 12px;
-  color: var(--tinta-claro);
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: #6B3A2C;
 }
 
 .analisis-ia__footer {
@@ -320,30 +320,30 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--crema-borde);
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #E8C4BC;
 }
 
 .analisis-ia__descarga {
-  background: var(--cerdo);
+  background: #C96A5B;
   color: white;
   border: none;
-  padding: 8px 14px;
+  padding: 6px 12px;
   border-radius: 6px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s;
 }
 
 .analisis-ia__descarga:hover:not(:disabled) {
-  background: var(--cerdo-claro);
+  background: #D4736B;
 }
 
 .analisis-ia__descarga:disabled {
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 @keyframes spin {
@@ -351,6 +351,9 @@ onMounted(async () => {
 }
 
 @media (max-width: 700px) {
+  .analisis-ia {
+    padding: 12px 14px;
+  }
   .analisis-ia__encabezado {
     flex-direction: column;
     gap: 12px;
