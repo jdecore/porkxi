@@ -23,7 +23,7 @@ const MODELOS = {
 
 const MODELO_RESPALDO_FINAL = 'onnx-community/gpt2-medium-ONNX'
 
-const cargando = ref(true)
+const cargando = ref(false)
 const modeloListo = ref(false)
 const error = ref(false)
 const analisis = ref('')
@@ -32,7 +32,7 @@ const datosWeb = ref(null)
 const generando = ref(false)
 let generador = null
 const modeloSeleccionado = ref(null)
-const mostrarSelector = ref(false)
+const mostrarSelector = ref(true)
 
 const quitarThink = (texto) => texto.replace(/<think>[\s\S]*?<\/think>/gi, ' ').replace(/\s+/g, ' ').trim()
 
@@ -243,17 +243,10 @@ const seleccionarModelo = async (tamaño) => {
   await generarAnalisisIA()
 }
 
-onMounted(async () => {
-  await cargarDatosWeb()
-  cargando.value = false
-
+onMounted(() => {
   const guardado = localStorage.getItem('modeloIA')
   if (guardado && MODELOS[guardado]) {
     modeloSeleccionado.value = MODELOS[guardado].id
-    await generarAnalisisIA()
-  } else {
-    mostrarSelector.value = true
-    analisis.value = 'Selecciona el tamaño del modelo para generar el análisis'
   }
 })
 </script>
@@ -265,7 +258,7 @@ onMounted(async () => {
       <h3 class="analisis-ia__titulo">Analisis con IA</h3>
     </div>
 
-    <!-- Selector de modelo (primera vez o al cambiar) -->
+    <!-- Selector de modelo -->
     <div v-if="mostrarSelector" class="analisis-ia__selector">
       <p class="analisis-ia__selector-texto">
         Elige el tamaño del modelo. Más pequeño = más rápido, más grande = mejor calidad.
