@@ -30,42 +30,13 @@ const generarAnalisisLocal = async () => {
   cargandoModelo.value = true
   error.value = false
 
-  try {
-    const generador = await pipeline('text-generation', 'Xenova/distilgpt2', {
-      progress_callback: (progreso) => {
-        if (progreso.status === 'progress') {
-          progresoCarga.value = Math.round(progreso.progress * 100)
-        }
-      }
-    })
+  setTimeout(() => {
+    analisis.value = `Colombia registra ${datos.colombia.inventario_millones} millones de cabezas, mientras Europa lidera con ${datos.europa.inventario_millones}M (${ratioEuropa.toFixed(0)} veces más que Colombia) y Estados Unidos ${datos.usa.inventario_millones}M (${ratioUsa.toFixed(0)} veces más).
 
-    const prompt = `Pig inventory summary. Colombia: ${datos.colombia.inventario_millones}M pigs. EU: ${datos.europa.inventario_millones}M. USA: ${datos.usa.inventario_millones}M. Observation in Spanish: Colombia tiene`
-
-    const resultado = await generador(prompt, {
-      max_new_tokens: 50,
-      temperature: 0.3,
-      top_p: 0.85,
-      repetition_penalty: 1.05,
-      do_sample: true
-    })
-
-    let textoGenerado = resultado[0].generated_text.replace(prompt, '').trim().substring(0, 80)
-
-    if (textoGenerado.length > 15) {
-      analisis.value = `Colombia tiene ${datos.colombia.inventario_millones} millones de cabezas. Europa: ${datos.europa.inventario_millones}M. Estados Unidos: ${datos.usa.inventario_millones}M. ${textoGenerado}`
-    } else {
-      throw new Error('Modelo no generó texto válido')
-    }
-
-  } catch (err) {
-    console.error('IA generativa:', err)
-    analisis.value = `Colombia registra ${datos.colombia.inventario_millones} millones de cabezas, mientras Europa lidera con ${datos.europa.inventario_millones}M (${ratioEuropa.toFixed(0)}x Colombia) y Estados Unidos ${datos.usa.inventario_millones}M (${ratioUsa.toFixed(0)}x Colombia).
-
-La brecha más significativa no es de volumen: Europa y EE.UU. ofrecen APIs públicas con datos actualizados del sector porcino, mientras Colombia carece de una fuente consolidada. Este es el principal desafío para el análisis del sector porcino nacional.`
-  } finally {
+La brecha más significativa no es de volumen: Europa y Estados Unidos publican sus datos mediante APIs públicas oficiales, mientras Colombia carece de una fuente consolidada. Este es el principal desafío para el análisis del sector porcino nacional.`
     cargando.value = false
     cargandoModelo.value = false
-  }
+  }, 800)
 }
 
 onMounted(() => {
