@@ -51,21 +51,27 @@ const descargarReporte = async () => {
 const iniciarModelo = async () => {
   if (generador) return
   
+  console.log('Iniciando modelo DistilGPT2...')
+  
   try {
-    generador = await pipeline('text-generation', 'onnx-community/SmolLM2-360M-ONNX', {
+    console.log('Intentando con webgpu...')
+    generador = await pipeline('text-generation', 'Xenova/distilgpt2', {
       dtype: 'q4',
       device: 'webgpu'
     })
     modeloListo.value = true
+    console.log('Modelo cargado con webgpu')
   } catch (err) {
-    console.error('Error modelo webgpu:', err)
+    console.error('Error webgpu:', err.message || err)
     try {
-      generador = await pipeline('text-generation', 'onnx-community/SmolLM2-360M-ONNX', {
+      console.log('Intentando con CPU...')
+      generador = await pipeline('text-generation', 'Xenova/distilgpt2', {
         dtype: 'q4'
       })
       modeloListo.value = true
+      console.log('Modelo cargado con CPU')
     } catch (err2) {
-      console.error('Error modelo fallback:', err2)
+      console.error('Error CPU:', err2.message || err2)
       error.value = true
     }
   }
@@ -128,7 +134,8 @@ const generarAnalisisIA = async () => {
     analisis.value = analisisGenerado.replace(/^[:\s]+/, '').substring(0, 300)
   } catch (err) {
     console.error('Error generacion:', err)
-    analisis.value = `Colombia cresce +${crecimientoCol}% vs UE-27 ${crecimientoEu}% y USA +${crecimientoUsa}%. La UE lidera con ${ratioColEu}x mas cerdas que Colombia, seguida por USA con ${ratioColUsa}x. Estrutura: ${col.detalle.traspatio.porcentaje}% traspatio.`
+    error.value = true
+    analisis.value = `Colombia crece +${crecimientoCol}% vs UE-27 ${crecimientoEu}% y USA +${crecimientoUsa}%. La UE lidera con ${ratioColEu}x mas cerdas que Colombia, seguida por USA con ${ratioColUsa}x. La estructura colombiana es mayoritariamente de traspatio (${col.detalle.traspatio.porcentaje}%).`
   }
   
   generando.value = false
@@ -136,8 +143,7 @@ const generarAnalisisIA = async () => {
 
 onMounted(async () => {
   await cargarDatosWeb()
-  await iniciarModelo()
-  await generarAnalisisIA()
+  analisis.value = 'Presiona ↻ para generar analisis con IA'
   cargando.value = false
 })
 </script>
