@@ -31,9 +31,9 @@ const svgAlto = 440
 const svgAncho = 760
 
 const catalogoSeries = {
-  colombia: { key: 'colombia', label: 'Colombia', icono: '🇨🇴', color: '#E8B4B8' },
-  europa: { key: 'europa', label: 'Europa (UE-27)', icono: '🇪🇺', color: '#A8C5B8' },
-  usa: { key: 'usa', label: 'EE.UU.', icono: '🇺🇸', color: '#B8C5E8' },
+  colombia: { key: 'colombia', label: 'Colombia', icono: '🇨🇴', color: '#f0a0a8' },
+  europa: { key: 'europa', label: 'Europa (UE-27)', icono: '🇪🇺', color: '#a8e0a8' },
+  usa: { key: 'usa', label: 'EE.UU.', icono: '🇺🇸', color: '#a8a8f0' },
 }
 
 const botones = [
@@ -206,7 +206,7 @@ onUnmounted(() => {
             :y1="yInicio + (chartHeight * (i - 1)) / 4"
             :x2="xFin"
             :y2="yInicio + (chartHeight * (i - 1)) / 4"
-            stroke="#E0BABB"
+            stroke="#9a5260"
             stroke-dasharray="3,3"
           />
         </g>
@@ -220,14 +220,14 @@ onUnmounted(() => {
             text-anchor="end"
             dominant-baseline="middle"
             font-size="13"
-            fill="#7A6565"
+            fill="#b8a8a8"
           >
             {{ valor }}
           </text>
         </g>
 
         <g class="grafica-x-axis">
-          <line :x1="xInicio" :y1="yFin" :x2="xFin" :y2="yFin" stroke="#E0BABB" stroke-width="1" />
+          <line :x1="xInicio" :y1="yFin" :x2="xFin" :y2="yFin" stroke="#9a5260" stroke-width="1" />
           <text
             v-for="(label, i) in etiquetasX"
             :key="`x-${i}`"
@@ -235,7 +235,7 @@ onUnmounted(() => {
             y="425"
             text-anchor="middle"
             font-size="12"
-            fill="#7A6565"
+            fill="#b8a8a8"
             :transform="debeRotar ? `rotate(-40, ${xInicio + i * pasoXEtiquetas}, 452)` : ''"
           >
             {{ label }}
@@ -272,7 +272,7 @@ onUnmounted(() => {
           <g v-for="(serie, idx) in seriesActivas" :key="`legend-${serie.key}`" :transform="`translate(${idx * 180}, 0)`">
             <line x1="0" y1="0" x2="24" y2="0" :stroke="serie.color" stroke-width="3" />
             <circle cx="12" cy="0" r="4" :fill="serie.color" />
-            <text x="32" y="4" font-size="12" fill="#5D4A4A" font-weight="500">{{ serie.label }}</text>
+            <text x="32" y="4" font-size="12" fill="#f0e0e0" font-weight="500">{{ serie.label }}</text>
           </g>
         </g>
       </svg>

@@ -3,7 +3,7 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   margin-bottom: 24px;
-  background: #D1A3A4;
+  background: #6b2c31;
   border-radius: 14px;
   padding: 16px 20px;
 }
@@ -76,11 +76,26 @@
 }
 
 .frecuencia-card {
-  background: #D1A3A4;
-  border: 1px solid #E0BABB;
+  background: #7a3d45;
+  border: 1px solid #9a5260;
   border-radius: 10px;
   padding: 14px 16px;
   box-shadow: none;
+}
+
+.frecuencia-card--colombia {
+  background: #8b3a4a;
+  border-color: #a85065;
+}
+
+.frecuencia-card--europa {
+  background: #6b2c31;
+  border-color: #8a4a55;
+}
+
+.frecuencia-card--usa {
+  background: #4a2530;
+  border-color: #6a3550;
 }
 
 .frecuencia-card--colombia,
@@ -105,7 +120,99 @@
   font-family: 'Playfair Display', serif;
   font-size: 16px;
   font-weight: 700;
-  color: #5D4A4A;
+}
+
+.frecuencia-card--colombia .frecuencia-card__titulo,
+.frecuencia-card--usa .frecuencia-card__titulo,
+.frecuencia-card--europa .frecuencia-card__titulo {
+  color: #f0e0e0;
+}
+
+.frecuencia-card__pildora {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.frecuencia-card--colombia .frecuencia-card__pildora,
+.frecuencia-card--usa .frecuencia-card__pildora,
+.frecuencia-card--europa .frecuencia-card__pildora {
+  background: #f0e0e0;
+  color: #6b2c31;
+  border: 1px solid #9a5260;
+}
+
+.frecuencia-card__descripcion {
+  font-size: 12px;
+  color: #d8c8c8;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+
+.frecuencia-timeline {
+  border-left: 2px solid #9a5260;
+  padding-left: 16px;
+  margin-bottom: 12px;
+}
+
+.frecuencia-timeline__item {
+  position: relative;
+  padding-bottom: 12px;
+}
+
+.frecuencia-timeline__item:last-child {
+  padding-bottom: 0;
+}
+
+.frecuencia-timeline__punto {
+  position: absolute;
+  left: -22px;
+  top: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid #7a3d45;
+}
+
+.frecuencia-timeline__punto--colombia,
+.frecuencia-timeline__punto--usa,
+.frecuencia-timeline__punto--europa {
+  background: #f0e0e0;
+}
+
+.frecuencia-timeline__punto--alerta {
+  background: #f0c080;
+}
+
+.frecuencia-timeline__punto--futuro {
+  background: #666;
+  border-style: dashed;
+}
+
+.frecuencia-timeline__periodo {
+  font-weight: 600;
+  font-size: 11px;
+  color: #d8c8c8;
+  margin-bottom: 2px;
+}
+
+.frecuencia-timeline__valor {
+  font-size: 10px;
+  color: #b8a8a8;
+}
+
+.frecuencia-timeline__valor--alerta {
+  color: #f0c080;
+}
+
+.frecuencia-card__fuente {
+  font-size: 10px;
+  color: #a89898;
+  font-style: italic;
+  text-align: right;
 }
 
 

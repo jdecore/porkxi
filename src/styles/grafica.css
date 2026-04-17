@@ -1,6 +1,6 @@
 .grafica-card {
-  background: #D1A3A4;
-  border: 1px solid #E0BABB;
+  background: #6b2c31;
+  border: 1px solid #9a5260;
   border-radius: 14px;
   padding: 20px 24px;
   margin-bottom: 24px;
@@ -13,28 +13,28 @@
   font-size: 20px;
   font-weight: 700;
   margin: 0 0 8px;
-  color: #5D4A4A;
+  color: #f0e0e0;
 }
 
 .grafica-card__subtitulo {
   font-size: 13px;
-  color: #7A6565;
+  color: #b8a8a8;
   margin: 0 0 16px;
   line-height: 1.5;
 }
 
 .grafica-card__colombia {
-  color: #8B4513;
+  color: #f0a0a8;
   font-weight: 600;
 }
 
 .grafica-card__europa {
-  color: #5D4A4A;
+  color: #a8e0a8;
   font-weight: 600;
 }
 
 .grafica-card__usa {
-  color: #3D3D3D;
+  color: #a8a8f0;
   font-weight: 600;
 }
 
@@ -46,29 +46,29 @@
 }
 
 .grafica-boton {
-  background: #FFFFFF;
-  border: 1px solid #E0BABB;
+  background: #f0e0e0;
+  border: 1px solid #9a5260;
   border-radius: 6px;
   padding: 6px 12px;
   font-size: 12px;
   font-weight: 500;
-  color: #5D4A4A;
+  color: #6b2c31;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .grafica-boton:hover {
-  background: #F5E8E8;
+  background: #d8c8c8;
 }
 
 .grafica-boton--activo {
-  background: #5D4A4A;
-  border-color: #5D4A4A;
-  color: #FFFFFF;
+  background: #9a5260;
+  border-color: #f0e0e0;
+  color: #f0e0e0;
 }
 
 .grafica-boton--activo:hover {
-  background: #7A6565;
+  background: #b87080;
 }
 
 .grafica-contenedor {
