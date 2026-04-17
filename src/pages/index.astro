@@ -3,7 +3,6 @@ import GraficaInteractiva from '../components/GraficaInteractiva.vue';
 import TarjetasKpiAnimadas from '../components/TarjetasKpiAnimadas.vue';
 import AnalisisIA from '../components/AnalisisIA.vue';
 import MonitoreoFuentes from '../components/MonitoreoFuentes.vue';
-import GraficaPrincipal from '../components/GraficaPrincipal.astro';
 
 import '../styles/encabezado.css';
 import '../styles/alerta.css';
@@ -16,21 +15,22 @@ import '../styles/pieDepagina.css';
 
 import { SERIE_COLOMBIA, DETALLE_COLOMBIA, PROBLEMA_DATOS_COLOMBIA } from '../data/colombia';
 import { SERIE_USA, DETALLE_USA } from '../data/usa';
+import { SERIE_EUROPA, DETALLE_EUROPA } from '../data/europa';
 
-// Validación básica de datos
 if (!Array.isArray(SERIE_COLOMBIA) || !SERIE_COLOMBIA.length) {
   throw new Error('SERIE_COLOMBIA está vacío o no es un array');
 }
 if (!Array.isArray(SERIE_USA) || !SERIE_USA.length) {
   throw new Error('SERIE_USA está vacío o no es un array');
 }
+if (!Array.isArray(SERIE_EUROPA) || !SERIE_EUROPA.length) {
+  throw new Error('SERIE_EUROPA está vacío o no es un array');
+}
 
 const anos = [2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015];
-const colombiaRecientes = SERIE_COLOMBIA.filter(d => d.periodo >= "2020");
-const usaRecientes = SERIE_USA.filter(d => d.periodo >= "Mar 2025");
-
-const ultimoDatoColombia = SERIE_COLOMBIA[SERIE_COLOMBIA.length - 1];
-const ultimoDatoUsa = SERIE_USA[SERIE_USA.length - 1];
+const colombiaRecientes = SERIE_COLOMBIA.filter((d) => Number(d.periodo) >= 2020);
+const europaRecientes = SERIE_EUROPA.filter((d) => Number(d.periodo) >= 2020);
+const usaRecientes = SERIE_USA.slice(-6);
 ---
 
 <html lang="es">
@@ -38,29 +38,27 @@ const ultimoDatoUsa = SERIE_USA[SERIE_USA.length - 1];
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-    <meta name="description" content="Inventario porcino Colombia vs EE.UU. — y la brecha invisible en sus datos oficiales." />
+    <meta name="description" content="Inventario porcino Colombia vs Europa vs EE.UU. y la diferencia en apertura de datos oficiales." />
     <meta name="author" content="Juan Enríquez" />
     <meta name="theme-color" content="#FDF0EE" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://porkxi.com/" />
 
-    <!-- Open Graph -->
     <meta property="og:title" content="porkξ | Inventario porcino" />
-    <meta property="og:description" content="Inventario porcino Colombia vs EE.UU. — y la brecha invisible en sus datos oficiales." />
+    <meta property="og:description" content="Comparativo de inventario porcino entre Colombia, Europa y EE.UU. con fuentes oficiales." />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="es_CO" />
     <meta property="og:site_name" content="porkξ" />
     <meta property="og:image" content="/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Gráfica comparativa de inventario porcino Colombia vs EE.UU." />
+    <meta property="og:image:alt" content="Gráfica comparativa de inventario porcino Colombia, Europa y EE.UU." />
 
-    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="porkξ | Inventario porcino" />
-    <meta name="twitter:description" content="Inventario porcino Colombia vs EE.UU. — y la brecha invisible en sus datos oficiales." />
+    <meta name="twitter:description" content="Comparativo de inventario porcino entre Colombia, Europa y EE.UU. con fuentes oficiales." />
     <meta name="twitter:image" content="/og-image.png" />
-    <meta name="twitter:image:alt" content="Gráfica comparativa de inventario porcino Colombia vs EE.UU." />
+    <meta name="twitter:image:alt" content="Gráfica comparativa de inventario porcino Colombia, Europa y EE.UU." />
 
     <title>porkξ | Inventario porcino</title>
 
@@ -76,6 +74,7 @@ const ultimoDatoUsa = SERIE_USA[SERIE_USA.length - 1];
         --tinta: #3B1F1C;
         --tinta-claro: #7A4A44;
         --colombia: #F5A800;
+        --europa: #0EA5A4;
         --usa: #2563EB;
         --alerta: #C0392B;
         --alerta-fondo: #FEF0EE;
@@ -95,28 +94,25 @@ const ultimoDatoUsa = SERIE_USA[SERIE_USA.length - 1];
   </head>
   <body>
     <main class="contenedor">
-
       <header class="encabezado">
         <h1 class="encabezado__logo"><span class="encabezado__logo-parte">pork</span><span class="encabezado__logo-xi">ξ</span></h1>
-        <p class="encabezado__subtitulo">Inventario porcino Colombia vs EE.UU. — y la brecha invisible en sus datos oficiales.</p>
+        <p class="encabezado__subtitulo">Inventario porcino Colombia vs Europa vs EE.UU. — y la brecha en transparencia de datos oficiales.</p>
         <div class="encabezado__badges">
-          <span class="encabezado__badge encabezado__badge--colombia">Porcinews (enero 2026)</span>
+          <span class="encabezado__badge encabezado__badge--colombia">Porcinews (ene 2026)</span>
+          <span class="encabezado__badge encabezado__badge--europa">Eurostat (API)</span>
           <span class="encabezado__badge encabezado__badge--usa">USDA NASS (dic 2025)</span>
-          <span class="encabezado__badge encabezado__badge--datos">Datos verificados · Sin API</span>
+          <span class="encabezado__badge encabezado__badge--datos">Datos verificados</span>
         </div>
       </header>
 
       <div class="banner-alerta">
         <span class="banner-alerta__icono">⚠️</span>
-        <p class="banner-alerta__texto">En EE.UU., el USDA NASS publica datos de inventario porcino cada trimestre desde fuentes gubernamentales directas — el último salió el 23 de diciembre de 2025. En Colombia, los datos oficiales no son fáciles de acceder: están fragmentados, desactualizados o sin API funcional. El último dato disponible proviene de Porcinews, un medio especializado.</p>
+        <p class="banner-alerta__texto">Europa (Eurostat) y EE.UU. (USDA) publican inventario porcino con fuentes oficiales y trazables. En Colombia, los datos siguen fragmentados y sin API pública equivalente, por lo que el último dato consolidado disponible proviene de Porcinews.</p>
       </div>
 
       <TarjetasKpiAnimadas client:idle />
-
       <GraficaInteractiva client:idle />
-
       <AnalisisIA client:idle />
-
       <MonitoreoFuentes client:idle />
 
       <div class="comparativa-frecuencia">
@@ -133,7 +129,23 @@ const ultimoDatoUsa = SERIE_USA[SERIE_USA.length - 1];
               </div>
             ))}
           </div>
-          <p class="frecuencia-card__fuente">Fuente: Porcinews (enero 2026)</p>
+          <p class="frecuencia-card__fuente">Fuente: Porcinews</p>
+        </div>
+
+        <div class="frecuencia-card frecuencia-card--europa">
+          <div class="frecuencia-card__encabezado"><span class="frecuencia-card__icono">🇪🇺</span><h3 class="frecuencia-card__titulo">Europa (UE-27)</h3></div>
+          <span class="frecuencia-card__pildora">Anual · API abierta</span>
+          <p class="frecuencia-card__descripcion">Serie oficial publicada por Eurostat vía API.</p>
+          <div class="frecuencia-timeline">
+            {europaRecientes.map((d) => (
+              <div class="frecuencia-timeline__item">
+                <span class="frecuencia-timeline__punto frecuencia-timeline__punto--europa"></span>
+                <div class="frecuencia-timeline__periodo">{d.periodo}</div>
+                <div class="frecuencia-timeline__valor">{d.valor.toLocaleString()} cabezas {d.ultimoDato ? '✓ dato oficial más reciente' : '✓'}</div>
+              </div>
+            ))}
+          </div>
+          <p class="frecuencia-card__fuente">Fuente: Eurostat (apro_mt_lspig)</p>
         </div>
 
         <div class="frecuencia-card frecuencia-card--usa">
@@ -145,14 +157,9 @@ const ultimoDatoUsa = SERIE_USA[SERIE_USA.length - 1];
               <div class="frecuencia-timeline__item">
                 <span class="frecuencia-timeline__punto frecuencia-timeline__punto--usa"></span>
                 <div class="frecuencia-timeline__periodo">{d.periodo}</div>
-                <div class="frecuencia-timeline__valor">{d.valor.toLocaleString()} cabezas ✓ {d.ultimoDato ? '(23 dic 2025)' : ''}</div>
+                <div class="frecuencia-timeline__valor">{d.valor.toLocaleString()} cabezas {d.ultimoDato ? '(último reporte)' : '✓'}</div>
               </div>
             ))}
-            <div class="frecuencia-timeline__item">
-              <span class="frecuencia-timeline__punto frecuencia-timeline__punto--futuro"></span>
-              <div class="frecuencia-timeline__periodo">Mar 2026</div>
-              <div class="frecuencia-timeline__valor">🔜 Sale el 26 mar 2026</div>
-            </div>
           </div>
           <p class="frecuencia-card__fuente">Fuente: USDA NASS</p>
         </div>
@@ -171,10 +178,22 @@ const ultimoDatoUsa = SERIE_USA[SERIE_USA.length - 1];
               <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Comercial familiar</span><span class="detalle-metrica__valor">{DETALLE_COLOMBIA.comercialFamiliar.cantidad.toLocaleString()} ({DETALLE_COLOMBIA.comercialFamiliar.porcentaje}%)</span></div>
               <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Comercial industrial</span><span class="detalle-metrica__valor">{DETALLE_COLOMBIA.comercialIndustrial.cantidad.toLocaleString()} ({DETALLE_COLOMBIA.comercialIndustrial.porcentaje}%)</span></div>
               <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Granjas tecnificadas</span><span class="detalle-metrica__valor">{DETALLE_COLOMBIA.tecnificadas.cantidad.toLocaleString()} ({DETALLE_COLOMBIA.tecnificadas.porcentaje}%)</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Carne 2024</span><span class="detalle-metrica__valor">{DETALLE_COLOMBIA.carne2024Toneladas.toLocaleString()} toneladas (+{DETALLE_COLOMBIA.carne2024Variacion}%)</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Beneficio 2024</span><span class="detalle-metrica__valor">{DETALLE_COLOMBIA.beneficio2024Cabezas.toLocaleString()} cabezas (+{DETALLE_COLOMBIA.beneficio2024Variacion}%)</span></div>
             </div>
             <a href={DETALLE_COLOMBIA.enlace} target="_blank" rel="noopener noreferrer" class="detalle-card__enlace">Ver fuente: Porcinews</a>
+          </div>
+
+          <div class="detalle-card detalle-card--europa">
+            <div class="detalle-card__encabezado"><span class="detalle-card__icono">🇪🇺</span><h3 class="detalle-card__titulo">Europa — {DETALLE_EUROPA.fechaDato}</h3></div>
+            <p class="detalle-card__subtitulo">Dataset {DETALLE_EUROPA.dataset} · Eurostat</p>
+            <div class="detalle-metricas">
+              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Total inventario</span><span class="detalle-metrica__valor">{DETALLE_EUROPA.totalCabezas.toLocaleString()} cabezas</span></div>
+              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Variación anual</span><span class="detalle-metrica__valor">{DETALLE_EUROPA.variacionAnualPct}% vs 2023</span></div>
+              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Frecuencia</span><span class="detalle-metrica__valor">{DETALLE_EUROPA.frecuencia}</span></div>
+              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Cobertura</span><span class="detalle-metrica__valor">{DETALLE_EUROPA.cobertura}</span></div>
+              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Unidad</span><span class="detalle-metrica__valor">{DETALLE_EUROPA.unidad}</span></div>
+              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Actualización API</span><span class="detalle-metrica__valor">{DETALLE_EUROPA.fechaActualizacionApi}</span></div>
+            </div>
+            <a href={DETALLE_EUROPA.enlace} target="_blank" rel="noopener noreferrer" class="detalle-card__enlace">Ver dataset oficial</a>
           </div>
 
           <div class="detalle-card detalle-card--usa">
@@ -186,22 +205,8 @@ const ultimoDatoUsa = SERIE_USA[SERIE_USA.length - 1];
               <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Reproductores</span><span class="detalle-metrica__valor">{DETALLE_USA.reproductores.toLocaleString()}</span></div>
               <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Lechones destetados</span><span class="detalle-metrica__valor">{DETALLE_USA.cerdosDestetados.toLocaleString()}</span></div>
               <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Promedio camada</span><span class="detalle-metrica__valor">{DETALLE_USA.promedioLechonesPorCamada} lechones</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Partos Dic-Feb</span><span class="detalle-metrica__valor">{DETALLE_USA.sowsFarroDicFeb.toLocaleString()} cerdas</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Partos Mar-May</span><span class="detalle-metrica__valor">{DETALLE_USA.sowsFarroMarMay.toLocaleString()} cerdas</span></div>
+              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Próximo reporte</span><span class="detalle-metrica__valor">{DETALLE_USA.proximoReporte}</span></div>
             </div>
-            <div class="detalle-subseccion">
-              <h4 class="detalle-subseccion__titulo">Ranking estados</h4>
-              <div class="detalle-ranking">
-                {DETALLE_USA.estados && DETALLE_USA.estados.length > 0 ? DETALLE_USA.estados.map((estado) => (
-                  <div class="detalle-ranking__item">
-                    <span class={`detalle-ranking__posicion detalle-ranking__posicion--${estado.posicion}`}>{estado.posicion === 1 ? '🥇' : estado.posicion === 2 ? '🥈' : '🥉'}</span>
-                    <span class="detalle-ranking__nombre">{estado.nombre}</span>
-                    <span class="detalle-ranking__cabezas">{estado.cabezas.toLocaleString()}</span>
-                  </div>
-                )) : <p class="detalle-ranking__vacio">Datos de estados no disponibles.</p>}
-              </div>
-            </div>
-            <p class="detalle-proximo">Próximo reporte: {DETALLE_USA.proximoReporte}</p>
             <a href={DETALLE_USA.enlace} target="_blank" rel="noopener noreferrer" class="detalle-card__enlace">Ver reporte oficial</a>
           </div>
         </div>
@@ -209,29 +214,34 @@ const ultimoDatoUsa = SERIE_USA[SERIE_USA.length - 1];
 
       <section class="tabla-historica">
         <h2 class="tabla-historica__titulo">Histórico año a año</h2>
-        <p class="tabla-historica__subtitulo">Filas marcadas: dato duplicado o faltante.</p>
+        <p class="tabla-historica__subtitulo">Comparativo de los últimos diez años.</p>
         <div class="tabla-contenedor">
           <table class="tabla">
-            <thead class="tabla__encabezado"><tr><th>Año</th><th>Colombia</th><th>EE.UU. Dic</th><th>Estado</th></tr></thead>
+            <thead class="tabla__encabezado"><tr><th>Año</th><th>Colombia</th><th>UE-27</th><th>EE.UU. Dic</th><th>Estado</th></tr></thead>
             <tbody class="tabla__cuerpo">
               {anos.map((ano) => {
-                const datoColombia = SERIE_COLOMBIA.find(d => d.periodo === String(ano));
-                const datoUsa = SERIE_USA.find(d => d.periodo === `Dic ${ano}`);
+                const datoColombia = SERIE_COLOMBIA.find((d) => d.periodo === String(ano));
+                const datoEuropa = SERIE_EUROPA.find((d) => d.periodo === String(ano));
+                const datoUsa = SERIE_USA.find((d) => d.periodo === `Dic ${ano}`);
                 const es2023 = ano === 2023;
                 const es2024 = ano === 2024;
                 return (
                   <tr class={es2023 ? 'tabla__fila--alerta' : es2024 ? 'tabla__fila--reciente' : ''}>
                     <td>{ano}</td>
                     <td class="tabla__cabezas">{datoColombia ? datoColombia.valor.toLocaleString() : '—'}</td>
+                    <td class="tabla__cabezas">{datoEuropa ? datoEuropa.valor.toLocaleString() : '—'}</td>
                     <td class="tabla__cabezas">{datoUsa ? datoUsa.valor.toLocaleString() : '—'}</td>
-                    <td>{es2023 && <span class="tabla__estado tabla__estado--alerta">⚠️ Dato duplicado</span>}{es2024 && <span class="tabla__estado tabla__estado--reciente">✓ Más reciente</span>}</td>
+                    <td>
+                      {es2023 && <span class="tabla__estado tabla__estado--alerta">⚠️ COL duplicado</span>}
+                      {es2024 && <span class="tabla__estado tabla__estado--reciente">✓ COL + UE actualizados</span>}
+                    </td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
         </div>
-        <div class="tabla__pie"><span>Colombia: Porcinews</span><span>EE.UU.: USDA NASS</span></div>
+        <div class="tabla__pie"><span>Colombia: Porcinews</span><span>UE-27: Eurostat</span><span>EE.UU.: USDA NASS</span></div>
       </section>
 
       <section class="explicacion">
@@ -239,9 +249,9 @@ const ultimoDatoUsa = SERIE_USA[SERIE_USA.length - 1];
         <div class="explicacion__grid">
           <div class="explicacion-columna explicacion-columna--colombia">
             <h3 class="explicacion-columna__titulo">🇨🇴 Colombia</h3>
-            <p class="explicacion-columna__texto">En Colombia, acceder a información porcina oficial actualizada es prácticamente imposible. Los datos están fragmentados entre ICA, DANE, Porkcolombia e INVIMA.</p>
-            <p class="explicacion-columna__texto">El portal datos.gov.co requiere registro y su API no responde.</p>
-            <div class="explicacion-destacado">Por eso, los datos de Colombia provienen de Porcinews, un medio especializado — no del gobierno.</div>
+            <p class="explicacion-columna__texto">Acceder a información porcina oficial actualizada sigue siendo difícil. Los datos están fragmentados entre ICA, DANE, Porkcolombia e INVIMA.</p>
+            <p class="explicacion-columna__texto">No existe una API pública y estable equivalente a USDA o Eurostat para la serie consolidada nacional.</p>
+            <div class="explicacion-destacado">Por eso, esta visualización usa Porcinews como fuente de referencia para el último dato disponible.</div>
             <div class="explicacion-tabla">
               <table>
                 <thead><tr><th>Entidad</th><th>Qué publica</th><th>Problema</th></tr></thead>
@@ -253,9 +263,17 @@ const ultimoDatoUsa = SERIE_USA[SERIE_USA.length - 1];
               </table>
             </div>
           </div>
+
+          <div class="explicacion-columna explicacion-columna--europa">
+            <h3 class="explicacion-columna__titulo">🇪🇺 Europa (UE-27)</h3>
+            <p class="explicacion-columna__texto">Eurostat publica la serie oficial mediante API abierta (`apro_mt_lspig`) con dimensiones estandarizadas.</p>
+            <p class="explicacion-columna__texto">Esto permite trazabilidad, automatización y comparabilidad entre países sin depender de scraping manual de PDFs.</p>
+          </div>
+
           <div class="explicacion-columna explicacion-columna--usa">
             <h3 class="explicacion-columna__titulo">🇺🇸 EE.UU.</h3>
-            <p class="explicacion-columna__texto">La Livestock Mandatory Reporting Act obliga a.reportar al USDA. Datos trimestrales verificables y obligatorios.</p>
+            <p class="explicacion-columna__texto">La Livestock Mandatory Reporting Act obliga a reportar al USDA. Hay publicaciones periódicas, verificables y con calendario público.</p>
+            <p class="explicacion-columna__texto">La disponibilidad trimestral facilita monitoreo continuo y análisis oportuno del sector porcino.</p>
           </div>
         </div>
       </section>
@@ -265,11 +283,15 @@ const ultimoDatoUsa = SERIE_USA[SERIE_USA.length - 1];
           <div class="pie-pagina__fuente">
             <div class="pie-pagina__fuente-titulo">🇨🇴 Colombia</div>
             <div class="pie-pagina__fuente-nota">Fuente periodística especializada.</div>
-            <a href={DETALLE_COLOMBIA.enlace} target="_blank" rel="noopener noreferrer" class="pie-pagina__enlace">Porcinews (enero 2026)</a>
+            <a href={DETALLE_COLOMBIA.enlace} target="_blank" rel="noopener noreferrer" class="pie-pagina__enlace">Porcinews (ene 2026)</a>
+          </div>
+          <div class="pie-pagina__fuente">
+            <div class="pie-pagina__fuente-titulo">🇪🇺 Europa</div>
+            <a href={DETALLE_EUROPA.enlace} target="_blank" rel="noopener noreferrer" class="pie-pagina__enlace">Eurostat API (apro_mt_lspig)</a>
           </div>
           <div class="pie-pagina__fuente">
             <div class="pie-pagina__fuente-titulo">🇺🇸 EE.UU.</div>
-            <a href={DETALLE_USA.enlace} target="_blank" rel="noopener noreferrer" class="pie-pagina__enlace">USDA NASS (23 dic 2025)</a>
+            <a href={DETALLE_USA.enlace} target="_blank" rel="noopener noreferrer" class="pie-pagina__enlace">USDA NASS</a>
           </div>
         </div>
 
@@ -279,29 +301,29 @@ const ultimoDatoUsa = SERIE_USA[SERIE_USA.length - 1];
             <div class="sobre-proyecto__item">
               <div class="sobre-proyecto__icono">⚡</div>
               <div class="sobre-proyecto__texto">
-                <strong>Renderizado 100% estático</strong>
-                <p>Construido con Astro 6, sin runtime innecesario. Bundle total: ~90KB</p>
+                <strong>Renderizado estático optimizado</strong>
+                <p>Astro 6 + hidratación selectiva para bajo costo y alto rendimiento.</p>
               </div>
             </div>
             <div class="sobre-proyecto__item">
               <div class="sobre-proyecto__icono">💚</div>
               <div class="sobre-proyecto__texto">
-                <strong>Componentes interactivos Vue 3</strong>
-                <p>Gráfica SVG nativa sin librerías externas. Hidratación diferida</p>
+                <strong>Interactividad Vue 3</strong>
+                <p>Gráfica SVG con filtros por región y tooltips accesibles.</p>
               </div>
             </div>
             <div class="sobre-proyecto__item">
               <div class="sobre-proyecto__icono">🤖</div>
               <div class="sobre-proyecto__texto">
                 <strong>Actualización automática</strong>
-                <p>Python + Vercel Cron. Revisa fuentes oficiales diariamente</p>
+                <p>Python + GitHub Actions para generar snapshot diario.</p>
               </div>
             </div>
             <div class="sobre-proyecto__item">
               <div class="sobre-proyecto__icono">🧠</div>
               <div class="sobre-proyecto__texto">
                 <strong>Análisis con IA Generativa</strong>
-                <p>Extrae tendencias y predicciones automáticamente de los datos</p>
+                <p>Resumen comparativo automático usando los datos más recientes.</p>
               </div>
             </div>
           </div>
@@ -309,18 +331,17 @@ const ultimoDatoUsa = SERIE_USA[SERIE_USA.length - 1];
             <span class="sobre-proyecto__tag">Astro</span>
             <span class="sobre-proyecto__tag">Vue 3</span>
             <span class="sobre-proyecto__tag">Python</span>
-            <span class="sobre-proyecto__tag">SVG</span>
-            <span class="sobre-proyecto__tag">Vercel</span>
+            <span class="sobre-proyecto__tag">Eurostat API</span>
+            <span class="sobre-proyecto__tag">USDA</span>
             <span class="sobre-proyecto__tag">IA Generativa</span>
           </div>
         </section>
 
         <hr class="pie-pagina__separador" />
         <div class="pie-pagina__creditos">Hecho por Juan Enríquez con ayuda de IA</div>
-        <p class="pie-pagina__creditos-nota">Todos los datos fueron verificados contra fuentes oficiales.</p>
+        <p class="pie-pagina__creditos-nota">Todos los datos fueron verificados contra fuentes oficiales disponibles públicamente.</p>
         <div class="pie-pagina__marca">pork<span class="pie-pagina__marca-xi">ξ</span> · 2026</div>
       </footer>
-
     </main>
   </body>
 </html>

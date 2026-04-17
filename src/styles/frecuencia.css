@@ -1,6 +1,6 @@
 .comparativa-frecuencia {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 24px;
   margin-bottom: 36px;
 }
@@ -104,6 +104,10 @@
   color: var(--usa);
 }
 
+.frecuencia-card--europa .frecuencia-card__titulo {
+  color: var(--europa);
+}
+
 .frecuencia-card__pildora {
   display: inline-block;
   padding: 4px 12px;
@@ -121,6 +125,11 @@
 .frecuencia-card--usa .frecuencia-card__pildora {
   background: #DBEAFE;
   color: #1D4ED8;
+}
+
+.frecuencia-card--europa .frecuencia-card__pildora {
+  background: #ECFEFF;
+  color: #0F766E;
 }
 
 .frecuencia-card__descripcion {
@@ -161,6 +170,10 @@
 
 .frecuencia-timeline__punto--usa {
   background: var(--usa);
+}
+
+.frecuencia-timeline__punto--europa {
+  background: var(--europa);
 }
 
 .frecuencia-timeline__punto--alerta {

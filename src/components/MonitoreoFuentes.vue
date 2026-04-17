@@ -1,66 +1,9 @@
-<template>
-  <div class="monitoreo">
-    <div class="monitoreo__encabezado">
-      <span class="monitoreo__icono">📊</span>
-      <h3 class="monitoreo__titulo">Estado de las fuentes</h3>
-      <div class="monitoreo__acciones">
-        <span class="monitoreo__actualizacion">Snapshot: {{ fechaActualizacion }}</span>
-        <button class="monitoreo__boton" :disabled="cargando" @click="cargarEstado(true)">
-          {{ cargando ? 'Recargando...' : 'Recargar snapshot' }}
-        </button>
-      </div>
-    </div>
-
-    <div class="monitoreo__grid">
-      <div class="monitoreo__fuente monitoreo__fuente--usa">
-        <div class="monitoreo__estado">
-          <span class="monitoreo__indicador" :class="claseIndicadorUsa"></span>
-          <span class="monitoreo__nombre">🇺🇸 USDA NASS</span>
-          <span class="monitoreo__badge">Snapshot diario</span>
-        </div>
-        <div class="monitoreo__detalle">
-          <span class="monitoreo__fecha">Último: {{ usaUltimoReporte }}</span>
-          <span class="monitoreo__status">{{ usaEstado }}</span>
-        </div>
-        <div class="monitoreo__meta">Hace {{ usaDiasTexto }} días</div>
-        <div class="monitoreo__meta">Inventario: {{ usaInventarioTexto }}</div>
-        <div class="monitoreo__proximo">
-          {{ usaProximoReporte }}
-        </div>
-        <a v-if="usaEnlace" :href="usaEnlace" target="_blank" rel="noopener noreferrer" class="monitoreo__enlace">
-          Ver comunicado oficial
-        </a>
-        <div v-if="usaError" class="monitoreo__error">
-          {{ usaError }}
-        </div>
-      </div>
-
-      <div class="monitoreo__fuente monitoreo__fuente--colombia">
-        <div class="monitoreo__estado">
-          <span class="monitoreo__indicador monitoreo__indicador--warning"></span>
-          <span class="monitoreo__nombre">🇨🇴 Porcinews</span>
-        </div>
-        <div class="monitoreo__detalle">
-          <span class="monitoreo__fecha">Último: {{ colombiaUltimoReporte }}</span>
-          <span class="monitoreo__status">⚠️ {{ colombiaEstado }}</span>
-        </div>
-        <div class="monitoreo__meta">Hace {{ colombiaDiasTexto }} días</div>
-        <div class="monitoreo__proximo">
-          {{ colombiaProximoReporte }}
-        </div>
-        <a v-if="colombiaEnlace" :href="colombiaEnlace" target="_blank" rel="noopener noreferrer" class="monitoreo__enlace">
-          Ver fuente consultada
-        </a>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 
 const cargando = ref(false)
 const fechaActualizacion = ref('sin datos')
+
 const usaUltimoReporte = ref('sin dato')
 const usaEstado = ref('Pendiente')
 const usaProximoReporte = ref('Próximo reporte: por confirmar')
@@ -69,6 +12,16 @@ const usaEnlace = ref('')
 const usaInventarioTexto = ref('sin dato')
 const usaDiasTexto = ref('—')
 const usaNivel = ref('warning')
+
+const europaUltimoReporte = ref('sin dato')
+const europaEstado = ref('Pendiente')
+const europaProximoReporte = ref('Próxima actualización: por confirmar')
+const europaError = ref('')
+const europaEnlace = ref('')
+const europaInventarioTexto = ref('sin dato')
+const europaDiasTexto = ref('—')
+const europaNivel = ref('warning')
+
 const colombiaUltimoReporte = ref('ene 2026')
 const colombiaEstado = ref('Desactualizado')
 const colombiaProximoReporte = ref('Sin fecha programada')
@@ -76,15 +29,16 @@ const colombiaEnlace = ref('')
 const colombiaDiasTexto = ref('—')
 
 const claseIndicadorUsa = computed(() => {
-  if (cargando.value) {
-    return 'monitoreo__indicador--warning'
-  }
-  if (usaNivel.value === 'error') {
-    return 'monitoreo__indicador--error'
-  }
-  if (usaNivel.value === 'warning') {
-    return 'monitoreo__indicador--warning'
-  }
+  if (cargando.value) return 'monitoreo__indicador--warning'
+  if (usaNivel.value === 'error') return 'monitoreo__indicador--error'
+  if (usaNivel.value === 'warning') return 'monitoreo__indicador--warning'
+  return 'monitoreo__indicador--ok'
+})
+
+const claseIndicadorEuropa = computed(() => {
+  if (cargando.value) return 'monitoreo__indicador--warning'
+  if (europaNivel.value === 'error') return 'monitoreo__indicador--error'
+  if (europaNivel.value === 'warning') return 'monitoreo__indicador--warning'
   return 'monitoreo__indicador--ok'
 })
 
@@ -106,7 +60,7 @@ const formatearFechaHora = (valor) => {
     month: 'short',
     year: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   })
 }
 
@@ -115,20 +69,25 @@ const normalizarDias = (valor) => {
   return Number.isFinite(numero) ? Math.max(0, Math.floor(numero)) : null
 }
 
-const obtenerEstadoUsa = (status, dias) => {
+const obtenerEstadoFuente = (
+  status,
+  dias,
+  limiteRetraso,
+  limiteDesactualizado,
+) => {
   if (status !== 'ok') {
     return {
       nivel: 'error',
       texto: 'Error de consulta',
     }
   }
-  if (dias !== null && dias > 120) {
+  if (dias !== null && dias > limiteDesactualizado) {
     return {
       nivel: 'warning',
       texto: 'Desactualizado',
     }
   }
-  if (dias !== null && dias > 60) {
+  if (dias !== null && dias > limiteRetraso) {
     return {
       nivel: 'warning',
       texto: 'Con retraso',
@@ -143,24 +102,26 @@ const obtenerEstadoUsa = (status, dias) => {
 const cargarEstado = async (forzarRecarga = false) => {
   cargando.value = true
   usaError.value = ''
+  europaError.value = ''
 
   try {
     const url = forzarRecarga ? `/estado-fuentes.json?v=${Date.now()}` : '/estado-fuentes.json'
     const respuesta = await fetch(url, { method: 'GET', cache: 'no-store' })
-
-    if (!respuesta.ok) {
-      throw new Error('No se pudo cargar el snapshot de fuentes')
-    }
+    if (!respuesta.ok) throw new Error('No se pudo cargar el snapshot de fuentes')
 
     const datos = await respuesta.json()
     const usa = datos?.usa ?? {}
+    const europa = datos?.europa ?? {}
     const colombia = datos?.colombia ?? {}
     const usaDias = normalizarDias(usa?.dias_desde_reporte)
+    const europaDias = normalizarDias(europa?.dias_desde_reporte)
     const colombiaDias = normalizarDias(colombia?.dias_desde_reporte)
-    const estadoUsa = obtenerEstadoUsa(usa?.status, usaDias)
+    const estadoUsa = obtenerEstadoFuente(usa?.status, usaDias, 60, 120)
+    const estadoEuropa = obtenerEstadoFuente(europa?.status, europaDias, 450, 700)
 
     fechaActualizacion.value = formatearFechaHora(datos?.fecha_consulta)
-    usaUltimoReporte.value = formatearFecha(usa?.ultimo_reporte)
+
+    usaUltimoReporte.value = formatearFecha(usa?.ultimo_reporte_iso || usa?.ultimo_reporte)
     usaProximoReporte.value = usa?.proximo_reporte ?? 'Próximo reporte: por confirmar'
     usaInventarioTexto.value = Number.isFinite(Number(usa?.inventario_millones))
       ? `${Number(usa.inventario_millones).toFixed(1)} millones`
@@ -170,15 +131,30 @@ const cargarEstado = async (forzarRecarga = false) => {
     usaNivel.value = estadoUsa.nivel
     usaEnlace.value = usa?.enlace ?? ''
     usaError.value = usa?.error ?? ''
+
+    europaUltimoReporte.value = formatearFecha(europa?.ultimo_reporte_iso || europa?.ultimo_reporte)
+    europaProximoReporte.value = europa?.proximo_reporte ?? 'Actualización anual'
+    europaInventarioTexto.value = Number.isFinite(Number(europa?.inventario_millones))
+      ? `${Number(europa.inventario_millones).toFixed(1)} millones`
+      : 'sin dato'
+    europaDiasTexto.value = europaDias === null ? '—' : String(europaDias)
+    europaEstado.value = estadoEuropa.texto
+    europaNivel.value = estadoEuropa.nivel
+    europaEnlace.value = europa?.enlace ?? ''
+    europaError.value = europa?.error ?? ''
+
     colombiaUltimoReporte.value = colombia?.ultimo_reporte ?? 'ene 2026'
     colombiaProximoReporte.value = colombia?.proximo_reporte ?? 'Sin fecha programada'
     colombiaEnlace.value = colombia?.enlace ?? ''
     colombiaDiasTexto.value = colombiaDias === null ? '—' : String(colombiaDias)
     colombiaEstado.value = colombiaDias !== null && colombiaDias > 120 ? 'Muy desactualizado' : 'Desactualizado'
-  } catch (error) {
+  } catch (_error) {
     usaNivel.value = 'error'
+    europaNivel.value = 'error'
     usaEstado.value = 'Error de consulta'
+    europaEstado.value = 'Error de consulta'
     usaError.value = 'No se pudo cargar el snapshot de monitoreo'
+    europaError.value = 'No se pudo cargar el snapshot de monitoreo'
   } finally {
     cargando.value = false
   }
@@ -188,6 +164,77 @@ onMounted(() => {
   void cargarEstado(false)
 })
 </script>
+
+<template>
+  <div class="monitoreo">
+    <div class="monitoreo__encabezado">
+      <span class="monitoreo__icono">📊</span>
+      <h3 class="monitoreo__titulo">Estado de las fuentes</h3>
+      <div class="monitoreo__acciones">
+        <span class="monitoreo__actualizacion">Snapshot: {{ fechaActualizacion }}</span>
+        <button class="monitoreo__boton" :disabled="cargando" @click="cargarEstado(true)">
+          {{ cargando ? 'Recargando...' : 'Recargar snapshot' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="monitoreo__grid">
+      <div class="monitoreo__fuente monitoreo__fuente--colombia">
+        <div class="monitoreo__estado">
+          <span class="monitoreo__indicador monitoreo__indicador--warning"></span>
+          <span class="monitoreo__nombre">🇨🇴 Porcinews</span>
+        </div>
+        <div class="monitoreo__detalle">
+          <span class="monitoreo__fecha">Último: {{ colombiaUltimoReporte }}</span>
+          <span class="monitoreo__status">⚠️ {{ colombiaEstado }}</span>
+        </div>
+        <div class="monitoreo__meta">Hace {{ colombiaDiasTexto }} días</div>
+        <div class="monitoreo__proximo">{{ colombiaProximoReporte }}</div>
+        <a v-if="colombiaEnlace" :href="colombiaEnlace" target="_blank" rel="noopener noreferrer" class="monitoreo__enlace">
+          Ver fuente consultada
+        </a>
+      </div>
+
+      <div class="monitoreo__fuente monitoreo__fuente--europa">
+        <div class="monitoreo__estado">
+          <span class="monitoreo__indicador" :class="claseIndicadorEuropa"></span>
+          <span class="monitoreo__nombre">🇪🇺 Eurostat</span>
+          <span class="monitoreo__badge">API oficial</span>
+        </div>
+        <div class="monitoreo__detalle">
+          <span class="monitoreo__fecha">Último: {{ europaUltimoReporte }}</span>
+          <span class="monitoreo__status">{{ europaEstado }}</span>
+        </div>
+        <div class="monitoreo__meta">Hace {{ europaDiasTexto }} días</div>
+        <div class="monitoreo__meta">Inventario: {{ europaInventarioTexto }}</div>
+        <div class="monitoreo__proximo">{{ europaProximoReporte }}</div>
+        <a v-if="europaEnlace" :href="europaEnlace" target="_blank" rel="noopener noreferrer" class="monitoreo__enlace">
+          Ver dataset oficial
+        </a>
+        <div v-if="europaError" class="monitoreo__error">{{ europaError }}</div>
+      </div>
+
+      <div class="monitoreo__fuente monitoreo__fuente--usa">
+        <div class="monitoreo__estado">
+          <span class="monitoreo__indicador" :class="claseIndicadorUsa"></span>
+          <span class="monitoreo__nombre">🇺🇸 USDA NASS</span>
+          <span class="monitoreo__badge">Snapshot diario</span>
+        </div>
+        <div class="monitoreo__detalle">
+          <span class="monitoreo__fecha">Último: {{ usaUltimoReporte }}</span>
+          <span class="monitoreo__status">{{ usaEstado }}</span>
+        </div>
+        <div class="monitoreo__meta">Hace {{ usaDiasTexto }} días</div>
+        <div class="monitoreo__meta">Inventario: {{ usaInventarioTexto }}</div>
+        <div class="monitoreo__proximo">{{ usaProximoReporte }}</div>
+        <a v-if="usaEnlace" :href="usaEnlace" target="_blank" rel="noopener noreferrer" class="monitoreo__enlace">
+          Ver comunicado oficial
+        </a>
+        <div v-if="usaError" class="monitoreo__error">{{ usaError }}</div>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style scoped>
 .monitoreo {
@@ -245,7 +292,7 @@ onMounted(() => {
 
 .monitoreo__grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
 }
 
@@ -261,6 +308,10 @@ onMounted(() => {
 
 .monitoreo__fuente--colombia {
   border-left: 4px solid var(--colombia);
+}
+
+.monitoreo__fuente--europa {
+  border-left: 4px solid var(--europa, #0EA5A4);
 }
 
 .monitoreo__estado {
@@ -341,6 +392,12 @@ onMounted(() => {
   color: var(--alerta);
 }
 
+@media (max-width: 900px) {
+  .monitoreo__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 600px) {
   .monitoreo__encabezado {
     flex-direction: column;
@@ -351,10 +408,6 @@ onMounted(() => {
   .monitoreo__acciones {
     width: 100%;
     justify-content: space-between;
-  }
-
-  .monitoreo__grid {
-    grid-template-columns: 1fr;
   }
 }
 </style>

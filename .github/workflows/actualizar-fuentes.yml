@@ -25,6 +25,8 @@ jobs:
           python-version: "3.12"
 
       - name: Generar snapshot
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python scripts/generar_estado_fuentes.py
 
       - name: Commit y push si hay cambios

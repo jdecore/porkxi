@@ -27,7 +27,7 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
-  min-width: 500px;
+  min-width: 680px;
 }
 
 .tabla__encabezado {
@@ -152,7 +152,7 @@
 
   .tabla {
     font-size: 11px;
-    min-width: 450px;
+    min-width: 620px;
   }
 
   .tabla__encabezado th {

@@ -55,6 +55,12 @@
   color: var(--usa);
 }
 
+.encabezado__badge--europa {
+  border-color: var(--europa);
+  background: #ECFEFF;
+  color: var(--europa);
+}
+
 .encabezado__badge--datos {
   border-color: var(--alerta);
   background: var(--crema-oscuro);

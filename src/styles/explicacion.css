@@ -22,8 +22,14 @@
 
 .explicacion__grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 32px;
+}
+
+@media (max-width: 1000px) {
+  .explicacion__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 700px) {
@@ -126,6 +132,10 @@
 
 .explicacion-columna--usa .explicacion-columna__titulo {
   color: var(--usa);
+}
+
+.explicacion-columna--europa .explicacion-columna__titulo {
+  color: var(--europa);
 }
 
 .explicacion-columna__texto {

@@ -1,59 +1,45 @@
-# Astro Starter Kit: Minimal
+# porkxi-astro
 
-```sh
-npm create astro@latest -- --template minimal
-```
+Visualización de inventario porcino Colombia vs Europa (UE-27) vs EE.UU. construida con Astro + Vue.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Stack
 
-## 🚀 Project Structure
+- Astro 6 (output estático)
+- Vue 3 (`client:idle` en componentes interactivos)
+- Python 3.12 para generación de snapshots de datos
 
-Inside of your Astro project, you'll see the following folders and files:
+## Scripts
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+| Comando | Acción |
+|---|---|
+| `npm run dev` | Desarrollo local |
+| `npm run check` | Validación Astro |
+| `npm run build` | Build de producción |
+| `npm run preview` | Preview local |
+| `npm run update:fuentes` | Genera `public/estado-fuentes.json` |
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Frontend y cuota Vercel Free
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+El sitio está optimizado para plan Hobby:
 
-Any static assets, like images, can be placed in the `public/` directory.
+- No usa funciones `/api` en producción.
+- `MonitoreoFuentes.vue` y `AnalisisIA.vue` leen `public/estado-fuentes.json`.
+- El snapshot se actualiza diariamente con GitHub Actions (`.github/workflows/actualizar-fuentes.yml`).
 
-## 🧞 Commands
+Esto evita consumo por invocaciones serverless en cada visita.
 
-All commands are run from the root of the project, from a terminal:
+## Snapshot diario con análisis IA
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run check`           | Run Astro type/content checks                    |
-| `npm run update:fuentes`  | Generate `public/estado-fuentes.json` snapshot   |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+`scripts/scraper_usda.py` genera:
 
-## 👀 Want to learn more?
+- estado de fuentes (USDA + Eurostat + Porcinews)
+- bloque `analisis_ia` consumido por el frontend
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Si existe `GEMINI_API_KEY`, usa Gemini para redactar el análisis.
+Si no existe, usa un fallback automático para mantener el contenido visible.
 
-## Vercel (Hobby) required env vars
+## Variables de entorno
 
-Set these in Project Settings -> Environment Variables:
+- `GEMINI_API_KEY` (opcional para generación IA del snapshot)
 
-- `GEMINI_API_KEY`: used by `api/analisis.py` to call Gemini server-side.
-- `CRON_SECRET` (optional): used by `api/actualizar.py` if you invoke that endpoint manually.
-
-## Daily source updates (without Vercel quota burn)
-
-The monitoring UI reads from `public/estado-fuentes.json` (static file).
-
-- `.github/workflows/actualizar-fuentes.yml` updates that snapshot daily using GitHub Actions.
-- This avoids per-visit Vercel Function invocations for source monitoring.
+Para GitHub Actions, configúrala como secret del repositorio.

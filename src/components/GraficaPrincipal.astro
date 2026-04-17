@@ -1,5 +1,5 @@
 ---
-import { serieColombia, serieUSA } from '../lib/datos-grafico.js';
+import { serieColombia, serieUSA, serieEuropa } from '../lib/datos-grafico.js';
 import '../styles/grafica.css';
 
 const width = 756;
@@ -7,9 +7,8 @@ const height = 476;
 const areaAncho = 816;
 const areaAlto = 340;
 const paddingX = 86;
-const paddingY = 56;
 
-const maxValor = 80;
+const maxValor = 150;
 const puntosColombia = serieColombia.map((d, i) => {
   const x = paddingX + i * (areaAncho / (serieColombia.length - 1));
   const y = 340 - (d.valor / 1e6 / maxValor) * areaAlto + 56;
@@ -22,8 +21,15 @@ const puntosUsa = serieUSA.map((d, i) => {
   return { x, y };
 });
 
+const puntosEuropa = serieEuropa.map((d, i) => {
+  const x = paddingX + i * (areaAncho / (serieEuropa.length - 1));
+  const y = 340 - (d.valor / 1e6 / maxValor) * areaAlto + 56;
+  return { x, y };
+});
+
 const colombiaPoly = puntosColombia.map(p => `${p.x},${p.y}`).join(' ');
 const usaPoly = puntosUsa.map(p => `${p.x},${p.y}`).join(' ');
+const europaPoly = puntosEuropa.map(p => `${p.x},${p.y}`).join(' ');
 const allPeriodos = serieColombia.map(d => d.periodo);
 ---
 
@@ -32,9 +38,9 @@ const allPeriodos = serieColombia.map(d => d.periodo);
   <p class="grafica-card__subtitulo">En millones de cabezas.</p>
   
   <div class="grafica-contenedor">
-    <svg class="grafica-svg" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMidYMid meet" role="img" aria-label="Gráfica de inventario porcino Colombia vs EE.UU.">
-      <title>Inventario histórico porcino: Colombia vs EE.UU.</title>
-      <desc>Gráfica de líneas que compara el inventario porcino en Colombia (datos anuales) y EE.UU. (datos trimestrales) desde 2015 hasta 2025.</desc>
+    <svg class="grafica-svg" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMidYMid meet" role="img" aria-label="Gráfica de inventario porcino Colombia, Europa y EE.UU.">
+      <title>Inventario histórico porcino: Colombia, Europa y EE.UU.</title>
+      <desc>Gráfica de líneas que compara el inventario porcino en Colombia, Europa (UE-27) y EE.UU.</desc>
       
       <g class="grafica-grid">
         {Array.from({ length: 5 }).map((_, i) => (
@@ -43,7 +49,7 @@ const allPeriodos = serieColombia.map(d => d.periodo);
       </g>
       
       <g class="grafica-y-axis">
-        {['0', '20M', '40M', '60M', '80M'].map((label, i) => (
+        {['0', '40M', '80M', '120M', '150M'].map((label, i) => (
           <text x={69} y={56 + 340 * i / 4} text-anchor="end" dominant-baseline="middle" font-size="13" fill="#7A4A44">{label}</text>
         ))}
       </g>
@@ -56,12 +62,16 @@ const allPeriodos = serieColombia.map(d => d.periodo);
       </g>
       
       <polyline points={usaPoly} fill="none" stroke="#2563EB" stroke-width="3.5" stroke-linecap="round" />
+      <polyline points={europaPoly} fill="none" stroke="#0EA5A4" stroke-width="3.5" stroke-linecap="round" />
       <polyline points={colombiaPoly} fill="none" stroke="#F5A800" stroke-width="3.5" stroke-linecap="round" />
       
-      {puntosColombia.map((p, i) => (
+      {puntosColombia.map((p) => (
         <circle cx={p.x} cy={p.y} r="5" fill="#F5A800" />
       ))}
-      {puntosUsa.map((p, i) => (
+      {puntosEuropa.map((p) => (
+        <circle cx={p.x} cy={p.y} r="5" fill="#0EA5A4" />
+      ))}
+      {puntosUsa.map((p) => (
         <circle cx={p.x} cy={p.y} r="5" fill="#2563EB" />
       ))}
       
@@ -70,9 +80,13 @@ const allPeriodos = serieColombia.map(d => d.periodo);
         <circle cx="12" cy="0" r="4" fill="#F5A800" />
         <text x="32" y="4" font-size="12" fill="#3B1F1C" font-weight="500">Colombia</text>
         
-        <line x1="110" y1="0" x2="134" y2="0" stroke="#2563EB" stroke-width="3" />
-        <circle cx="122" cy="0" r="4" fill="#2563EB" />
-        <text x="142" y="4" font-size="12" fill="#3B1F1C" font-weight="500">USA</text>
+        <line x1="110" y1="0" x2="134" y2="0" stroke="#0EA5A4" stroke-width="3" />
+        <circle cx="122" cy="0" r="4" fill="#0EA5A4" />
+        <text x="142" y="4" font-size="12" fill="#3B1F1C" font-weight="500">Europa</text>
+
+        <line x1="210" y1="0" x2="234" y2="0" stroke="#2563EB" stroke-width="3" />
+        <circle cx="222" cy="0" r="4" fill="#2563EB" />
+        <text x="242" y="4" font-size="12" fill="#3B1F1C" font-weight="500">USA</text>
       </g>
     </svg>
   </div>
