@@ -11,6 +11,7 @@
     "preview": "astro preview",
     "check": "astro check",
     "update:fuentes": "python3 scripts/generar_estado_fuentes.py",
+    "update:datasets": "node scripts/generar_datasets_publicos.mjs",
     "astro": "astro"
   },
   "dependencies": {

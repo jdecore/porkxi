@@ -1,5 +1,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { withBase } from '../lib/paths.js'
 
 const cargando = ref(true)
 const error = ref(false)
@@ -48,7 +49,9 @@ const cargarAnalisis = async (forzarRecarga = false) => {
   error.value = false
 
   try {
-    const url = forzarRecarga ? `/estado-fuentes.json?v=${Date.now()}` : '/estado-fuentes.json'
+    const url = forzarRecarga
+      ? withBase(`estado-fuentes.json?v=${Date.now()}`)
+      : withBase('estado-fuentes.json')
     const respuesta = await fetch(url, { method: 'GET', cache: 'no-store' })
     if (!respuesta.ok) throw new Error('No se pudo cargar snapshot')
     const datos = await respuesta.json()

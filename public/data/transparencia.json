@@ -1,0 +1,29 @@
+{
+  "generated_at": "2026-04-17T15:20:39.078Z",
+  "series": [
+    {
+      "region": "EE.UU.",
+      "dias_publicacion": 90,
+      "frecuencia": "Trimestral",
+      "formato": "API + comunicado",
+      "fuente": "USDA NASS",
+      "api_publica": true
+    },
+    {
+      "region": "UE-27",
+      "dias_publicacion": 180,
+      "frecuencia": "Anual",
+      "formato": "JSON-stat",
+      "fuente": "Eurostat",
+      "api_publica": true
+    },
+    {
+      "region": "Colombia",
+      "dias_publicacion": 400,
+      "frecuencia": "Irregular",
+      "formato": "Artículo periodístico",
+      "fuente": "Porcinews",
+      "api_publica": false
+    }
+  ]
+}

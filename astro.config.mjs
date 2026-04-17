@@ -4,12 +4,17 @@ import vue from '@astrojs/vue';
 import sitemap from '@astrojs/sitemap';
 import vercel from '@astrojs/vercel';
 
+const deployTarget = process.env.DEPLOY_TARGET || 'vercel';
+const astroBase = process.env.ASTRO_BASE || '/';
+const siteUrl = process.env.SITE_URL || 'https://porkxi.com';
+
 export default defineConfig({
-  site: 'https://porkxi.com',
-  integrations: [ vue(), sitemap() ],
-  adapter: vercel(),
+  site: siteUrl,
+  base: astroBase,
+  integrations: [vue(), sitemap()],
   output: 'static',
   build: {
     inlineStylesheets: 'always',
   },
+  ...(deployTarget === 'vercel' ? { adapter: vercel() } : {}),
 });
