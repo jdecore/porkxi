@@ -3,16 +3,21 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   margin-bottom: 24px;
+  background: #FDF6F4;
+  border: 1.5px solid #E8C4BC;
+  border-radius: 14px;
+  padding: 16px 20px;
 }
 
 @media (max-width: 700px) {
   .comparativa-frecuencia {
     grid-template-columns: 1fr;
-    gap: 14px;
+    gap: 12px;
+    padding: 12px 14px;
   }
 
   .frecuencia-card {
-    padding: 12px 14px;
+    padding: 10px 12px;
   }
 
   .frecuencia-card__encabezado {
@@ -72,10 +77,10 @@
 }
 
 .frecuencia-card {
-  background: #FDF6F4;
-  border: 1.5px solid #E8C4BC;
-  border-radius: 14px;
-  padding: 16px 20px;
+  background: #FEF0EB;
+  border: 1px solid #E8C4BC;
+  border-radius: 10px;
+  padding: 14px 16px;
   box-shadow: none;
 }
 
