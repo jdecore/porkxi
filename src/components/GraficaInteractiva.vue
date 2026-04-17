@@ -31,9 +31,9 @@ const svgAlto = 440
 const svgAncho = 760
 
 const catalogoSeries = {
-  colombia: { key: 'colombia', label: 'Colombia', icono: '🇨🇴', color: '#C97B7B' },
-  europa: { key: 'europa', label: 'Europa (UE-27)', icono: '🇪🇺', color: '#5D4A4A' },
-  usa: { key: 'usa', label: 'EE.UU.', icono: '🇺🇸', color: '#3D3D3D' },
+  colombia: { key: 'colombia', label: 'Colombia', icono: '🇨🇴', color: '#E8B4B8' },
+  europa: { key: 'europa', label: 'Europa (UE-27)', icono: '🇪🇺', color: '#A8C5B8' },
+  usa: { key: 'usa', label: 'EE.UU.', icono: '🇺🇸', color: '#B8C5E8' },
 }
 
 const botones = [

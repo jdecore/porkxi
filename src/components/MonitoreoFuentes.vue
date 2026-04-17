@@ -42,6 +42,10 @@ const colombiaEnlace = ref('')
 const colombiaDiasTexto = ref('—')
 const colombiaFuente = ref('Porcinews')
 const colombiaStatusTecnico = ref('warning')
+const snapshotRemotoUrl = ref(
+  import.meta.env.PUBLIC_REMOTE_SNAPSHOT_URL
+  || 'https://raw.githubusercontent.com/jdecore/porkxi/main/public/estado-fuentes.json',
+)
 
 const textoBoton = computed(() => {
   if (sincronizando.value) return 'Sincronizando...'
@@ -127,6 +131,13 @@ const obtenerEstadoFuente = (
 }
 
 const obtenerSnapshot = async (forzarRecarga = false) => {
+  if (forzarRecarga) {
+    const separador = snapshotRemotoUrl.value.includes('?') ? '&' : '?'
+    const urlRemota = `${snapshotRemotoUrl.value}${separador}v=${Date.now()}`
+    const respuestaRemota = await fetch(urlRemota, { method: 'GET', cache: 'no-store' })
+    if (respuestaRemota.ok) return respuestaRemota.json()
+  }
+
   const url = forzarRecarga
     ? withBase(`estado-fuentes.json?v=${Date.now()}`)
     : withBase('estado-fuentes.json')
@@ -234,7 +245,7 @@ const sincronizarDatos = async () => {
   const fechaAnteriorMs = Date.parse(fechaConsultaIso.value)
 
   try {
-    const respuesta = await fetch(withBase('api/sincronizar-fuentes'), {
+    const respuesta = await fetch('/api/sincronizar-fuentes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       cache: 'no-store',
@@ -244,6 +255,11 @@ const sincronizarDatos = async () => {
     if (!respuesta.ok) {
       const payload = await respuesta.json().catch(() => null)
       throw new Error(payload?.error || 'No se pudo iniciar la sincronización')
+    }
+
+    const payload = await respuesta.json().catch(() => null)
+    if (typeof payload?.snapshot_url === 'string' && payload.snapshot_url) {
+      snapshotRemotoUrl.value = payload.snapshot_url
     }
 
     mensajeSincronizacion.value = 'Sincronización iniciada. Esperando snapshot actualizado...'
