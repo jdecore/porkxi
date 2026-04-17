@@ -1,123 +1,112 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { withBase } from '../lib/paths.js'
+import { pipeline, env } from '@xenova/transformers'
+
+// Configurar Transformers.js para CDN
+env.allowLocalModels = false
+env.useBrowserCache = true
 
 const cargando = ref(true)
+const cargandoModelo = ref(false)
 const error = ref(false)
 const analisis = ref('')
-const fuente = ref('snapshot')
-const actualizadoEn = ref('')
-const notaModelo = ref('')
-const resumenInventarios = ref('')
-const fuentesSnapshot = ref('')
+const progresoCarga = ref(0)
 
 const fuenteTexto = computed(() => {
-  if (fuente.value === 'gemini-2.0-flash') return 'Gemini (snapshot diario)'
-  return 'Resumen automático (snapshot diario)'
+  return '🤖 Transformers.js · DistilGPT2 (corre completamente en tu navegador)'
 })
 
-const actualizadoTexto = computed(() => {
-  if (!actualizadoEn.value) return ''
-  const fecha = new Date(actualizadoEn.value)
-  if (Number.isNaN(fecha.getTime())) return ''
-  return fecha.toLocaleString('es-CO', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-})
-
-const crearFallbackDesdeSnapshot = (snapshot) => {
-  const usa = snapshot?.usa ?? {}
-  const europa = snapshot?.europa ?? {}
-  const colombia = snapshot?.colombia ?? {}
-  const inventarioUsa = Number(usa?.inventario_millones)
-  const inventarioEuropa = Number(europa?.inventario_millones)
-  const inventarioColombia = Number(colombia?.inventario_millones)
-  const ratioUsa = inventarioUsa > 0 && inventarioColombia > 0 ? inventarioUsa / inventarioColombia : null
-  const ratioEuropa = inventarioEuropa > 0 && inventarioColombia > 0 ? inventarioEuropa / inventarioColombia : null
-
-  const escala = Number.isFinite(ratioEuropa) && Number.isFinite(ratioUsa)
-    ? `Europa registra ${inventarioEuropa.toFixed(1)} millones y EE.UU. ${inventarioUsa.toFixed(1)} millones frente a ${inventarioColombia.toFixed(1)} millones de Colombia (${ratioEuropa.toFixed(1)}x y ${ratioUsa.toFixed(1)}x, respectivamente).`
-    : 'Europa y EE.UU. mantienen una escala de inventario claramente superior a Colombia.'
-  const transparencia = 'Europa (Eurostat) y EE.UU. (USDA) publican series oficiales con metodologías trazables, mientras Colombia sigue dependiendo de fuentes no gubernamentales para su dato consolidado.'
-  const conclusion = 'Cerrar esa brecha exige institucionalizar una API pública nacional con actualización periódica y trazabilidad histórica.'
-  return `${escala} ${transparencia} ${conclusion}`
-}
-
-const cargarAnalisis = async (forzarRecarga = false) => {
+const generarAnalisisLocal = async () => {
   cargando.value = true
+  cargandoModelo.value = true
   error.value = false
 
   try {
-    const url = forzarRecarga
-      ? withBase(`estado-fuentes.json?v=${Date.now()}`)
-      : withBase('estado-fuentes.json')
-    const respuesta = await fetch(url, { method: 'GET', cache: 'no-store' })
-    if (!respuesta.ok) throw new Error('No se pudo cargar snapshot')
-    const datos = await respuesta.json()
+    // Datos hardcodeados actualizados
+    const datos = {
+      colombia: { inventario_millones: 2.4 },
+      europa: { inventario_millones: 128 },
+      usa: { inventario_millones: 75 }
+    }
 
-    const texto = datos?.analisis_ia?.texto?.trim()
-    analisis.value = texto || crearFallbackDesdeSnapshot(datos)
-    fuente.value = datos?.analisis_ia?.fuente || 'fallback'
-    actualizadoEn.value = datos?.analisis_ia?.actualizado_en || datos?.fecha_consulta || ''
-    notaModelo.value = datos?.analisis_ia?.nota || ''
-    const usa = Number(datos?.usa?.inventario_millones)
-    const europa = Number(datos?.europa?.inventario_millones)
-    const colombia = Number(datos?.colombia?.inventario_millones)
-    resumenInventarios.value = [
-      Number.isFinite(colombia) ? `COL ${colombia.toFixed(1)}M` : '',
-      Number.isFinite(europa) ? `UE ${europa.toFixed(1)}M` : '',
-      Number.isFinite(usa) ? `USA ${usa.toFixed(1)}M` : '',
-    ]
-      .filter(Boolean)
-      .join(' · ')
-    fuentesSnapshot.value = [
-      `COL: ${datos?.colombia?.fuente || '—'}`,
-      `UE: ${datos?.europa?.fuente || '—'}`,
-      `USA: ${datos?.usa?.fuente || '—'}`,
-    ].join(' · ')
-  } catch (_err) {
+    const ratioUsa = datos.usa.inventario_millones / datos.colombia.inventario_millones
+    const ratioEuropa = datos.europa.inventario_millones / datos.colombia.inventario_millones
+
+    // Cargar generador de texto
+    const generador = await pipeline('text-generation', 'Xenova/distilgpt2', {
+      progress_callback: (progreso) => {
+        if (progreso.status === 'progress') {
+          progresoCarga.value = Math.round(progreso.progress * 100)
+        }
+      }
+    })
+
+    const prompt = `Análisis objetivo del inventario porcino:
+
+Colombia: ${datos.colombia.inventario_millones} millones de cabezas
+Europa (UE-27): ${datos.europa.inventario_millones} millones
+Estados Unidos: ${datos.usa.inventario_millones} millones
+
+Observaciones clave:`
+
+    const resultado = await generador(prompt, {
+      max_new_tokens: 150,
+      temperature: 0.7,
+      top_p: 0.9,
+      repetition_penalty: 1.2,
+      do_sample: true
+    })
+
+    analisis.value = resultado[0].generated_text.replace(prompt, '').trim()
+
+  } catch (err) {
+    console.error(err)
     error.value = true
+    analisis.value = `Colombia cuenta con ${datos.colombia.inventario_millones} millones de cabezas, mientras Europa tiene ${ratioEuropa.toFixed(0)} veces más (${datos.europa.inventario_millones}M) y Estados Unidos ${ratioUsa.toFixed(0)} veces más (${datos.usa.inventario_millones}M).
+
+La brecha más importante no es solo cuantitativa, sino institucional: mientras UE y USA publican datos oficiales actualizados vía API, en Colombia no existe una fuente pública consolidada.
+
+Esto dificulta el análisis, la planeación y la toma de decisiones basadas en evidencia para el sector porcino nacional.`
   } finally {
     cargando.value = false
+    cargandoModelo.value = false
   }
 }
 
 onMounted(() => {
-  void cargarAnalisis(false)
+  void generarAnalisisLocal()
 })
 </script>
 
 <template>
   <div class="analisis-ia">
     <div class="analisis-ia__encabezado">
-      <span class="analisis-ia__icono">🤖</span>
-      <h3 class="analisis-ia__titulo">Análisis automático con IA</h3>
-      <button v-if="!cargando" @click="cargarAnalisis(true)" class="analisis-ia__boton">
-        Actualizar snapshot
+      <span class="analisis-ia__icono">⚡</span>
+      <h3 class="analisis-ia__titulo">Análisis local con Transformers.js</h3>
+      <button v-if="!cargando" @click="generarAnalisisLocal" class="analisis-ia__boton">
+        Regenerar análisis
       </button>
     </div>
 
     <div v-if="cargando" class="analisis-ia__cargando">
       <div class="analisis-ia__spinner"></div>
-      <span>Cargando análisis...</span>
+      <span>
+        {{ cargandoModelo ? `Cargando modelo de IA... ${progresoCarga}%` : 'Generando análisis...' }}
+      </span>
     </div>
 
     <div v-else-if="error" class="analisis-ia__error">
-      ⚠️ No se pudo cargar el análisis.
+      ⚠️ Error cargando modelo. Usando análisis predefinido.
     </div>
 
     <div v-else class="analisis-ia__contenido">
       <p class="analisis-ia__texto">{{ analisis }}</p>
       <p class="analisis-ia__meta">
-        Fuente: {{ fuenteTexto }}<span v-if="actualizadoTexto"> · {{ actualizadoTexto }}</span>
+        ✅ {{ fuenteTexto }}
       </p>
-      <p v-if="resumenInventarios" class="analisis-ia__meta">Inventarios snapshot: {{ resumenInventarios }}</p>
-      <p v-if="fuentesSnapshot" class="analisis-ia__meta">Fuentes del snapshot: {{ fuentesSnapshot }}</p>
-      <p v-if="notaModelo" class="analisis-ia__meta">Nota del modelo: {{ notaModelo }}</p>
+      <p class="analisis-ia__meta">
+        💡 Este modelo corre 100% en tu navegador, no envía datos a ningún servidor.
+      </p>
     </div>
   </div>
 </template>
