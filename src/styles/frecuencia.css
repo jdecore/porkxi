@@ -120,23 +120,7 @@
   border: 1px solid #D1A3A4;
 }
 
-.frecuencia-card--colombia .frecuencia-timeline {
-  border-left-color: #C2704A;
-}
 
-.frecuencia-card--colombia .frecuencia-timeline__punto {
-  border-color: #A65D3F;
-}
-
-.frecuencia-card--colombia .frecuencia-card__descripcion,
-.frecuencia-card--colombia .frecuencia-timeline__valor,
-.frecuencia-card--colombia .frecuencia-card__fuente {
-  color: #F5E6D8;
-}
-
-.frecuencia-card--colombia .frecuencia-timeline__periodo {
-  color: #FFFFFF;
-}
 
 .frecuencia-card--europa .frecuencia-card__pildora {
   background: #5D6658;
