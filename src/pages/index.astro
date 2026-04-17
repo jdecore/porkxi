@@ -228,38 +228,6 @@ const metodosEncuestaUsa = Array.isArray(DETALLE_USA.metodosEncuesta)
         </div>
       </section>
 
-      <section class="tabla-historica">
-        <h2 class="tabla-historica__titulo">Histórico año a año</h2>
-        <p class="tabla-historica__subtitulo">Comparativo de los últimos diez años.</p>
-        <div class="tabla-contenedor">
-          <table class="tabla">
-            <thead class="tabla__encabezado"><tr><th>Año</th><th>Colombia</th><th>UE-27</th><th>EE.UU. Dic</th><th>Estado</th></tr></thead>
-            <tbody class="tabla__cuerpo">
-              {anos.map((ano) => {
-                const datoColombia = SERIE_COLOMBIA.find((d) => d.periodo === String(ano));
-                const datoEuropa = SERIE_EUROPA.find((d) => d.periodo === String(ano));
-                const datoUsa = SERIE_USA.find((d) => d.periodo === `Dic ${ano}`);
-                const es2023 = ano === 2023;
-                const es2024 = ano === 2024;
-                return (
-                  <tr class={es2023 ? 'tabla__fila--alerta' : es2024 ? 'tabla__fila--reciente' : ''}>
-                    <td>{ano}</td>
-                    <td class="tabla__cabezas">{datoColombia ? datoColombia.valor.toLocaleString() : '—'}</td>
-                    <td class="tabla__cabezas">{datoEuropa ? datoEuropa.valor.toLocaleString() : '—'}</td>
-                    <td class="tabla__cabezas">{datoUsa ? datoUsa.valor.toLocaleString() : '—'}</td>
-                    <td>
-                      {es2023 && <span class="tabla__estado tabla__estado--alerta">⚠️ COL duplicado</span>}
-                      {es2024 && <span class="tabla__estado tabla__estado--reciente">✓ COL + UE actualizados</span>}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-        <div class="tabla__pie"><span>Colombia: Porcinews</span><span>UE-27: Eurostat</span><span>EE.UU.: USDA NASS</span></div>
-      </section>
-
       <section class="explicacion">
         <h2 class="explicacion__titulo">¿Por qué existe esta brecha?</h2>
         <div class="explicacion__grid">
