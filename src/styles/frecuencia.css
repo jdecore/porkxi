@@ -121,10 +121,8 @@
   font-weight: 700;
 }
 
-.frecuencia-card--colombia .frecuencia-card__titulo,
-.frecuencia-card--usa .frecuencia-card__titulo,
-.frecuencia-card--europa .frecuencia-card__titulo {
-  color: #f0e0e0;
+.frecuencia-card__titulo {
+  color: #000000;
 }
 
 .frecuencia-card__pildora {
@@ -138,12 +136,11 @@
   color: #4A2E2E;
   border: none;
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s;
 }
 
 .frecuencia-card__pildora:hover {
-  background: #F5D5D5;
-  color: #4A2E2E;
+  background: #F5D5D5 !important;
+  color: #4A2E2E !important;
 }
 
 .frecuencia-card__descripcion {
@@ -222,7 +219,7 @@
 
 .frecuencia-card__descripcion {
   font-size: 12px;
-  color: #d8c8c8;
+  color: #000000;
   line-height: 1.5;
   margin-bottom: 14px;
 }
@@ -230,7 +227,7 @@
 .frecuencia-card--colombia .frecuencia-card__descripcion,
 .frecuencia-card--europa .frecuencia-card__descripcion,
 .frecuencia-card--usa .frecuencia-card__descripcion {
-  color: #d8c8c8;
+  color: #000000;
 }
 
 .frecuencia-timeline {
@@ -289,25 +286,25 @@
 .frecuencia-timeline__periodo {
   font-weight: 600;
   font-size: 11px;
-  color: #d8c8c8;
+  color: #000000;
   margin-bottom: 2px;
 }
 
 .frecuencia-card--colombia .frecuencia-timeline__periodo,
 .frecuencia-card--europa .frecuencia-timeline__periodo,
 .frecuencia-card--usa .frecuencia-timeline__periodo {
-  color: #f0e0e0;
+  color: #000000;
 }
 
 .frecuencia-timeline__valor {
   font-size: 10px;
-  color: #b8a8a8;
+  color: #000000;
 }
 
 .frecuencia-card--colombia .frecuencia-timeline__valor,
 .frecuencia-card--europa .frecuencia-timeline__valor,
 .frecuencia-card--usa .frecuencia-timeline__valor {
-  color: #d8c8c8;
+  color: #000000;
 }
 
 .frecuencia-timeline__valor--alerta {
@@ -316,7 +313,7 @@
 
 .frecuencia-card__fuente {
   font-size: 10px;
-  color: #b8a8a8;
+  color: #000000;
   font-style: italic;
   text-align: right;
 }
@@ -324,5 +321,5 @@
 .frecuencia-card--colombia .frecuencia-card__fuente,
 .frecuencia-card--europa .frecuencia-card__fuente,
 .frecuencia-card--usa .frecuencia-card__fuente {
-  color: #d8c8c8;
+  color: #000000;
 }
