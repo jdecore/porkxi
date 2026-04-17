@@ -1,3 +1,4 @@
+import { jsPDF } from 'jspdf'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -12,105 +13,121 @@ if (!fs.existsSync(outputDir)) {
   fs.mkdirSync(outputDir, { recursive: true })
 }
 
-function generarReporteHtml() {
+function generarReportePdf() {
   const inventario = JSON.parse(fs.readFileSync(path.join(dataDir, 'historico-inventario.json'), 'utf-8'))
-  
-  const ultimos = inventario.series.slice(-5)
+  const ultimos = inventario.series.slice(-5).reverse()
   
   const col2024 = ultimos.find(s => s.anio === 2024)?.colombia || 0
   const eu2024 = ultimos.find(s => s.anio === 2024)?.europa || 0
   const usa2025 = inventario.series.find(s => s.anio === 2025)?.usa_dic || 0
 
-  const html = `<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Radar Porcino Colombia | Reporte Abril 2026</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Georgia', serif; line-height: 1.6; color: #1a1a1a; padding: 40px; max-width: 800px; margin: 0 auto; }
-    .header { border-bottom: 3px solid #c4320a; padding-bottom: 20px; margin-bottom: 30px; }
-    .logo { font-size: 32px; font-weight: 900; letter-spacing: -1px; }
-    .logo span { color: #c4320a; }
-    .fecha { font-size: 12px; color: #666; margin-top: 8px; }
-    h1 { font-size: 24px; margin-bottom: 8px; }
-    h2 { font-size: 18px; margin: 30px 0 15px; color: #c4320a; border-bottom: 1px solid #ddd; padding-bottom: 8px; }
-    .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 20px 0; }
-    .kpi { background: #f9f9f9; padding: 20px; border-radius: 8px; text-align: center; }
-    .kpi-valor { font-size: 28px; font-weight: 700; color: #c4320a; }
-    .kpi-label { font-size: 13px; color: #666; }
-    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-    th { background: #f5f5f5; font-weight: 600; }
-    .Fuente { font-size: 11px; color: #999; margin-top: 40px; text-align: center; }
-    .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; }
-    .destacado { background: #fff8f5; padding: 20px; border-left: 4px solid #c4320a; margin: 20px 0; }
-  </style>
-</head>
-<body>
-  <div class="header">
-    <div class="logo">pork<span>ξ</span> Radar</div>
-    <div class="fecha">Reporte generado: 17 abril 2026</div>
-  </div>
+  const doc = new jsPDF()
+  const pageWidth = doc.internal.pageSize.getWidth()
+  const margin = 20
+  let y = 20
 
-  <h1>Inventario Porcino: Colombia vs Mundo</h1>
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(22)
+  doc.setTextColor(196, 50, 10)
+  doc.text('porkξ Radar', margin, y)
   
-  <div class="kpi-grid">
-    <div class="kpi">
-      <div class="kpi-valor">${(col2024 / 1000000).toFixed(1)}M</div>
-      <div class="kpi-label">Colombia</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-valor">${(eu2024 / 1000000).toFixed(0)}M</div>
-      <div class="kpi-label">UE-27</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-valor">${(usa2025 / 1000000).toFixed(1)}M</div>
-      <div class="kpi-label">EE.UU.</div>
-    </div>
-  </div>
+  doc.setFontSize(10)
+  doc.setTextColor(100)
+  doc.text('Reporte de Inventario Porcino', margin, y + 8)
+  y += 15
 
-  <h2>Contexto del Mercado</h2>
-  <div class="destacado">
-    <strong>Breve análisis:</strong> Colombia registra ~10.7M de cabezas, mientras Europa lidera con 132M (12x Colombia) y Estados Unidos con 75.5M (7x Colombia). La brecha no es solo de volumen: Europa y EE.UU. publican datos oficiales vía API, mientras Colombia carece de una fuente consolidada. Este es el principal desafío para el análisis del sector.
-  </div>
+  doc.setFontSize(16)
+  doc.setTextColor(0)
+  doc.text('Inventario Porcino: Colombia vs Mundo', margin, y)
+  y += 12
 
-  <h2>Serie Histórica (Millones)</h2>
-  <table>
-    <thead>
-      <tr><th>Año</th><th>Colombia</th><th>UE-27</th><th>EE.UU.</th></tr>
-    </thead>
-    <tbody>
-      ${ultimos.reverse().map(s => `
-      <tr>
-        <td>${s.anio}</td>
-        <td>${(s.colombia / 1000000).toFixed(1)}M</td>
-        <td>${(s.europa / 1000000).toFixed(0)}M</td>
-        <td>${s.usa_dic ? (s.usa_dic / 1000000).toFixed(1) + 'M' : '—'}</td>
-      </tr>
-      `).join('')}
-    </tbody>
-  </table>
+  doc.setFillColor(249, 246, 241)
+  doc.rect(margin, y, pageWidth - 2 * margin, 45, 'F')
+  
+  doc.setFontSize(11)
+  doc.setFont('helvetica', 'bold')
+  doc.text('Colombia', margin + 10, y + 12)
+  doc.setFontSize(14)
+  doc.setTextColor(196, 50, 10)
+  doc.text((col2024 / 1000000).toFixed(1) + 'M', margin + 10, y + 24)
+  
+  doc.setFontSize(11)
+  doc.setFont('helvetica', 'bold')
+  doc.setTextColor(0)
+  doc.text('UE-27', margin + 55, y + 12)
+  doc.setFontSize(14)
+  doc.setTextColor(15, 118, 110)
+  doc.text((eu2024 / 1000000).toFixed(0) + 'M', margin + 55, y + 24)
+  
+  doc.setFontSize(11)
+  doc.setFont('helvetica', 'bold')
+  doc.text('EE.UU.', margin + 100, y + 12)
+  doc.setFontSize(14)
+  doc.setTextColor(29, 78, 216)
+  doc.text(usa2025 ? (usa2025 / 1000000).toFixed(1) + 'M' : '—', margin + 100, y + 24)
+  
+  y += 50
 
-  <h2>Fuentes</h2>
-  <table>
-    <tr><td>🇨🇴 Colombia</td><td>Porcinews (medio especializado)</td></tr>
-    <tr><td>🇪🇺 Europa</td><td>Eurostat API (oficial)</td></tr>
-    <tr><td>🇺🇸 EE.UU.</td><td>USDA NASS (trimestral)</td></tr>
-  </table>
+  doc.setFontSize(14)
+  doc.setTextColor(0)
+  doc.text('Serie Histórica', margin, y)
+  y += 8
 
-  <div class="footer">
-    <p>Este reporte fue generado automáticamente con datos de fuentes públicas.</p>
-    <p>porkξ | porkxi.com</p>
-  </div>
-</body>
-</html>`
+  doc.setFontSize(9)
+  doc.setFillColor(245, 245, 245)
+  doc.rect(margin, y, pageWidth - 2 * margin, 8, 'F')
+  doc.setFont('helvetica', 'bold')
+  doc.text('Año', margin + 4, y + 5.5)
+  doc.text('Colombia', margin + 30, y + 5.5)
+  doc.text('UE-27', margin + 65, y + 5.5)
+  doc.text('EE.UU.', margin + 100, y + 5.5)
+  y += 8
 
-  return html
+  doc.setFont('helvetica', 'normal')
+  ultimos.forEach(s => {
+    doc.text(String(s.anio), margin + 4, y + 5)
+    doc.text((s.colombia / 1000000).toFixed(1) + 'M', margin + 30, y + 5)
+    doc.text((s.europa / 1000000).toFixed(0) + 'M', margin + 65, y + 5)
+    doc.text(s.usa_dic ? (s.usa_dic / 1000000).toFixed(1) + 'M' : '—', margin + 100, y + 5)
+    y += 7
+  })
+  
+  y += 10
+
+  doc.setFontSize(14)
+  doc.text('Análisis del Mercado', margin, y)
+  y += 8
+
+  doc.setFontSize(10)
+  doc.setTextColor(60)
+  const analisisTexto = `Colombia registra ${(col2024 / 1000000).toFixed(1)} millones de cabezas, mientras Europa lidera con ${(eu2024 / 1000000).toFixed(0)} millones (12 veces más que Colombia) y Estados Unidos con ${usa2025 ? (usa2025 / 1000000).toFixed(1) : '—'} millones (7 veces más). La brecha no es solo de volumen: Europa y EE.UU. publican datos oficiales mediante APIs públicas, mientras Colombia carece de una fuente consolidada. Este es el principal desafío para el análisis del sector porcino nacional.`
+  const lineas = doc.splitTextToSize(analisisTexto, pageWidth - 2 * margin)
+  doc.text(lineas, margin, y)
+  y += lineas.length * 5 + 15
+
+  doc.setFontSize(14)
+  doc.setTextColor(0)
+  doc.text('Fuentes', margin, y)
+  y += 8
+
+  doc.setFontSize(9)
+  doc.setTextColor(60)
+  doc.text('🇨🇴 Colombia: Porcinews (medio especializado)', margin, y)
+  y += 6
+  doc.text('🇪🇺 Europa: Eurostat API (oficial)', margin, y)
+  y += 6
+  doc.text('🇺🇸 EE.UU.: USDA NASS (trimestral)', margin, y)
+  y += 12
+
+  doc.setFontSize(8)
+  doc.setTextColor(150)
+  doc.text('Generado: ' + new Date().toLocaleDateString('es-CO'), margin, y)
+  doc.text('porkξ | porkxi.com', pageWidth - margin - 25, y)
+
+  const outputPath = path.join(outputDir, 'radar-porcino.pdf')
+  doc.save(outputPath)
+
+  console.log(`✅ PDF generado: ${outputPath}`)
 }
 
-const html = generarReporteHtml()
-const outputPath = path.join(outputDir, 'radar-porcino.html')
-fs.writeFileSync(outputPath, html, 'utf-8')
-
-console.log(`✅ Reporte generado: ${outputPath}`)
+generarReportePdf()

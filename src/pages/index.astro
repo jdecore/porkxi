@@ -117,7 +117,6 @@ const metodosEncuestaUsa = Array.isArray(DETALLE_USA.metodosEncuesta)
       <TarjetasKpiAnimadas client:idle />
       <GraficaInteractiva client:idle />
       <AnalisisIA client:idle />
-      <TablaResumen client:visible />
       <DescargarReporte client:visible />
       <MonitoreoFuentes client:idle />
       <InsightsComparativas client:visible />
@@ -170,68 +169,7 @@ const metodosEncuestaUsa = Array.isArray(DETALLE_USA.metodosEncuesta)
           </div>
           <p class="frecuencia-card__fuente">Fuente: USDA NASS</p>
         </div>
-      </div>
-
-      <section class="detalle-seccion">
-        <h2 class="detalle-seccion__titulo">Detalle del último reporte oficial</h2>
-        <div class="detalle-grid">
-          <div class="detalle-card detalle-card--colombia">
-            <div class="detalle-card__aviso">⚠️ Fuente: Porcinews (medio periodístico especializado).</div>
-            <div class="detalle-card__encabezado"><span class="detalle-card__icono">🇨🇴</span><h3 class="detalle-card__titulo">Colombia — {DETALLE_COLOMBIA.fecha}</h3></div>
-            <div class="detalle-metricas">
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Total inventario</span><span class="detalle-metrica__valor">{DETALLE_COLOMBIA.totalCabezas.toLocaleString()} cabezas</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Total predios</span><span class="detalle-metrica__valor">{DETALLE_COLOMBIA.totalPredios.toLocaleString()}</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Predios traspatio</span><span class="detalle-metrica__valor">{DETALLE_COLOMBIA.traspatio.cantidad.toLocaleString()} ({DETALLE_COLOMBIA.traspatio.porcentaje}%)</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Comercial familiar</span><span class="detalle-metrica__valor">{DETALLE_COLOMBIA.comercialFamiliar.cantidad.toLocaleString()} ({DETALLE_COLOMBIA.comercialFamiliar.porcentaje}%)</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Comercial industrial</span><span class="detalle-metrica__valor">{DETALLE_COLOMBIA.comercialIndustrial.cantidad.toLocaleString()} ({DETALLE_COLOMBIA.comercialIndustrial.porcentaje}%)</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Granjas tecnificadas</span><span class="detalle-metrica__valor">{DETALLE_COLOMBIA.tecnificadas.cantidad.toLocaleString()} ({DETALLE_COLOMBIA.tecnificadas.porcentaje}%)</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Carne 2024</span><span class="detalle-metrica__valor">{DETALLE_COLOMBIA.carne2024Toneladas.toLocaleString()} t</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Variación carne</span><span class="detalle-metrica__valor">+{DETALLE_COLOMBIA.carne2024Variacion}%</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Beneficio 2024</span><span class="detalle-metrica__valor">{DETALLE_COLOMBIA.beneficio2024Cabezas.toLocaleString()} cabezas</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Variación beneficio</span><span class="detalle-metrica__valor">+{DETALLE_COLOMBIA.beneficio2024Variacion}%</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Fuente</span><span class="detalle-metrica__valor">{DETALLE_COLOMBIA.fuente}</span></div>
-            </div>
-            <p class="detalle-card__subtitulo">{DETALLE_COLOMBIA.notaFuente}</p>
-            <a href={DETALLE_COLOMBIA.enlace} target="_blank" rel="noopener noreferrer" class="detalle-card__enlace">Ver fuente: Porcinews</a>
-          </div>
-
-          <div class="detalle-card detalle-card--europa">
-            <div class="detalle-card__encabezado"><span class="detalle-card__icono">🇪🇺</span><h3 class="detalle-card__titulo">Europa — {DETALLE_EUROPA.fechaDato}</h3></div>
-            <p class="detalle-card__subtitulo">Dataset {DETALLE_EUROPA.dataset} · Eurostat</p>
-            <div class="detalle-metricas">
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Total inventario</span><span class="detalle-metrica__valor">{DETALLE_EUROPA.totalCabezas.toLocaleString()} cabezas</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Variación anual</span><span class="detalle-metrica__valor">{DETALLE_EUROPA.variacionAnualPct}% vs 2023</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Frecuencia</span><span class="detalle-metrica__valor">{DETALLE_EUROPA.frecuencia}</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Cobertura</span><span class="detalle-metrica__valor">{DETALLE_EUROPA.cobertura}</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Unidad</span><span class="detalle-metrica__valor">{DETALLE_EUROPA.unidad}</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Actualización API</span><span class="detalle-metrica__valor">{DETALLE_EUROPA.fechaActualizacionApi}</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Fuente</span><span class="detalle-metrica__valor">{DETALLE_EUROPA.fuente}</span></div>
-            </div>
-            <p class="detalle-card__subtitulo">{DETALLE_EUROPA.notaFuente}</p>
-            <a href={DETALLE_EUROPA.enlace} target="_blank" rel="noopener noreferrer" class="detalle-card__enlace">Ver dataset oficial</a>
-          </div>
-
-          <div class="detalle-card detalle-card--usa">
-            <div class="detalle-card__encabezado"><span class="detalle-card__icono">🇺🇸</span><h3 class="detalle-card__titulo">EE.UU. — {DETALLE_USA.fechaDato}</h3></div>
-            <p class="detalle-card__subtitulo">Publicado el {DETALLE_USA.fechaPublicacion} · USDA NASS</p>
-            <div class="detalle-metricas">
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Total inventario</span><span class="detalle-metrica__valor">{DETALLE_USA.totalCabezas.toLocaleString()} cabezas (+{DETALLE_USA.variacionAnualPct}% vs dic 2024)</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Cerdos de mercado</span><span class="detalle-metrica__valor">{DETALLE_USA.cerDosMercado.toLocaleString()}</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Reproductores</span><span class="detalle-metrica__valor">{DETALLE_USA.reproductores.toLocaleString()}</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Lechones destetados</span><span class="detalle-metrica__valor">{DETALLE_USA.cerdosDestetados.toLocaleString()}</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Promedio camada</span><span class="detalle-metrica__valor">{DETALLE_USA.promedioLechonesPorCamada} lechones</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Próximo reporte</span><span class="detalle-metrica__valor">{DETALLE_USA.proximoReporte}</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Sows farrow dic-feb</span><span class="detalle-metrica__valor">{DETALLE_USA.sowsFarroDicFeb.toLocaleString()}</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Sows farrow mar-may</span><span class="detalle-metrica__valor">{DETALLE_USA.sowsFarroMarMay.toLocaleString()}</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Operadores encuestados</span><span class="detalle-metrica__valor">{DETALLE_USA.operadoresEncuestados.toLocaleString()}</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Métodos encuesta</span><span class="detalle-metrica__valor">{metodosEncuestaUsa}</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Top estados</span><span class="detalle-metrica__valor">{topEstadosUsa}</span></div>
-              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Fuente</span><span class="detalle-metrica__valor">{DETALLE_USA.fuente}</span></div>
-            </div>
-            <a href={DETALLE_USA.enlace} target="_blank" rel="noopener noreferrer" class="detalle-card__enlace">Ver reporte oficial</a>
-          </div>
-        </div>
-      </section>
+</div>
 
       <section class="explicacion">
         <h2 class="explicacion__titulo">¿Por qué existe esta brecha?</h2>

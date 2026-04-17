@@ -6,12 +6,12 @@ const generando = ref(false)
 const descargarReporte = async () => {
   generando.value = true
   try {
-    const response = await fetch('/reportes/radar-porcino.html')
+    const response = await fetch('/reportes/radar-porcino.pdf')
     const blob = await response.blob()
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'radar-porcino-colombia.html'
+    a.download = 'radar-porcino-colombia.pdf'
     a.click()
     URL.revokeObjectURL(url)
   } catch (err) {
@@ -25,10 +25,10 @@ const descargarReporte = async () => {
 <template>
   <div class="descargar-reporte">
     <div class="descargar-reporte__header">
-      <span class="descargar-reporte__icono">📄</span>
+      <span class="descargar-reporte__icono">📊</span>
       <div class="descargar-reporte__info">
-        <h3 class="descargar-reporte__titulo">Reporte descargable</h3>
-        <p class="descargar-reporte__descripcion">Resumen ejecutivo del inventario porcino con análisis del mercado.</p>
+        <h3 class="descargar-reporte__titulo">Reporte PDF</h3>
+        <p class="descargar-reporte__descripcion">Reporte ejecutivo con serie histórica, análisis del mercado y fuentes.</p>
       </div>
     </div>
     <button 
@@ -36,7 +36,7 @@ const descargarReporte = async () => {
       @click="descargarReporte"
       :disabled="generando"
     >
-      {{ generando ? 'Generando...' : 'Descargar reporte HTML' }}
+      {{ generando ? 'Descargando...' : 'Descargar PDF' }}
     </button>
   </div>
 </template>
