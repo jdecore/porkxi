@@ -115,6 +115,56 @@ body { margin: 0; padding: 0; font-family: 'Sora', 'DM Sans', sans-serif; backgr
       <GraficaInteractiva client:idle />
       <MonitoreoFuentes client:idle />
 
+<div class="comparativa-frecuencia">
+        <div class="frecuencia-card frecuencia-card--colombia">
+          <div class="frecuencia-card__encabezado"><span class="frecuencia-card__icono">🇨🇴</span><h3 class="frecuencia-card__titulo">Colombia</h3></div>
+          <span class="frecuencia-card__pildora">Anual · con retraso</span>
+          <p class="frecuencia-card__descripcion">Los datos más recientes provienen de Porcinews, un medio especializado.</p>
+          <div class="frecuencia-timeline">
+            {colombiaRecientes.map((d) => (
+              <div class="frecuencia-timeline__item">
+                <span class={`frecuencia-timeline__punto ${d.advertencia ? 'frecuencia-timeline__punto--alerta' : 'frecuencia-timeline__punto--colombia'}`}></span>
+                <div class="frecuencia-timeline__periodo">{d.periodo}</div>
+                <div class={`frecuencia-timeline__valor ${d.advertencia ? 'frecuencia-timeline__valor--alerta' : ''}`}>{d.valor.toLocaleString()} cabezas {d.advertencia ? '⚠️ mismo dato de 2022' : d.ultimoDato ? '(Porcinews, ene 2026)' : '✓'}</div>
+              </div>
+            ))}
+          </div>
+          <p class="frecuencia-card__fuente">Fuente: Porcinews</p>
+        </div>
+
+        <div class="frecuencia-card frecuencia-card--europa">
+          <div class="frecuencia-card__encabezado"><span class="frecuencia-card__icono">🇪🇺</span><h3 class="frecuencia-card__titulo">Europa (UE-27)</h3></div>
+          <span class="frecuencia-card__pildora">Anual · APIabierta</span>
+          <p class="frecuencia-card__descripcion">Serie oficial publicada por Eurostat vía API.</p>
+          <div class="frecuencia-timeline">
+            {europaRecientes.map((d) => (
+              <div class="frecuencia-timeline__item">
+                <span class="frecuencia-timeline__punto frecuencia-timeline__punto--europa"></span>
+                <div class="frecuencia-timeline__periodo">{d.periodo}</div>
+                <div class="frecuencia-timeline__valor">{d.valor.toLocaleString()} cabezas {d.ultimoDato ? '✓ dato oficial más reciente' : '✓'}</div>
+              </div>
+            ))}
+          </div>
+          <p class="frecuencia-card__fuente">Fuente: Eurostat (apro_mt_lspig)</p>
+        </div>
+
+        <div class="frecuencia-card frecuencia-card--usa">
+          <div class="frecuencia-card__encabezado"><span class="frecuencia-card__icono">🇺🇸</span><h3 class="frecuencia-card__titulo">Estados Unidos</h3></div>
+          <span class="frecuencia-card__pildora">Trimestral · obligatorio por ley</span>
+          <p class="frecuencia-card__descripcion">Reporte obligatorio bajo la Livestock Mandatory Reporting Act.</p>
+          <div class="frecuencia-timeline">
+            {usaRecientes.map((d) => (
+              <div class="frecuencia-timeline__item">
+                <span class="frecuencia-timeline__punto frecuencia-timeline__punto--usa"></span>
+                <div class="frecuencia-timeline__periodo">{d.periodo}</div>
+                <div class="frecuencia-timeline__valor">{d.valor.toLocaleString()} cabezas {d.ultimoDato ? '(último reporte)' : '✓'}</div>
+              </div>
+            ))}
+          </div>
+          <p class="frecuencia-card__fuente">Fuente: USDA NASS</p>
+        </div>
+      </div>
+
       <div class="comparativa-frecuencia">
         <div class="frecuencia-card frecuencia-card--colombia">
           <div class="frecuencia-card__encabezado"><span class="frecuencia-card__icono">🇨🇴</span><h3 class="frecuencia-card__titulo">Colombia</h3></div>
@@ -216,48 +266,6 @@ body { margin: 0; padding: 0; font-family: 'Sora', 'DM Sans', sans-serif; backgr
             <a href={DETALLE_USA.enlace} target="_blank" rel="noopener noreferrer" class="pie-pagina__enlace">USDA NASS</a>
           </div>
         </div>
-
-        <section class="sobre-proyecto">
-          <h3 class="sobre-proyecto__titulo">🧑‍💻 Sobre este proyecto</h3>
-          <div class="sobre-proyecto__grid">
-            <div class="sobre-proyecto__item">
-              <div class="sobre-proyecto__icono">⚡</div>
-              <div class="sobre-proyecto__texto">
-                <strong>Renderizado estático optimizado</strong>
-                <p>Astro 6 + hidratación selectiva para bajo costo y alto rendimiento.</p>
-              </div>
-            </div>
-            <div class="sobre-proyecto__item">
-              <div class="sobre-proyecto__icono">💚</div>
-              <div class="sobre-proyecto__texto">
-                <strong>Interactividad Vue 3</strong>
-                <p>Gráfica SVG con filtros por región y tooltips accesibles.</p>
-              </div>
-            </div>
-            <div class="sobre-proyecto__item">
-              <div class="sobre-proyecto__icono">🤖</div>
-              <div class="sobre-proyecto__texto">
-                <strong>Actualización automática</strong>
-                <p>Python + GitHub Actions para generar snapshot diario.</p>
-              </div>
-            </div>
-            <div class="sobre-proyecto__item">
-              <div class="sobre-proyecto__icono">🧠</div>
-              <div class="sobre-proyecto__texto">
-                <strong>Análisis con IA Generativa</strong>
-                <p>Resumen comparativo automático usando los datos más recientes.</p>
-              </div>
-            </div>
-          </div>
-          <div class="sobre-proyecto__tech">
-            <span class="sobre-proyecto__tag">Astro</span>
-            <span class="sobre-proyecto__tag">Vue 3</span>
-            <span class="sobre-proyecto__tag">Python</span>
-            <span class="sobre-proyecto__tag">Eurostat API</span>
-            <span class="sobre-proyecto__tag">USDA</span>
-            <span class="sobre-proyecto__tag">IA Generativa</span>
-          </div>
-        </section>
 
         <hr class="pie-pagina__separador" />
         <div class="pie-pagina__creditos">Hecho por Juan Enríquez con ayuda de IA</div>
