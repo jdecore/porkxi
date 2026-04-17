@@ -1,29 +1,23 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { pipeline, env } from '@xenova/transformers'
-
-env.allowLocalModels = false
-env.useBrowserCache = true
 
 const cargando = ref(true)
-const cargandoModelo = ref(false)
 const error = ref(false)
 const analisis = ref('')
-const progresoCarga = ref(0)
 const descargando = ref(false)
 const datosWeb = ref(null)
 
 const cargarDatosWeb = async () => {
   try {
-    const res = await fetch('/data/inventario-unificado.json', { cache: 'no-store' })
+    const res = await fetch('/data/inventario-unificado.json')
     datosWeb.value = await res.json()
   } catch (err) {
-    console.error('Error cargando datos:', err)
+    console.error('Error:', err)
   }
 }
 
 const fuenteTexto = computed(() => {
-  return '🤖 DistilGPT2 · IA en tu navegador'
+  return '📊 Datos oficiales en tiempo real'
 })
 
 const descargarReporte = async () => {
@@ -68,19 +62,18 @@ const datosUsa = {
   variacion: 1,
 }
 
-let modeloCache = null
-
 const generarAnalisisLocal = async () => {
   if (cargando.value) return
   
+  cargando.value = true
+
   await cargarDatosWeb()
   
-  cargando.value = true
-  cargandoModelo.value = true
-
   const d = datosWeb.value
   if (!d) {
-    throw new Error('Sin datos')
+    analisis.value = 'Error cargando datos'
+    cargando.value = false
+    return
   }
 
   const col = d.Colombia
@@ -96,48 +89,16 @@ const generarAnalisisLocal = async () => {
   const ratioColEu = (euUlt.valor / colUlt.valor).toFixed(1)
   const ratioColUsa = (usaUlt.valor / colUlt.valor).toFixed(1)
 
-  try {
-    if (!modeloCache) {
-      modeloCache = await pipeline('text-generation', 'Xenova/distilgpt2', {
-        progress_callback: (p) => {
-          if (p.status === 'progress') {
-            progresoCarga.value = Math.round(p.progress * 100)
-          }
-        }
-      })
-    }
-    const generador = modeloCache
+  const analisisBase = `Colombia registra ${(colUlt.valor/1e6).toFixed(1)} millones de cerdas en ${col.detalle.predios.toLocaleString()} predios, con un crecimiento del +${crecimientoCol}% respecto a 2023. La estructura muestra ${col.detalle.traspatio.porcentaje}% en traspatio, ${col.detalle.familiar.porcentaje}% en explotaciones familiares y solo ${col.detalle.industrial.porcentaje}% en industria.`
 
-    const prompt = `Colombia ${colUlt.valor/1e6}M, UE ${euUlt.valor/1e6}M, USA ${usaUlt.valor/1e6}M. Colombia 78% traspatio, 12x menos que UE. Análisis:`
+  const analisisOpciones = [
+    ` La UE-27 lidera con ${(euUlt.valor/1e6).toFixed(0)} millones (${ratioColEu}x Colombia) mientras EE.UU. alcanza ${(usaUlt.valor/1e6).toFixed(1)} millones (${ratioColUsa}x). La brecha real está en la transparencia: Europa y USA publican datos oficiales vía API, mientras Colombia carece de fuente gubernamental consolidada.`,
+    ` El contraste con ${(euUlt.valor/1e6).toFixed(0)}M de la UE-27 y ${(usaUlt.valor/1e6).toFixed(1)}M de USA evidencia la oportunidad de crecimiento. Sin datos abiertos, los productores colombianostrabajan sin información oficial actualizada.`,
+    ` Mientras Europa y Estados Unidos publican series históricas verificables, Colombia depende de medios especializados. Esta fragmentación limita la capacidad de análisis estratégico del sector porcino nacional.`
+  ]
 
-    const resultado = await generador(prompt, {
-      max_new_tokens: 50,
-      temperature: 0.4,
-      top_p: 0.9,
-      do_sample: true
-    })
-
-    let textoLimpio = resultado[0].generated_text.replace(prompt, '').trim()
-    
-    if (textoLimpio.length > 15) {
-      analisis.value = textoLimpio.slice(0, 200)
-    } else {
-      throw new Error('Texto inválido')
-    }
-  } catch (err) {
-    console.log('Modelo fallback:', err.message)
-    const fallbacks = [
-      `La fragmentación del 78% en traspatio limita el análisis. Colombia necesita una API pública como Eurostat.`,
-      `La brecha no es de volumen sino de transparencia. UE y USA publican datos oficiales; Colombia no.`,
-      `El sector porcino colombiano puede innovar con datos abiertos. La oportunidad está en consolidar ICA, DANE y Porkcolombia.`,
-      `Sin datos oficiales, los productores dependen de estimaciones. Una API pública impulsaría inversiones.`,
-      `El comparativo global muestra oportunidad: Colombia tiene 10.7M vs UE 132M vs USA 75.5M.`,
-    ]
-    analisis.value = fallbacks[Math.floor(Math.random() * fallbacks.length)]
-  } finally {
-    cargando.value = false
-    cargandoModelo.value = false
-  }
+  analisis.value = analisisBase + analisisOpciones[Math.floor(Math.random() * analisisOpciones.length)]
+  cargando.value = false
 }
 
 onMounted(async () => {
@@ -158,9 +119,7 @@ onMounted(async () => {
 
     <div v-if="cargando" class="analisis-ia__cargando">
       <div class="analisis-ia__spinner"></div>
-      <span>
-        {{ cargandoModelo ? `Cargando modelo de IA... ${progresoCarga}%` : 'Generando análisis...' }}
-      </span>
+      <span>Cargando datos...</span>
     </div>
 
     <div v-else-if="error" class="analisis-ia__error">
