@@ -133,64 +133,12 @@ def _crear_prompt_analisis(usa, europa, colombia):
     )
 
 
-def _generar_analisis_gemini(prompt):
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        return None, "GEMINI_API_KEY no configurado"
-
-    payload = {
-        "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {
-            "temperature": 0.3,
-            "maxOutputTokens": 260,
-        },
-    }
-    req = request.Request(
-        url=f"{GEMINI_API_URL}?key={api_key}",
-        data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-
-    try:
-        with request.urlopen(req, timeout=20) as response:
-            data = json.loads(response.read().decode("utf-8"))
-    except error.HTTPError as exc:
-        detalle = exc.read().decode("utf-8", errors="ignore")
-        return None, f"Gemini HTTPError: {detalle[:250]}"
-    except error.URLError as exc:
-        return None, f"Gemini URLError: {exc.reason}"
-    except json.JSONDecodeError:
-        return None, "Gemini devolvió JSON inválido"
-
-    candidates = data.get("candidates", [])
-    if not candidates:
-        return None, "Gemini sin candidates"
-
-    content = candidates[0].get("content", {})
-    parts = content.get("parts", [])
-    if not parts or "text" not in parts[0]:
-        return None, "Gemini sin texto"
-
-    return parts[0]["text"].strip(), None
-
-
 def construir_analisis_ia(usa, europa, colombia):
-    prompt = _crear_prompt_analisis(usa, europa, colombia)
-    texto, error_gemini = _generar_analisis_gemini(prompt)
-
-    if texto:
-        return {
-            "texto": texto,
-            "fuente": "gemini-2.0-flash",
-            "actualizado_en": datetime.now(timezone.utc).isoformat(),
-        }
-
+    """Genera análisis usando fallback local (sin API externa)."""
     return {
         "texto": _crear_analisis_fallback(usa, europa, colombia),
-        "fuente": "fallback",
+        "fuente": "analisis-local",
         "actualizado_en": datetime.now(timezone.utc).isoformat(),
-        "nota": error_gemini,
     }
 
 

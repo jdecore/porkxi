@@ -1,7 +1,7 @@
 :root {
   --crema:           #F9F6F1;
-  --crema-oscuro:    #FFEBE6;
-  --crema-borde:     #FFD1CC;
+  --crema-oscuro:    #F5F5F5;
+  --crema-borde:     #E8E4E0;
   --tinta:           #3A2320;
   --tinta-claro:     #5A4A45;
   --cerdo:           #C4320A;
@@ -10,7 +10,7 @@
   --europa:         #0F766E;
   --usa:            #1D4ED8;
   --alerta:          #C0392B;
-  --alerta-fondo:    #FEF0EE;
+  --alerta-fondo:    #F5F5F5;
   --radio:           14px;
   --sombra:          0 10px 28px rgba(59,31,28,0.08);
 }

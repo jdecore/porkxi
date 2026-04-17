@@ -36,25 +36,15 @@ Esto evita consumo por invocaciones serverless en cada visita.
 - estado de fuentes (USDA + Eurostat + Porcinews)
 - bloque `analisis_ia` consumido por el frontend
 
-Si existe `GEMINI_API_KEY`, usa Gemini para redactar el análisis.
-Si no existe, usa un fallback automático para mantener el contenido visible.
+El análisis de IA usa Transformers.js con Qwen3-0.8B-Instruct ejecutándose 100% en el navegador del usuario.
 
-## Datasets enriquecidos (sin costo serverless)
+## Datasets
 
-Además de `estado-fuentes.json`, el pipeline genera:
-
-- `public/data/historico-inventario.json`
-- `public/data/transparencia.json`
-- `public/data/sacrificio-anual-ue.json`
-- `public/data/ciclo-reproductivo-ue.json`
-- `public/data/precios-comercio.json`
-- `public/data/serie-completa.csv`
-
-`InsightsComparativas.vue` consume estos archivos desde frontend estático, por lo que no suma invocaciones en Vercel Free.
+Solo `estado-fuentes.json` y `inventario-unificado.json` se usan en el frontend.
 
 ## Variables de entorno
 
-- `GEMINI_API_KEY` (opcional para generación IA del snapshot)
+- Análisis IA con Transformers.js (en el navegador)
 - `DEPLOY_TARGET` (`vercel` o `pages`)
 - `ASTRO_BASE` (ejemplo: `/porkxi/` para GitHub Pages de proyecto)
 - `SITE_URL` (URL pública del despliegue)

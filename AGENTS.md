@@ -36,17 +36,9 @@ Aplicación web para visualizar y comparar inventario porcino entre Colombia, Eu
 ## Estado de IA en frontend
 - `AnalisisIA.vue` muestra análisis automáticamente al cargar.
 - El texto viene de `estado-fuentes.json -> analisis_ia`.
-- Si hay `GEMINI_API_KEY`, el snapshot usa Gemini.
-- Si no hay clave, se genera fallback automático para no dejar el bloque vacío.
+- IA generativa local (Transformers.js en cliente)
 
-## Estado de Europa en frontend
-- Datos históricos de Europa en `src/data/europa.js` (fuente Eurostat).
-- Filtros y visualización integrados en `GraficaInteractiva.vue`.
-- Monitoreo de fuente europea integrado en `MonitoreoFuentes.vue`.
-
-## Adaptación para portafolio junior (Glovar)
-El proyecto ya evidencia:
-- IA generativa (Gemini en generación de snapshot)
+- Análisis con Qwen3-0.8B-Instruct en navegador
 - Automatización (workflow diario)
 - Monitoreo (estado de fuentes y recencia de reportes)
 - Backend con Python (pipeline de snapshot)

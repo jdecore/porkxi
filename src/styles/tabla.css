@@ -52,7 +52,7 @@
 }
 
 .tabla__cuerpo tr:nth-child(odd) {
-  background: #FFEBE6;
+  background: #F5F5F5;
 }
 
 .tabla__cuerpo td {
