@@ -1,0 +1,17 @@
+{
+  "generated_at": "2026-04-17T21:27:12.286Z",
+  "unidad": "millones de cabezas",
+  "fuente": "Eurostat",
+  "series": [
+    {
+      "indicador": "Cerdas reproductoras",
+      "valor_millones": 10.15,
+      "variacion_pct": -3.5
+    },
+    {
+      "indicador": "Lechones <20kg",
+      "valor_millones": 39.95,
+      "variacion_pct": -1.6
+    }
+  ]
+}

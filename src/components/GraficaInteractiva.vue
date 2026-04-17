@@ -31,13 +31,13 @@ const svgAlto = 440
 const svgAncho = 760
 
 const catalogoSeries = {
-  colombia: { key: 'colombia', label: 'Colombia', icono: '🇨🇴', color: '#C96A5B' },
-  europa: { key: 'europa', label: 'Europa (UE-27)', icono: '🇪🇺', color: '#0F766E' },
-  usa: { key: 'usa', label: 'EE.UU.', icono: '🇺🇸', color: '#1D4ED8' },
+  colombia: { key: 'colombia', label: 'Colombia', icono: '🇨🇴', color: '#E8A892' },
+  europa: { key: 'europa', label: 'Europa (UE-27)', icono: '🇪🇺', color: '#7CB9A8' },
+  usa: { key: 'usa', label: 'EE.UU.', icono: '🇺🇸', color: '#8BA8E8' },
 }
 
 const botones = [
-  { value: 'colombia', label: '🟡 Colombia' },
+  { value: 'colombia', label: '🟤 Colombia' },
   { value: 'europa', label: '🟢 Europa' },
   { value: 'usa', label: '🔵 EE.UU.' },
   { value: 'todos', label: '⚖️ Todos' },
@@ -206,7 +206,7 @@ onUnmounted(() => {
             :y1="yInicio + (chartHeight * (i - 1)) / 4"
             :x2="xFin"
             :y2="yInicio + (chartHeight * (i - 1)) / 4"
-            stroke="#D0CCC8"
+            stroke="#7A8073"
             stroke-dasharray="3,3"
           />
         </g>
@@ -220,14 +220,14 @@ onUnmounted(() => {
             text-anchor="end"
             dominant-baseline="middle"
             font-size="13"
-            fill="#5A4A45"
+            fill="#D4D9D0"
           >
             {{ valor }}
           </text>
         </g>
 
         <g class="grafica-x-axis">
-          <line :x1="xInicio" :y1="yFin" :x2="xFin" :y2="yFin" stroke="#D0CCC8" stroke-width="1" />
+          <line :x1="xInicio" :y1="yFin" :x2="xFin" :y2="yFin" stroke="#7A8073" stroke-width="1" />
           <text
             v-for="(label, i) in etiquetasX"
             :key="`x-${i}`"
@@ -235,7 +235,7 @@ onUnmounted(() => {
             y="425"
             text-anchor="middle"
             font-size="12"
-            fill="#5A4A45"
+            fill="#D4D9D0"
             :transform="debeRotar ? `rotate(-40, ${xInicio + i * pasoXEtiquetas}, 452)` : ''"
           >
             {{ label }}
@@ -272,7 +272,7 @@ onUnmounted(() => {
           <g v-for="(serie, idx) in seriesActivas" :key="`legend-${serie.key}`" :transform="`translate(${idx * 180}, 0)`">
             <line x1="0" y1="0" x2="24" y2="0" :stroke="serie.color" stroke-width="3" />
             <circle cx="12" cy="0" r="4" :fill="serie.color" />
-            <text x="32" y="4" font-size="12" fill="#3B1F1C" font-weight="500">{{ serie.label }}</text>
+            <text x="32" y="4" font-size="12" fill="#EDE7DF" font-weight="500">{{ serie.label }}</text>
           </g>
         </g>
       </svg>

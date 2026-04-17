@@ -306,10 +306,17 @@ onMounted(() => {
 
 .monitoreo__titulo {
   font-family: 'Playfair Display', serif;
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 700;
   margin: 0;
   color: #B8482D;
+}
+
+.monitoreo__auto {
+  font-size: 12px;
+  color: #6B3A2C;
+  display: block;
+  margin-top: 4px;
 }
 
 .monitoreo__actualizacion {
