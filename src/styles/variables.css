@@ -1,13 +1,14 @@
 :root {
-  --crema:           #F8F5F0;
+  --crema:           #F9F6F1;
   --crema-oscuro:    #FFEBE6;
   --crema-borde:     #FFD1CC;
-  --tinta:           #3B1F1C;
-  --tinta-claro:     #7A4A44;
-  --cerdo:           #D4736B;
-  --cerdo-claro:     #E8A09A;
-  --colombia:        #F5A800;
-  --usa:             #2563EB;
+  --tinta:           #3A2320;
+  --tinta-claro:     #5A4A45;
+  --cerdo:           #C4320A;
+  --cerdo-claro:     #D4736B;
+  --colombia:        #C96A5B;
+  --europa:         #0F766E;
+  --usa:            #1D4ED8;
   --alerta:          #C0392B;
   --alerta-fondo:    #FEF0EE;
   --radio:           14px;

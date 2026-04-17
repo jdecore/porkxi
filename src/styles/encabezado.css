@@ -1,16 +1,16 @@
 .encabezado {
-  padding: 64px 0 42px;
+  padding: 56px 0 32px;
   border-bottom: 2px solid var(--crema-borde);
-  margin-bottom: 36px;
+  margin-bottom: 32px;
   text-align: center;
 }
 
 .encabezado__logo {
   font-family: 'Poppins', sans-serif;
-  font-size: 86px;
+  font-size: 72px;
   font-weight: 900;
-  letter-spacing: -4px;
-  margin: 0 0 16px;
+  letter-spacing: -3px;
+  margin: 0 0 12px;
   line-height: 1;
 }
 
@@ -20,17 +20,18 @@
 
 .encabezado__logo-xi {
   color: var(--cerdo);
+  font-size: 56px;
+  vertical-align: sub;
 }
 
 .encabezado__subtitulo {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 19px;
-  color: #000000;
-  font-weight: 500;
-  max-width: 640px;
-  margin: 0 auto 24px;
-  line-height: 1.65;
-  letter-spacing: -0.2px;
+  font-family: 'Sora', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--tinta-claro);
+  max-width: 520px;
+  margin: 0 auto 20px;
+  line-height: 1.6;
 }
 
 .encabezado__badges {
@@ -41,81 +42,55 @@
 }
 
 .encabezado__badge {
-  display: inline-block;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
-  border: 1.5px solid;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--crema-oscuro);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--tinta-claro);
+  text-decoration: none;
+  transition: background 0.2s;
 }
 
-.encabezado__badge--colombia {
-  border-color: var(--colombia);
-  background: #FFF8E6;
-  color: var(--colombia);
-}
-
-.encabezado__badge--usa {
-  border-color: var(--usa);
-  background: #EFF6FF;
-  color: var(--usa);
+.encabezado__badge:hover {
+  background: var(--crema-borde);
 }
 
 .encabezado__badge--europa {
-  border-color: var(--europa);
-  background: #ECFEFF;
+  border: 1px solid var(--europa);
   color: var(--europa);
 }
 
-.encabezado__badge--datos {
-  border-color: var(--alerta);
-  background: var(--crema-oscuro);
-  color: var(--alerta);
+.encabezado__badge--usa {
+  border: 1px solid var(--usa);
+  color: var(--usa);
 }
 
-@media (max-width: 700px) {
+.encabezado__badge--colombia {
+  border: 1px solid var(--colombia);
+  color: var(--colombia);
+}
+
+@media (max-width: 600px) {
   .encabezado {
-    padding: 36px 0 20px;
-    margin-bottom: 28px;
+    padding: 40px 0 24px;
+    margin-bottom: 24px;
   }
 
   .encabezado__logo {
-    font-size: 62px;
-    letter-spacing: -3px;
+    font-size: 48px;
+  }
+
+  .encabezado__logo-xi {
+    font-size: 36px;
   }
 
   .encabezado__subtitulo {
-    font-size: 14px;
-    max-width: 100%;
-  }
-
-  .encabezado__badges {
-    gap: 8px;
-  }
-
-  .encabezado__badge {
-    padding: 5px 12px;
-    font-size: 11px;
-  }
-}
-
-@media (max-width: 500px) {
-  .encabezado {
-    padding: 28px 0 16px;
-  }
-
-  .encabezado__logo {
-    font-size: 52px;
-    letter-spacing: -2px;
-  }
-
-  .encabezado__subtitulo {
-    font-size: 13px;
-    margin-bottom: 16px;
-  }
-
-  .encabezado__badge {
-    padding: 4px 10px;
-    font-size: 10px;
+    font-size: 16px;
   }
 }

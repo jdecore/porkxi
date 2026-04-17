@@ -1,5 +1,6 @@
 ---
 import GraficaInteractiva from '../components/GraficaInteractiva.vue';
+import TablaResumen from '../components/TablaResumen.vue';
 import TarjetasKpiAnimadas from '../components/TarjetasKpiAnimadas.vue';
 import AnalisisIA from '../components/AnalisisIA.vue';
 import DescargarReporte from '../components/DescargarReporte.vue';
@@ -77,44 +78,46 @@ const metodosEncuestaUsa = Array.isArray(DETALLE_USA.metodosEncuesta)
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;900&family=Poppins:wght=900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Playfair+Display:wght@700;900&family=Poppins:wght@900&family=Sora:wght@400;600;700&display=swap" rel="stylesheet" />
     <script type="module" src="https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1/dist/transformers.min.js"></script>
 
     <style>
       :root {
-        --crema: #F8F5F0;
+        --crema: #F9F6F1;
         --crema-oscuro: #FFEBE6;
         --crema-borde: #FFD1CC;
-        --tinta: #3B1F1C;
-        --tinta-claro: #7A4A44;
-        --colombia: #F5A800;
-        --europa: #0EA5A4;
-        --usa: #2563EB;
+        --tinta: #3A2320;
+        --tinta-claro: #5A4A45;
+        --colombia: #C96A5B;
+        --europa: #0F766E;
+        --usa: #1D4ED8;
         --alerta: #C0392B;
         --alerta-fondo: #FEF0EE;
-        --cerdo: #D4736B;
-        --cerdo-claro: #E8A09A;
+        --cerdo: #C4320A;
+        --cerdo-claro: #D4736B;
         --radio: 14px;
         --sombra: 0 10px 28px rgba(59,31,28,0.08);
       }
       *, *::before, *::after { box-sizing: border-box; }
       html { -webkit-text-size-adjust: 100%; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; scroll-behavior: smooth; }
-      body { margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; background-color: var(--crema); color: var(--tinta); min-height: 100vh; position: relative; }
-      body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); opacity: 0.03; pointer-events: none; z-index: 0; }
-      .contenedor { max-width: 1100px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+      body { margin: 0; padding: 0; font-family: 'Sora', 'DM Sans', sans-serif; background-color: #FFFFFF; color: var(--tinta); min-height: 100vh; position: relative; }
+      body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); opacity: 0.02; pointer-events: none; z-index: 0; }
+      .hero-bg { background: linear-gradient(180deg, var(--crema) 0%, var(--crema) 70%, #FFFFFF 100%); }
+      .contenedor { max-width: 1140px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
       img, svg { max-width: 100%; height: auto; }
       @media (max-width: 700px) { .contenedor { padding: 0 16px; } }
     </style>
   </head>
   <body>
-    <main class="contenedor">
+    <main class="contenedor hero-bg">
       <header class="encabezado">
         <h1 class="encabezado__logo"><span class="encabezado__logo-parte">pork</span><span class="encabezado__logo-xi">ξ</span></h1>
-        <p class="encabezado__subtitulo">Europa (Eurostat) y EE.UU. (USDA) publican inventario porcino con fuentes oficiales y trazables. En Colombia, los datos siguen fragmentados y sin API pública equivalente, por lo que el último dato consolidado disponible proviene de Porcinews.</p>
+        <p class="encabezado__subtitulo">Inventario porcino de Colombia, UE-27 y EE.UU. en un solo lugar, con fuente.</p>
       </header>
       <TarjetasKpiAnimadas client:idle />
       <GraficaInteractiva client:idle />
       <AnalisisIA client:idle />
+      <TablaResumen client:visible />
       <DescargarReporte client:visible />
       <MonitoreoFuentes client:idle />
       <InsightsComparativas client:visible />
