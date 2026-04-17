@@ -15,7 +15,6 @@ from pathlib import Path
 from urllib import error, request
 
 USDA_NEWS_RSS_URL = "https://www.nass.usda.gov/rss/news.xml"
-GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
 EUROSTAT_SERIE_URL = (
     "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/"
     "apro_mt_lspig?geo=EU27_2020&animals=A3100&unit=THS_HD&month=M11_M12&sinceTimePeriod=2015"
