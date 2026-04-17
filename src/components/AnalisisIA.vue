@@ -7,6 +7,9 @@ const error = ref(false)
 const analisis = ref('')
 const fuente = ref('snapshot')
 const actualizadoEn = ref('')
+const notaModelo = ref('')
+const resumenInventarios = ref('')
+const fuentesSnapshot = ref('')
 
 const fuenteTexto = computed(() => {
   if (fuente.value === 'gemini-2.0-flash') return 'Gemini (snapshot diario)'
@@ -60,6 +63,22 @@ const cargarAnalisis = async (forzarRecarga = false) => {
     analisis.value = texto || crearFallbackDesdeSnapshot(datos)
     fuente.value = datos?.analisis_ia?.fuente || 'fallback'
     actualizadoEn.value = datos?.analisis_ia?.actualizado_en || datos?.fecha_consulta || ''
+    notaModelo.value = datos?.analisis_ia?.nota || ''
+    const usa = Number(datos?.usa?.inventario_millones)
+    const europa = Number(datos?.europa?.inventario_millones)
+    const colombia = Number(datos?.colombia?.inventario_millones)
+    resumenInventarios.value = [
+      Number.isFinite(colombia) ? `COL ${colombia.toFixed(1)}M` : '',
+      Number.isFinite(europa) ? `UE ${europa.toFixed(1)}M` : '',
+      Number.isFinite(usa) ? `USA ${usa.toFixed(1)}M` : '',
+    ]
+      .filter(Boolean)
+      .join(' · ')
+    fuentesSnapshot.value = [
+      `COL: ${datos?.colombia?.fuente || '—'}`,
+      `UE: ${datos?.europa?.fuente || '—'}`,
+      `USA: ${datos?.usa?.fuente || '—'}`,
+    ].join(' · ')
   } catch (_err) {
     error.value = true
   } finally {
@@ -96,6 +115,9 @@ onMounted(() => {
       <p class="analisis-ia__meta">
         Fuente: {{ fuenteTexto }}<span v-if="actualizadoTexto"> · {{ actualizadoTexto }}</span>
       </p>
+      <p v-if="resumenInventarios" class="analisis-ia__meta">Inventarios snapshot: {{ resumenInventarios }}</p>
+      <p v-if="fuentesSnapshot" class="analisis-ia__meta">Fuentes del snapshot: {{ fuentesSnapshot }}</p>
+      <p v-if="notaModelo" class="analisis-ia__meta">Nota del modelo: {{ notaModelo }}</p>
     </div>
   </div>
 </template>

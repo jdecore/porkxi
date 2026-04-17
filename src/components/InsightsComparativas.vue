@@ -8,36 +8,80 @@ const transparencia = ref([])
 const sacrificio = ref([])
 const ciclo = ref([])
 const preciosComercio = ref(null)
+const historico = ref([])
+const meta = ref({
+  transparencia: { generatedAt: '', fuente: '' },
+  sacrificio: { generatedAt: '', fuente: '', unidad: '', nota: '' },
+  ciclo: { generatedAt: '', fuente: '', unidad: '' },
+  precios: { generatedAt: '', fuente: '' },
+  historico: { generatedAt: '', fuente: '' },
+})
 
 const maxSacrificio = computed(() =>
   sacrificio.value.reduce((max, item) => Math.max(max, Number(item.valor_millones) || 0), 0),
 )
 
 const filasTransparencia = computed(() => transparencia.value.slice().sort((a, b) => a.dias_publicacion - b.dias_publicacion))
+const historicoReciente = computed(() => historico.value.slice(-5).reverse())
+
+const formatearFecha = (valor) => {
+  if (!valor) return 'sin dato'
+  const fecha = new Date(valor)
+  if (Number.isNaN(fecha.getTime())) return valor
+  return fecha.toLocaleString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })
+}
 
 const cargarDatasets = async () => {
   cargando.value = true
   error.value = ''
   try {
-    const [transparenciaRes, sacrificioRes, cicloRes, preciosRes] = await Promise.all([
+    const [transparenciaRes, sacrificioRes, cicloRes, preciosRes, historicoRes] = await Promise.all([
       fetch(withBase('data/transparencia.json'), { cache: 'no-store' }),
       fetch(withBase('data/sacrificio-anual-ue.json'), { cache: 'no-store' }),
       fetch(withBase('data/ciclo-reproductivo-ue.json'), { cache: 'no-store' }),
       fetch(withBase('data/precios-comercio.json'), { cache: 'no-store' }),
+      fetch(withBase('data/historico-inventario.json'), { cache: 'no-store' }),
     ])
-    if (!transparenciaRes.ok || !sacrificioRes.ok || !cicloRes.ok || !preciosRes.ok) {
+    if (!transparenciaRes.ok || !sacrificioRes.ok || !cicloRes.ok || !preciosRes.ok || !historicoRes.ok) {
       throw new Error('No se pudieron cargar los datasets enriquecidos')
     }
-    const [transparenciaData, sacrificioData, cicloData, preciosData] = await Promise.all([
+    const [transparenciaData, sacrificioData, cicloData, preciosData, historicoData] = await Promise.all([
       transparenciaRes.json(),
       sacrificioRes.json(),
       cicloRes.json(),
       preciosRes.json(),
+      historicoRes.json(),
     ])
     transparencia.value = Array.isArray(transparenciaData?.series) ? transparenciaData.series : []
     sacrificio.value = Array.isArray(sacrificioData?.series) ? sacrificioData.series : []
     ciclo.value = Array.isArray(cicloData?.series) ? cicloData.series : []
+    historico.value = Array.isArray(historicoData?.series) ? historicoData.series : []
     preciosComercio.value = preciosData ?? null
+    meta.value = {
+      transparencia: {
+        generatedAt: transparenciaData?.generated_at || '',
+        fuente: 'USDA NASS + Eurostat + Porcinews',
+      },
+      sacrificio: {
+        generatedAt: sacrificioData?.generated_at || '',
+        fuente: sacrificioData?.fuente || '',
+        unidad: sacrificioData?.unidad || '',
+        nota: sacrificioData?.nota || '',
+      },
+      ciclo: {
+        generatedAt: cicloData?.generated_at || '',
+        fuente: cicloData?.fuente || '',
+        unidad: cicloData?.unidad || '',
+      },
+      precios: {
+        generatedAt: preciosData?.generated_at || '',
+        fuente: preciosData?.fuente || '',
+      },
+      historico: {
+        generatedAt: historicoData?.generated_at || '',
+        fuente: Array.isArray(historicoData?.fuente) ? historicoData.fuente.join(', ') : '',
+      },
+    }
   } catch (_err) {
     error.value = 'No se pudieron cargar los insights enriquecidos'
   } finally {
@@ -67,9 +111,10 @@ onMounted(() => {
           <div v-for="item in filasTransparencia" :key="item.region" class="insights__row">
             <span>{{ item.region }}</span>
             <strong>{{ item.dias_publicacion }} días</strong>
-            <span>{{ item.formato }}</span>
+            <span>{{ item.formato }} · {{ item.frecuencia }}</span>
           </div>
         </div>
+        <p class="insights__meta">Dataset: {{ meta.transparencia.fuente }} · {{ formatearFecha(meta.transparencia.generatedAt) }}</p>
       </article>
 
       <article class="insights__card">
@@ -86,6 +131,8 @@ onMounted(() => {
             <span class="insights__bar-value">{{ item.valor_millones.toFixed(1) }}M</span>
           </div>
         </div>
+        <p class="insights__meta">{{ meta.sacrificio.fuente }} · {{ meta.sacrificio.unidad }}</p>
+        <p v-if="meta.sacrificio.nota" class="insights__meta">{{ meta.sacrificio.nota }}</p>
       </article>
 
       <article class="insights__card">
@@ -97,6 +144,7 @@ onMounted(() => {
             <span>{{ item.variacion_pct }}% interanual</span>
           </div>
         </div>
+        <p class="insights__meta">{{ meta.ciclo.fuente }} · {{ meta.ciclo.unidad }}</p>
       </article>
 
       <article class="insights__card">
@@ -107,6 +155,26 @@ onMounted(() => {
           <p><strong>COL importaciones:</strong> {{ preciosComercio.colombia_importaciones_desde_norteamerica_pct }}% desde EE.UU./Canadá/Chile</p>
           <p><strong>UE comercio vivo:</strong> España +{{ preciosComercio.espana_import_vivo_t1_2025_pct }}% T1 2025 desde Países Bajos</p>
         </div>
+        <p class="insights__meta">{{ meta.precios.fuente }} · {{ formatearFecha(meta.precios.generatedAt) }}</p>
+      </article>
+
+      <article class="insights__card insights__card--full">
+        <h3 class="insights__card-title">Histórico consolidado (Action)</h3>
+        <div class="insights__historico">
+          <div class="insights__historico-head">
+            <span>Año</span>
+            <span>COL</span>
+            <span>UE</span>
+            <span>USA dic</span>
+          </div>
+          <div v-for="item in historicoReciente" :key="item.anio" class="insights__historico-row">
+            <span>{{ item.anio }}</span>
+            <span>{{ Number(item.colombia).toLocaleString() }}</span>
+            <span>{{ Number(item.europa).toLocaleString() }}</span>
+            <span>{{ item.usa_dic ? Number(item.usa_dic).toLocaleString() : '—' }}</span>
+          </div>
+        </div>
+        <p class="insights__meta">Fuentes: {{ meta.historico.fuente }} · {{ formatearFecha(meta.historico.generatedAt) }}</p>
       </article>
     </div>
   </section>
@@ -160,6 +228,10 @@ onMounted(() => {
   background: var(--crema);
   border-radius: 10px;
   padding: 14px;
+}
+
+.insights__card--full {
+  grid-column: 1 / -1;
 }
 
 .insights__card-title {
@@ -238,6 +310,37 @@ onMounted(() => {
 
 .insights__bullets p:last-child {
   margin-bottom: 0;
+}
+
+.insights__meta {
+  color: var(--tinta-claro);
+  font-size: 11px;
+  margin: 8px 0 0;
+}
+
+.insights__historico {
+  border: 1px solid var(--crema-borde);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.insights__historico-head,
+.insights__historico-row {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 60px 1fr 1fr 1fr;
+  padding: 8px 10px;
+}
+
+.insights__historico-head {
+  background: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.insights__historico-row {
+  border-top: 1px solid var(--crema-borde);
+  font-size: 11px;
 }
 
 @media (max-width: 900px) {

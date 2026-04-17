@@ -13,6 +13,9 @@ const usaEnlace = ref('')
 const usaInventarioTexto = ref('sin dato')
 const usaDiasTexto = ref('—')
 const usaNivel = ref('warning')
+const usaFuente = ref('USDA NASS RSS')
+const usaTitulo = ref('')
+const usaStatusTecnico = ref('—')
 
 const europaUltimoReporte = ref('sin dato')
 const europaEstado = ref('Pendiente')
@@ -22,12 +25,18 @@ const europaEnlace = ref('')
 const europaInventarioTexto = ref('sin dato')
 const europaDiasTexto = ref('—')
 const europaNivel = ref('warning')
+const europaFuente = ref('Eurostat API')
+const europaDataset = ref('—')
+const europaNota = ref('')
+const europaStatusTecnico = ref('—')
 
 const colombiaUltimoReporte = ref('ene 2026')
 const colombiaEstado = ref('Desactualizado')
 const colombiaProximoReporte = ref('Sin fecha programada')
 const colombiaEnlace = ref('')
 const colombiaDiasTexto = ref('—')
+const colombiaFuente = ref('Porcinews')
+const colombiaStatusTecnico = ref('warning')
 
 const claseIndicadorUsa = computed(() => {
   if (cargando.value) return 'monitoreo__indicador--warning'
@@ -134,6 +143,9 @@ const cargarEstado = async (forzarRecarga = false) => {
     usaNivel.value = estadoUsa.nivel
     usaEnlace.value = usa?.enlace ?? ''
     usaError.value = usa?.error ?? ''
+    usaFuente.value = usa?.fuente ?? 'USDA NASS RSS'
+    usaTitulo.value = usa?.titulo ?? ''
+    usaStatusTecnico.value = usa?.status ?? '—'
 
     europaUltimoReporte.value = formatearFecha(europa?.ultimo_reporte_iso || europa?.ultimo_reporte)
     europaProximoReporte.value = europa?.proximo_reporte ?? 'Actualización anual'
@@ -145,12 +157,18 @@ const cargarEstado = async (forzarRecarga = false) => {
     europaNivel.value = estadoEuropa.nivel
     europaEnlace.value = europa?.enlace ?? ''
     europaError.value = europa?.error ?? ''
+    europaFuente.value = europa?.fuente ?? 'Eurostat API'
+    europaDataset.value = europa?.dataset ?? '—'
+    europaNota.value = europa?.nota ?? ''
+    europaStatusTecnico.value = europa?.status ?? '—'
 
     colombiaUltimoReporte.value = colombia?.ultimo_reporte ?? 'ene 2026'
     colombiaProximoReporte.value = colombia?.proximo_reporte ?? 'Sin fecha programada'
     colombiaEnlace.value = colombia?.enlace ?? ''
     colombiaDiasTexto.value = colombiaDias === null ? '—' : String(colombiaDias)
     colombiaEstado.value = colombiaDias !== null && colombiaDias > 120 ? 'Muy desactualizado' : 'Desactualizado'
+    colombiaFuente.value = colombia?.fuente ?? 'Porcinews'
+    colombiaStatusTecnico.value = colombia?.status ?? 'warning'
   } catch (_error) {
     usaNivel.value = 'error'
     europaNivel.value = 'error'
@@ -192,6 +210,8 @@ onMounted(() => {
           <span class="monitoreo__status">⚠️ {{ colombiaEstado }}</span>
         </div>
         <div class="monitoreo__meta">Hace {{ colombiaDiasTexto }} días</div>
+        <div class="monitoreo__meta">Fuente técnica: {{ colombiaFuente }}</div>
+        <div class="monitoreo__meta">Estado técnico: {{ colombiaStatusTecnico }}</div>
         <div class="monitoreo__proximo">{{ colombiaProximoReporte }}</div>
         <a v-if="colombiaEnlace" :href="colombiaEnlace" target="_blank" rel="noopener noreferrer" class="monitoreo__enlace">
           Ver fuente consultada
@@ -210,6 +230,10 @@ onMounted(() => {
         </div>
         <div class="monitoreo__meta">Hace {{ europaDiasTexto }} días</div>
         <div class="monitoreo__meta">Inventario: {{ europaInventarioTexto }}</div>
+        <div class="monitoreo__meta">Fuente técnica: {{ europaFuente }}</div>
+        <div class="monitoreo__meta">Dataset: {{ europaDataset }}</div>
+        <div class="monitoreo__meta">Estado técnico: {{ europaStatusTecnico }}</div>
+        <div v-if="europaNota" class="monitoreo__meta">Nota: {{ europaNota }}</div>
         <div class="monitoreo__proximo">{{ europaProximoReporte }}</div>
         <a v-if="europaEnlace" :href="europaEnlace" target="_blank" rel="noopener noreferrer" class="monitoreo__enlace">
           Ver dataset oficial
@@ -229,6 +253,9 @@ onMounted(() => {
         </div>
         <div class="monitoreo__meta">Hace {{ usaDiasTexto }} días</div>
         <div class="monitoreo__meta">Inventario: {{ usaInventarioTexto }}</div>
+        <div class="monitoreo__meta">Fuente técnica: {{ usaFuente }}</div>
+        <div class="monitoreo__meta">Estado técnico: {{ usaStatusTecnico }}</div>
+        <div v-if="usaTitulo" class="monitoreo__meta">Comunicado: {{ usaTitulo }}</div>
         <div class="monitoreo__proximo">{{ usaProximoReporte }}</div>
         <a v-if="usaEnlace" :href="usaEnlace" target="_blank" rel="noopener noreferrer" class="monitoreo__enlace">
           Ver comunicado oficial

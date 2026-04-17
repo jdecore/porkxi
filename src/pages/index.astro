@@ -37,6 +37,12 @@ const withBase = (path: string) => `${baseUrl}${String(path).replace(/^\/+/, '')
 const siteUrl = Astro.site ?? new URL('https://porkxi.com');
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
 const ogImageUrl = new URL(withBase('og-image.png'), siteUrl).toString();
+const topEstadosUsa = Array.isArray(DETALLE_USA.estados)
+  ? DETALLE_USA.estados.map((estado) => `${estado.nombre}: ${estado.cabezas.toLocaleString()}`).join(' · ')
+  : 'Sin dato';
+const metodosEncuestaUsa = Array.isArray(DETALLE_USA.metodosEncuesta)
+  ? DETALLE_USA.metodosEncuesta.join(', ')
+  : 'Sin dato';
 ---
 
 <html lang="es">
@@ -185,7 +191,13 @@ const ogImageUrl = new URL(withBase('og-image.png'), siteUrl).toString();
               <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Comercial familiar</span><span class="detalle-metrica__valor">{DETALLE_COLOMBIA.comercialFamiliar.cantidad.toLocaleString()} ({DETALLE_COLOMBIA.comercialFamiliar.porcentaje}%)</span></div>
               <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Comercial industrial</span><span class="detalle-metrica__valor">{DETALLE_COLOMBIA.comercialIndustrial.cantidad.toLocaleString()} ({DETALLE_COLOMBIA.comercialIndustrial.porcentaje}%)</span></div>
               <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Granjas tecnificadas</span><span class="detalle-metrica__valor">{DETALLE_COLOMBIA.tecnificadas.cantidad.toLocaleString()} ({DETALLE_COLOMBIA.tecnificadas.porcentaje}%)</span></div>
+              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Carne 2024</span><span class="detalle-metrica__valor">{DETALLE_COLOMBIA.carne2024Toneladas.toLocaleString()} t</span></div>
+              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Variación carne</span><span class="detalle-metrica__valor">+{DETALLE_COLOMBIA.carne2024Variacion}%</span></div>
+              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Beneficio 2024</span><span class="detalle-metrica__valor">{DETALLE_COLOMBIA.beneficio2024Cabezas.toLocaleString()} cabezas</span></div>
+              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Variación beneficio</span><span class="detalle-metrica__valor">+{DETALLE_COLOMBIA.beneficio2024Variacion}%</span></div>
+              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Fuente</span><span class="detalle-metrica__valor">{DETALLE_COLOMBIA.fuente}</span></div>
             </div>
+            <p class="detalle-card__subtitulo">{DETALLE_COLOMBIA.notaFuente}</p>
             <a href={DETALLE_COLOMBIA.enlace} target="_blank" rel="noopener noreferrer" class="detalle-card__enlace">Ver fuente: Porcinews</a>
           </div>
 
@@ -199,12 +211,14 @@ const ogImageUrl = new URL(withBase('og-image.png'), siteUrl).toString();
               <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Cobertura</span><span class="detalle-metrica__valor">{DETALLE_EUROPA.cobertura}</span></div>
               <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Unidad</span><span class="detalle-metrica__valor">{DETALLE_EUROPA.unidad}</span></div>
               <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Actualización API</span><span class="detalle-metrica__valor">{DETALLE_EUROPA.fechaActualizacionApi}</span></div>
+              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Fuente</span><span class="detalle-metrica__valor">{DETALLE_EUROPA.fuente}</span></div>
             </div>
+            <p class="detalle-card__subtitulo">{DETALLE_EUROPA.notaFuente}</p>
             <a href={DETALLE_EUROPA.enlace} target="_blank" rel="noopener noreferrer" class="detalle-card__enlace">Ver dataset oficial</a>
           </div>
 
           <div class="detalle-card detalle-card--usa">
-            <div class="detalle-card__encabezado"><span class="detalle-card__icono">🇺🇸</span><h3 class="detalle-card__titulo">EE.UU. — 1 dic 2025</h3></div>
+            <div class="detalle-card__encabezado"><span class="detalle-card__icono">🇺🇸</span><h3 class="detalle-card__titulo">EE.UU. — {DETALLE_USA.fechaDato}</h3></div>
             <p class="detalle-card__subtitulo">Publicado el {DETALLE_USA.fechaPublicacion} · USDA NASS</p>
             <div class="detalle-metricas">
               <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Total inventario</span><span class="detalle-metrica__valor">{DETALLE_USA.totalCabezas.toLocaleString()} cabezas (+{DETALLE_USA.variacionAnualPct}% vs dic 2024)</span></div>
@@ -213,6 +227,12 @@ const ogImageUrl = new URL(withBase('og-image.png'), siteUrl).toString();
               <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Lechones destetados</span><span class="detalle-metrica__valor">{DETALLE_USA.cerdosDestetados.toLocaleString()}</span></div>
               <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Promedio camada</span><span class="detalle-metrica__valor">{DETALLE_USA.promedioLechonesPorCamada} lechones</span></div>
               <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Próximo reporte</span><span class="detalle-metrica__valor">{DETALLE_USA.proximoReporte}</span></div>
+              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Sows farrow dic-feb</span><span class="detalle-metrica__valor">{DETALLE_USA.sowsFarroDicFeb.toLocaleString()}</span></div>
+              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Sows farrow mar-may</span><span class="detalle-metrica__valor">{DETALLE_USA.sowsFarroMarMay.toLocaleString()}</span></div>
+              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Operadores encuestados</span><span class="detalle-metrica__valor">{DETALLE_USA.operadoresEncuestados.toLocaleString()}</span></div>
+              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Métodos encuesta</span><span class="detalle-metrica__valor">{metodosEncuestaUsa}</span></div>
+              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Top estados</span><span class="detalle-metrica__valor">{topEstadosUsa}</span></div>
+              <div class="detalle-metrica"><span class="detalle-metrica__etiqueta">Fuente</span><span class="detalle-metrica__valor">{DETALLE_USA.fuente}</span></div>
             </div>
             <a href={DETALLE_USA.enlace} target="_blank" rel="noopener noreferrer" class="detalle-card__enlace">Ver reporte oficial</a>
           </div>
@@ -258,6 +278,7 @@ const ogImageUrl = new URL(withBase('og-image.png'), siteUrl).toString();
             <h3 class="explicacion-columna__titulo">🇨🇴 Colombia</h3>
             <p class="explicacion-columna__texto">Acceder a información porcina oficial actualizada sigue siendo difícil. Los datos están fragmentados entre ICA, DANE, Porkcolombia e INVIMA.</p>
             <p class="explicacion-columna__texto">No existe una API pública y estable equivalente a USDA o Eurostat para la serie consolidada nacional.</p>
+            <p class="explicacion-columna__texto">{PROBLEMA_DATOS_COLOMBIA.descripcion}</p>
             <div class="explicacion-destacado">Por eso, esta visualización usa Porcinews como fuente de referencia para el último dato disponible.</div>
             <div class="explicacion-tabla">
               <table>
