@@ -5,8 +5,9 @@ import { withBase } from '../lib/paths.js'
 const emit = defineEmits(['actualizado', 'reload'])
 
 const cargando = ref(false)
-const ultimaActualizacion = ref('sin datos')
-const fechaEstatica = ref(null)
+const sincronizando = ref(false)
+const mensajeSincronizacion = ref('')
+const fechaConsultaIso = ref('')
 const fechaActualizacion = ref('sin datos')
 
 const usaUltimoReporte = ref('sin dato')
@@ -41,6 +42,14 @@ const colombiaEnlace = ref('')
 const colombiaDiasTexto = ref('—')
 const colombiaFuente = ref('Porcinews')
 const colombiaStatusTecnico = ref('warning')
+
+const textoBoton = computed(() => {
+  if (sincronizando.value) return 'Sincronizando...'
+  if (cargando.value) return 'Actualizando...'
+  return '🔄 Sincronizar datos'
+})
+
+const botonBloqueado = computed(() => cargando.value || sincronizando.value)
 
 const claseIndicadorUsa = computed(() => {
   if (cargando.value) return 'monitoreo__indicador--warning'
@@ -83,6 +92,10 @@ const normalizarDias = (valor) => {
   return Number.isFinite(numero) ? Math.max(0, Math.floor(numero)) : null
 }
 
+const esperar = (ms) => new Promise((resolve) => {
+  setTimeout(resolve, ms)
+})
+
 const obtenerEstadoFuente = (
   status,
   dias,
@@ -113,81 +126,137 @@ const obtenerEstadoFuente = (
   }
 }
 
-const cargarEstado = async (forzarRecarga = false) => {
+const obtenerSnapshot = async (forzarRecarga = false) => {
+  const url = forzarRecarga
+    ? withBase(`estado-fuentes.json?v=${Date.now()}`)
+    : withBase('estado-fuentes.json')
+  const respuesta = await fetch(url, { method: 'GET', cache: 'no-store' })
+  if (!respuesta.ok) throw new Error('No se pudo cargar el snapshot de fuentes')
+  return respuesta.json()
+}
+
+const aplicarEstado = (datos) => {
+  emit('reload')
+  emit('actualizado', datos)
+  const usa = datos?.usa ?? {}
+  const europa = datos?.europa ?? {}
+  const colombia = datos?.colombia ?? {}
+  const usaDias = normalizarDias(usa?.dias_desde_reporte)
+  const europaDias = normalizarDias(europa?.dias_desde_reporte)
+  const colombiaDias = normalizarDias(colombia?.dias_desde_reporte)
+  const estadoUsa = obtenerEstadoFuente(usa?.status, usaDias, 60, 120)
+  const estadoEuropa = obtenerEstadoFuente(europa?.status, europaDias, 450, 700)
+
+  fechaConsultaIso.value = typeof datos?.fecha_consulta === 'string' ? datos.fecha_consulta : ''
+  fechaActualizacion.value = formatearFechaHora(datos?.fecha_consulta)
+
+  usaUltimoReporte.value = formatearFecha(usa?.ultimo_reporte_iso || usa?.ultimo_reporte)
+  usaProximoReporte.value = usa?.proximo_reporte ?? 'Próximo reporte: por confirmar'
+  usaInventarioTexto.value = Number.isFinite(Number(usa?.inventario_millones))
+    ? `${Number(usa.inventario_millones).toFixed(1)} millones`
+    : 'sin dato'
+  usaDiasTexto.value = usaDias === null ? '—' : String(usaDias)
+  usaEstado.value = estadoUsa.texto
+  usaNivel.value = estadoUsa.nivel
+  usaEnlace.value = usa?.enlace ?? ''
+  usaError.value = usa?.error ?? ''
+  usaFuente.value = usa?.fuente ?? 'USDA NASS RSS'
+  usaTitulo.value = usa?.titulo ?? ''
+  usaStatusTecnico.value = usa?.status ?? '—'
+
+  europaUltimoReporte.value = formatearFecha(europa?.ultimo_reporte_iso || europa?.ultimo_reporte)
+  europaProximoReporte.value = europa?.proximo_reporte ?? 'Actualización anual'
+  europaInventarioTexto.value = Number.isFinite(Number(europa?.inventario_millones))
+    ? `${Number(europa.inventario_millones).toFixed(1)} millones`
+    : 'sin dato'
+  europaDiasTexto.value = europaDias === null ? '—' : String(europaDias)
+  europaEstado.value = estadoEuropa.texto
+  europaNivel.value = estadoEuropa.nivel
+  europaEnlace.value = europa?.enlace ?? ''
+  europaError.value = europa?.error ?? ''
+  europaFuente.value = europa?.fuente ?? 'Eurostat API'
+  europaDataset.value = europa?.dataset ?? '—'
+  europaNota.value = europa?.nota ?? ''
+  europaStatusTecnico.value = europa?.status ?? '—'
+
+  colombiaUltimoReporte.value = colombia?.ultimo_reporte ?? 'ene 2026'
+  colombiaProximoReporte.value = colombia?.proximo_reporte ?? 'Sin fecha programada'
+  colombiaEnlace.value = colombia?.enlace ?? ''
+  colombiaDiasTexto.value = colombiaDias === null ? '—' : String(colombiaDias)
+  colombiaEstado.value = colombiaDias !== null && colombiaDias > 120 ? 'Muy desactualizado' : 'Desactualizado'
+  colombiaFuente.value = colombia?.fuente ?? 'Porcinews'
+  colombiaStatusTecnico.value = colombia?.status ?? 'warning'
+}
+
+const marcarErrorCarga = () => {
+  usaNivel.value = 'error'
+  europaNivel.value = 'error'
+  usaEstado.value = 'Error de consulta'
+  europaEstado.value = 'Error de consulta'
+  usaError.value = 'No se pudo cargar el snapshot de monitoreo'
+  europaError.value = 'No se pudo cargar el snapshot de monitoreo'
+}
+
+const cargarEstado = async (forzarRecarga = false, limpiarMensaje = true) => {
   cargando.value = true
   usaError.value = ''
   europaError.value = ''
 
   try {
-    const url = forzarRecarga
-      ? withBase(`estado-fuentes.json?v=${Date.now()}`)
-      : withBase('estado-fuentes.json')
-    const respuesta = await fetch(url, { method: 'GET', cache: 'no-store' })
-    if (!respuesta.ok) throw new Error('No se pudo cargar el snapshot de fuentes')
-
-    const datos = await respuesta.json()
-    fechaActualizacion.value = new Date().toLocaleString('es-CO', {
-      day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
-    })
-    
-    emit('reload')
-    emit('actualizado', datos)
-    const usa = datos?.usa ?? {}
-    const europa = datos?.europa ?? {}
-    const colombia = datos?.colombia ?? {}
-    const usaDias = normalizarDias(usa?.dias_desde_reporte)
-    const europaDias = normalizarDias(europa?.dias_desde_reporte)
-    const colombiaDias = normalizarDias(colombia?.dias_desde_reporte)
-    const estadoUsa = obtenerEstadoFuente(usa?.status, usaDias, 60, 120)
-    const estadoEuropa = obtenerEstadoFuente(europa?.status, europaDias, 450, 700)
-
-    fechaActualizacion.value = formatearFechaHora(datos?.fecha_consulta)
-
-    usaUltimoReporte.value = formatearFecha(usa?.ultimo_reporte_iso || usa?.ultimo_reporte)
-    usaProximoReporte.value = usa?.proximo_reporte ?? 'Próximo reporte: por confirmar'
-    usaInventarioTexto.value = Number.isFinite(Number(usa?.inventario_millones))
-      ? `${Number(usa.inventario_millones).toFixed(1)} millones`
-      : 'sin dato'
-    usaDiasTexto.value = usaDias === null ? '—' : String(usaDias)
-    usaEstado.value = estadoUsa.texto
-    usaNivel.value = estadoUsa.nivel
-    usaEnlace.value = usa?.enlace ?? ''
-    usaError.value = usa?.error ?? ''
-    usaFuente.value = usa?.fuente ?? 'USDA NASS RSS'
-    usaTitulo.value = usa?.titulo ?? ''
-    usaStatusTecnico.value = usa?.status ?? '—'
-
-    europaUltimoReporte.value = formatearFecha(europa?.ultimo_reporte_iso || europa?.ultimo_reporte)
-    europaProximoReporte.value = europa?.proximo_reporte ?? 'Actualización anual'
-    europaInventarioTexto.value = Number.isFinite(Number(europa?.inventario_millones))
-      ? `${Number(europa.inventario_millones).toFixed(1)} millones`
-      : 'sin dato'
-    europaDiasTexto.value = europaDias === null ? '—' : String(europaDias)
-    europaEstado.value = estadoEuropa.texto
-    europaNivel.value = estadoEuropa.nivel
-    europaEnlace.value = europa?.enlace ?? ''
-    europaError.value = europa?.error ?? ''
-    europaFuente.value = europa?.fuente ?? 'Eurostat API'
-    europaDataset.value = europa?.dataset ?? '—'
-    europaNota.value = europa?.nota ?? ''
-    europaStatusTecnico.value = europa?.status ?? '—'
-
-    colombiaUltimoReporte.value = colombia?.ultimo_reporte ?? 'ene 2026'
-    colombiaProximoReporte.value = colombia?.proximo_reporte ?? 'Sin fecha programada'
-    colombiaEnlace.value = colombia?.enlace ?? ''
-    colombiaDiasTexto.value = colombiaDias === null ? '—' : String(colombiaDias)
-    colombiaEstado.value = colombiaDias !== null && colombiaDias > 120 ? 'Muy desactualizado' : 'Desactualizado'
-    colombiaFuente.value = colombia?.fuente ?? 'Porcinews'
-    colombiaStatusTecnico.value = colombia?.status ?? 'warning'
+    const datos = await obtenerSnapshot(forzarRecarga)
+    aplicarEstado(datos)
+    if (limpiarMensaje) mensajeSincronizacion.value = ''
   } catch (_error) {
-    usaNivel.value = 'error'
-    europaNivel.value = 'error'
-    usaEstado.value = 'Error de consulta'
-    europaEstado.value = 'Error de consulta'
-    usaError.value = 'No se pudo cargar el snapshot de monitoreo'
-    europaError.value = 'No se pudo cargar el snapshot de monitoreo'
+    marcarErrorCarga()
   } finally {
     cargando.value = false
+  }
+}
+
+const esperarSnapshotNuevo = async (fechaAnteriorMs, timeoutMs = 180000, intervaloMs = 5000) => {
+  const inicio = Date.now()
+  while (Date.now() - inicio < timeoutMs) {
+    await esperar(intervaloMs)
+    const datos = await obtenerSnapshot(true)
+    const fechaNuevaMs = Date.parse(datos?.fecha_consulta ?? '')
+    if (Number.isFinite(fechaNuevaMs) && (!Number.isFinite(fechaAnteriorMs) || fechaNuevaMs > fechaAnteriorMs)) {
+      return datos
+    }
+  }
+  throw new Error('La actualización tardó más de lo esperado')
+}
+
+const sincronizarDatos = async () => {
+  if (botonBloqueado.value) return
+  sincronizando.value = true
+  mensajeSincronizacion.value = 'Lanzando actualización de fuentes...'
+
+  const fechaAnteriorMs = Date.parse(fechaConsultaIso.value)
+
+  try {
+    const respuesta = await fetch(withBase('api/sincronizar-fuentes'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
+      body: JSON.stringify({}),
+    })
+
+    if (!respuesta.ok) {
+      const payload = await respuesta.json().catch(() => null)
+      throw new Error(payload?.error || 'No se pudo iniciar la sincronización')
+    }
+
+    mensajeSincronizacion.value = 'Sincronización iniciada. Esperando snapshot actualizado...'
+    const datosActualizados = await esperarSnapshotNuevo(fechaAnteriorMs)
+    aplicarEstado(datosActualizados)
+    mensajeSincronizacion.value = 'Datos sincronizados correctamente.'
+  } catch (errorSync) {
+    console.error('Error sincronizando datos:', errorSync)
+    const detalle = errorSync instanceof Error ? errorSync.message : 'Error desconocido'
+    mensajeSincronizacion.value = `No se pudo completar la sincronización: ${detalle}`
+    await cargarEstado(true, false)
+  } finally {
+    sincronizando.value = false
   }
 }
 
@@ -205,11 +274,12 @@ onMounted(() => {
         <span class="monitoreo__auto">Snapshot diario: {{ fechaActualizacion || 'cargando...' }}</span>
       </div>
       <div class="monitoreo__acciones">
-        <button class="monitoreo__boton" :disabled="cargando" @click="cargarEstado(true)">
-          {{ cargando ? 'Actualizando...' : '🔄 Sincronizar datos' }}
+        <button class="monitoreo__boton" :disabled="botonBloqueado" @click="sincronizarDatos">
+          {{ textoBoton }}
         </button>
       </div>
     </div>
+    <p v-if="mensajeSincronizacion" class="monitoreo__sync">{{ mensajeSincronizacion }}</p>
 
     <div class="monitoreo__grid">
       <div class="monitoreo__fuente monitoreo__fuente--colombia">
@@ -337,6 +407,12 @@ onMounted(() => {
 .monitoreo__boton:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.monitoreo__sync {
+  margin: -2px 0 12px;
+  font-size: 11px;
+  color: #6B3A2C;
 }
 
 .monitoreo__grid {
