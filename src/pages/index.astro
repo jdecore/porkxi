@@ -1,9 +1,6 @@
 ---
 import GraficaInteractiva from '../components/GraficaInteractiva.vue';
-import TablaResumen from '../components/TablaResumen.vue';
-import TarjetasKpiAnimadas from '../components/TarjetasKpiAnimadas.vue';
 import AnalisisIA from '../components/AnalisisIA.vue';
-import DescargarReporte from '../components/DescargarReporte.vue';
 import MonitoreoFuentes from '../components/MonitoreoFuentes.vue';
 import '../styles/encabezado.css';
 import '../styles/alerta.css';
@@ -14,7 +11,7 @@ import '../styles/tabla.css';
 import '../styles/explicacion.css';
 import '../styles/pieDepagina.css';
 
-import { SERIE_COLOMBIA, DETALLE_COLOMBIA, PROBLEMA_DATOS_COLOMBIA } from '../data/colombia';
+import { SERIE_COLOMBIA, DETALLE_COLOMBIA } from '../data/colombia';
 import { SERIE_USA, DETALLE_USA } from '../data/usa';
 import { SERIE_EUROPA, DETALLE_EUROPA } from '../data/europa';
 
@@ -28,7 +25,6 @@ if (!Array.isArray(SERIE_EUROPA) || !SERIE_EUROPA.length) {
   throw new Error('SERIE_EUROPA está vacío o no es un array');
 }
 
-const anos = [2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015];
 const colombiaRecientes = SERIE_COLOMBIA.filter((d) => Number(d.periodo) >= 2020);
 const europaRecientes = SERIE_EUROPA.filter((d) => Number(d.periodo) >= 2020);
 const usaRecientes = SERIE_USA.slice(-6);
@@ -37,12 +33,6 @@ const withBase = (path: string) => `${baseUrl}${String(path).replace(/^\/+/, '')
 const siteUrl = Astro.site ?? new URL('https://porkxi.com');
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
 const ogImageUrl = new URL(withBase('og-image.png'), siteUrl).toString();
-const topEstadosUsa = Array.isArray(DETALLE_USA.estados)
-  ? DETALLE_USA.estados.map((estado) => `${estado.nombre}: ${estado.cabezas.toLocaleString()}`).join(' · ')
-  : 'Sin dato';
-const metodosEncuestaUsa = Array.isArray(DETALLE_USA.metodosEncuesta)
-  ? DETALLE_USA.metodosEncuesta.join(', ')
-  : 'Sin dato';
 ---
 
 <html lang="es">
@@ -72,12 +62,26 @@ const metodosEncuestaUsa = Array.isArray(DETALLE_USA.metodosEncuesta)
     <meta name="twitter:image" content={ogImageUrl} />
     <meta name="twitter:image:alt" content="Gráfica comparativa de inventario porcino Colombia, Europa y EE.UU." />
 
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "porkξ",
+      "url": "https://porkxi.com",
+      "description": "Inventario porcino Colombia vs Europa vs EE.UU. Comparativa con fuentes oficiales.",
+      "publisher": {
+        "@type": "Organization",
+        "name": "porkξ",
+        "url": "https://porkxi.com"
+      }
+    }
+    </script>
+
     <title>porkξ | Inventario porcino</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Playfair+Display:wght@700;900&family=Poppins:wght@900&family=Sora:wght@400;600;700&display=swap" rel="stylesheet" />
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1/dist/transformers.min.js"></script>
 
     <style>
       :root {

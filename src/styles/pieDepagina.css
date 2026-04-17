@@ -1,41 +1,44 @@
 .pie-pagina {
   border-top: 1.5px solid var(--crema-borde);
-  padding-top: 32px;
+  padding-top: 20px;
   text-align: center;
   color: var(--tinta-claro);
 }
 
 .pie-pagina__fuentes {
-  font-size: 11px;
-  text-align: left;
-  max-width: 700px;
-  margin: 0 auto 20px;
+  font-size: 10px;
+  text-align: center;
+  max-width: 900px;
+  margin: 0 auto 16px;
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
 }
 
 .pie-pagina__fuente {
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
 .pie-pagina__fuente-titulo {
   font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 4px;
+  gap: 4px;
+  margin-bottom: 2px;
+  font-size: 11px;
 }
 
 .pie-pagina__fuente-nota {
   font-style: italic;
-  font-size: 10px;
-  margin-bottom: 4px;
-  padding-left: 22px;
+  font-size: 9px;
+  margin-bottom: 2px;
 }
 
 .pie-pagina__enlace {
   color: var(--tinta-claro);
   text-decoration: none;
-  font-size: 11px;
-  padding-left: 22px;
+  font-size: 10px;
   transition: color 0.2s ease, text-decoration 0.2s ease;
 }
 

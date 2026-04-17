@@ -66,15 +66,27 @@ def _dias_desde(fecha):
 def _proximo_reporte_estimado(fecha):
     if not fecha:
         return "Próximo reporte: por confirmar"
+    ahora = datetime.now(timezone.utc)
+    referencia = ahora if ahora > fecha else fecha
     meses_trimestrales = [3, 6, 9, 12]
     siguiente = None
     for mes in meses_trimestrales:
-        if fecha.month < mes:
-            siguiente = (fecha.year, mes)
+        if referencia.month < mes:
+            siguiente = (referencia.year, mes)
             break
     if siguiente is None:
-        siguiente = (fecha.year + 1, 3)
+        siguiente = (referencia.year + 1, 3)
     return f"Próximo reporte estimado: {MESES_ES[siguiente[1]]} {siguiente[0]} (trimestral)"
+
+
+def _proxima_actualizacion_eurostat(last_year):
+    ahora = datetime.now(timezone.utc)
+    estimado = int(last_year) + 1
+    if estimado < ahora.year:
+        estimado = ahora.year
+    if ahora.month > 4 and estimado == ahora.year:
+        estimado += 1
+    return f"Próxima actualización anual estimada: {MESES_ES[4]} {estimado}"
 
 
 def _crear_analisis_fallback(usa, europa, colombia):
@@ -284,7 +296,7 @@ def obtener_ultimo_reporte_eurostat():
         "ultimo_reporte_iso": fecha.isoformat(),
         "dias_desde_reporte": _dias_desde(fecha),
         "inventario_millones": round(last_value_ths / 1000, 2),
-        "proximo_reporte": f"Próxima actualización anual estimada: {MESES_ES[4]} {int(last_year) + 1}",
+        "proximo_reporte": _proxima_actualizacion_eurostat(last_year),
     }
     if nota_status:
         result["nota"] = nota_status

@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { withBase } from '../lib/paths.js'
 
 const emit = defineEmits(['actualizado', 'reload'])
@@ -201,8 +201,8 @@ onMounted(() => {
     <div class="monitoreo__encabezado">
       <span class="monitoreo__icono">📡</span>
       <div class="monitoreo__titulo-wrap">
-        <h3 class="monitoreo__titulo">Datos en vivo</h3>
-        <span class="monitoreo__auto">Actualizado: {{ fechaActualizacion || 'cargando...' }}</span>
+        <h3 class="monitoreo__titulo">Monitoreo de fuentes</h3>
+        <span class="monitoreo__auto">Snapshot diario: {{ fechaActualizacion || 'cargando...' }}</span>
       </div>
       <div class="monitoreo__acciones">
         <button class="monitoreo__boton" :disabled="cargando" @click="cargarEstado(true)">
