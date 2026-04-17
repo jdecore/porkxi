@@ -1,0 +1,52 @@
+{
+  "actualizado": "2026-04-17T18:00:00Z",
+  " Colombia": {
+    "ultimo": { "periodo": "2024", "valor": 10668276, "fecha": "ene 2026", "fuente": "Porcinews" },
+    "serie": [
+      { "periodo": "2020", "valor": 6200000 },
+      { "periodo": "2021", "valor": 6500000 },
+      { "periodo": "2022", "valor": 9658204 },
+      { "periodo": "2023", "valor": 9658204 },
+      { "periodo": "2024", "valor": 10668276 }
+    ],
+    "detalle": {
+      "totalPredios": 189198,
+      "traspatio": { "cantidad": 148295, "porcentaje": 78.38 },
+      "familiar": { "cantidad": 36004, "porcentaje": 19.03 },
+      "industrial": { "cantidad": 4010, "porcentaje": 2.12 },
+      "tecnificadas": { "cantidad": 889, "porcentaje": 0.47 },
+      "carne2024": 608752,
+      "variacionCarne": 7.8
+    }
+  },
+  "europa": {
+    "ultimo": { "periodo": "2024", "valor": 132135520, "fecha": "nov-dic 2024", "var": "-0.5", "fuente": "Eurostat" },
+    "serie": [
+      { "periodo": "2020", "valor": 145918600 },
+      { "periodo": "2021", "valor": 141681380 },
+      { "periodo": "2022", "valor": 134410040 },
+      { "periodo": "2023", "valor": 132845670 },
+      { "periodo": "2024", "valor": 132135520 }
+    ]
+  },
+  "usa": {
+    "ultimo": { "periodo": "Dic 2025", "valor": 75500000, "fecha": "1 dic 2025", "var": "+1", "fuente": "USDA NASS" },
+    "serie": [
+      { "periodo": "Dic 2020", "valor": null },
+      { "periodo": "Dic 2021", "valor": null },
+      { "periodo": "Dic 2022", "valor": null },
+      { "periodo": "Dic 2023", "valor": 74100000 },
+      { "periodo": "Dic 2024", "valor": 74700000 },
+      { "periodo": "Mar 2025", "valor": 74500000 },
+      { "periodo": "Jun 2025", "valor": 75100000 },
+      { "periodo": "Sep 2025", "valor": 74500000 },
+      { "periodo": "Dic 2025", "valor": 75500000 }
+    ],
+    "detalle": {
+      "mercado": 69600000,
+      "reproductores": 5950000,
+      "lechones": 35000000,
+      "camada": 11.93
+    }
+  }
+}

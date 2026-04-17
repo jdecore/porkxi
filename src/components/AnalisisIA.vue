@@ -52,15 +52,16 @@ const generarAnalisisLocal = async () => {
       }
     })
 
-    const prompt = `Analiza el mercado porcino en 3 puntos cortos:
+    const prompt = `Eres analista senior de mercados agrícolas. Escribe análisis en español sobre mercado porcino:
 
-1. Inventario actual: Colombia tiene 10.7M en 189K predios (78% traspatio). UE tiene 132M (-0.5% vs 2023). USA tiene 75.5M con 69.6M cerdos de mercado y 5.95M reproductores. La escala UE es 12x Colombia.
+DATOS: Colombia 10.7M/189K predios (78% traspatio). UE 132M (var -0.5%). USA 75.5M (cerdos mercado 69.6M +5.95M reproductores).
 
-2. Brecha de datos: Only Colombia depends on press (Porcinews). UE has Eurostat API, USA has USDA quarterly reports. Colombia lacks public API from ICA/DANE.
+POINTS (write in Spanish):
+1. Escala y distribución: Colombia fragmentado en traspatio vs concentración en UE/USA.
+2. Brecha datos: Colombia=Porcinews. UE=Eurostat API pública. USA=USDA trimestral. Sin API Colombia.
+3. Implicación: Productores y reguladores no tienen datos oficiales confiables.
 
-3. Action item: Colombia needs consolidated data from ICA, DANE, Porkcolombia via open API like Eurostat.
-
-Write in Spanish, 2-3 sentences per point. Be specific with numbers.`
+Máx 3 oraciones cortas, usa números exactos.`
 
     const resultado = await generador(prompt, {
       max_new_tokens: 120,
@@ -69,10 +70,10 @@ Write in Spanish, 2-3 sentences per point. Be specific with numbers.`
       do_sample: true
     })
 
-    const textoLimpio = resultado[0].generated_text.replace(prompt, '').trim()
+    const textoLimpio = resultado[0].generated_text.replace(prompt, '').trim().replace(/\n+/g, ' ').replace(/\s+/g, ' ')
     
-    if (textoLimpio.length > 50 && !textoLimpio.includes('I cannot') && !textoLimpio.includes('No puedo')) {
-      analisis.value = textoLimpio
+    if (textoLimpio.length > 60) {
+      analisis.value = textoLimpio.slice(0, 300) + '...'
     } else {
       throw new Error('Respuesta inválida')
     }
@@ -82,11 +83,11 @@ Write in Spanish, 2-3 sentences per point. Be specific with numbers.`
     const euM = (datosEuropa.total / 1000000).toFixed(0)
     const usaM = (datosUsa.total / 1000000).toFixed(1)
     
-    analisis.value = `${colM}M de cerdos en Colombia (78% traspatio) vs ${euM}M en UE-27 y ${usaM}M en EE.UU. UE tiene 12x más que Colombia.
+    analisis.value = `El mercado porcino global presenta disparidades significativas. Colombia registra 10.7 millones de cabezas en 189,198 predios, donde el 78% corresponde a traspatio (explotaciones menores a 10 cerdas), evidenciando alta fragmentación. La UE-27 lidera con 132 millones (-0.5% vs 2023) y Estados Unidos alcanza 75.5 millones con variación positiva de +1%.
 
-La brecha real: mientras Eurostat y USDA publican datos oficiales con APIs, Colombia solo tiene medios especializados. No existe una fuente pública consolidada del gobierno.
+La brecha de datos es el problema central: mientras Eurostat y USDA publican APIs públicas con frecuencia regular, Colombia carece de una fuente gubernamental consolidada. Los datos únicamente existen en Porcinews, un medio especializado, lo que limita el análisis estratégico del sector.
 
-Lo que falta: un observatorio porcino colombiano con datos abiertos de ICA, DANE y Porkcolombia.`;
+Esto implica que productores, industriales y formuladores de política en Colombia operan sin información oficial verificada, a diferencia de sus homólogos europeos y estadounidenses.`;
   } finally {
     cargando.value = false
     cargandoModelo.value = false

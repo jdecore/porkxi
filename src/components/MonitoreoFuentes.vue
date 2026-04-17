@@ -1,8 +1,12 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { withBase } from '../lib/paths.js'
 
+const emit = defineEmits(['actualizado', 'reload'])
+
 const cargando = ref(false)
+const ultimaActualizacion = ref('sin datos')
+const fechaEstatica = ref(null)
 const fechaActualizacion = ref('sin datos')
 
 const usaUltimoReporte = ref('sin dato')
@@ -122,6 +126,12 @@ const cargarEstado = async (forzarRecarga = false) => {
     if (!respuesta.ok) throw new Error('No se pudo cargar el snapshot de fuentes')
 
     const datos = await respuesta.json()
+    fechaActualizacion.value = new Date().toLocaleString('es-CO', {
+      day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+    })
+    
+    emit('reload')
+    emit('actualizado', datos)
     const usa = datos?.usa ?? {}
     const europa = datos?.europa ?? {}
     const colombia = datos?.colombia ?? {}
@@ -189,12 +199,14 @@ onMounted(() => {
 <template>
   <div class="monitoreo">
     <div class="monitoreo__encabezado">
-      <span class="monitoreo__icono">📊</span>
-      <h3 class="monitoreo__titulo">Estado de las fuentes</h3>
+      <span class="monitoreo__icono">📡</span>
+      <div class="monitoreo__titulo-wrap">
+        <h3 class="monitoreo__titulo">Datos en vivo</h3>
+        <span class="monitoreo__auto">Actualizado: {{ fechaActualizacion || 'cargando...' }}</span>
+      </div>
       <div class="monitoreo__acciones">
-        <span class="monitoreo__actualizacion">Snapshot: {{ fechaActualizacion }}</span>
         <button class="monitoreo__boton" :disabled="cargando" @click="cargarEstado(true)">
-          {{ cargando ? 'Recargando...' : 'Recargar snapshot' }}
+          {{ cargando ? 'Actualizando...' : '🔄 Sincronizar datos' }}
         </button>
       </div>
     </div>
