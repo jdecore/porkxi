@@ -22,6 +22,17 @@ const MODELOS = {
 }
 
 const MODELO_RESPALDO_FINAL = 'onnx-community/gpt2-medium-ONNX'
+const MODELOS_COMPATIBILIDAD = [
+  'onnx-community/Qwen3-0.6B-DQ-ONNX',
+  'onnx-community/Qwen3-0.6B-ONNX',
+  MODELO_RESPALDO_FINAL,
+]
+const OPCIONES_CARGA_MODELO = [
+  { device: 'webgpu', dtype: 'q4f16' },
+  { device: 'webgpu', dtype: 'q4' },
+  { dtype: 'q4' },
+  { dtype: 'q8' },
+]
 
 const cargando = ref(false)
 const modeloListo = ref(false)
@@ -103,37 +114,44 @@ const descargarReporte = async () => {
   }
 }
 
+const etiquetaOpcionesModelo = (opciones) => `${opciones.device ?? 'cpu'}/${opciones.dtype ?? 'default'}`
+
+const cargarPipelineConFallback = async (modelId) => {
+  let ultimoError = null
+
+  for (const opciones of OPCIONES_CARGA_MODELO) {
+    try {
+      return await pipeline('text-generation', modelId, opciones)
+    } catch (errorCarga) {
+      ultimoError = errorCarga
+      console.error(`Error cargando ${modelId} con ${etiquetaOpcionesModelo(opciones)}:`, errorCarga)
+    }
+  }
+
+  throw ultimoError ?? new Error(`No se pudo cargar el modelo ${modelId}`)
+}
+
 const iniciarModelo = async () => {
   if (generador) return
 
-  const modelId = modeloSeleccionado.value
+  const candidatos = [
+    modeloSeleccionado.value,
+    ...MODELOS_COMPATIBILIDAD.filter((id) => id !== modeloSeleccionado.value),
+  ].filter(Boolean)
 
-  try {
-    generador = await pipeline('text-generation', modelId, {
-      device: 'webgpu',
-      dtype: 'q4f16',
-    })
-    modeloListo.value = true
-  } catch (err) {
-    console.error('Error WebGPU, usando CPU:', err)
+  let ultimoError = null
+  for (const modelId of candidatos) {
     try {
-      generador = await pipeline('text-generation', modelId, { dtype: 'q4' })
+      generador = await cargarPipelineConFallback(modelId)
       modeloListo.value = true
-    } catch (errLigero) {
-      console.error('Error modelo principal, usando respaldo:', errLigero)
-      try {
-        generador = await pipeline('text-generation', MODELO_RESPALDO_FINAL, {
-          device: 'webgpu',
-          dtype: 'q4f16',
-        })
-        modeloListo.value = true
-      } catch (errRespaldoWebgpu) {
-        console.error('Error respaldo WebGPU, usando CPU:', errRespaldoWebgpu)
-        generador = await pipeline('text-generation', MODELO_RESPALDO_FINAL, { dtype: 'q4' })
-        modeloListo.value = true
-      }
+      return
+    } catch (errorModelo) {
+      ultimoError = errorModelo
+      console.error(`No se pudo cargar el modelo candidato ${modelId}:`, errorModelo)
     }
   }
+
+  throw ultimoError ?? new Error('No se pudo cargar ningún modelo IA')
 }
 
 const generarAnalisisIA = async () => {
