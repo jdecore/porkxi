@@ -5,7 +5,8 @@ import { withBase } from '../lib/paths.js'
 
 env.allowLocalModels = false
 
-const MODELO_ID = 'onnx-community/Qwen3-0.6B-ONNX'
+const MODELO_ID = 'onnx-community/Qwen3-0.6B-DQ-ONNX'
+const MODELO_RESPALDO_ID = 'onnx-community/Qwen3-0.6B-ONNX'
 
 const cargando = ref(true)
 const modeloListo = ref(false)
@@ -23,6 +24,8 @@ const tieneRepeticionLarga = (texto) => /(\b[\p{L}]{3,}\b)(?:\s+\1){2,}/iu.test(
 const esAnalisisValido = (texto) => {
   if (!texto || texto.length < 60) return false
   if (!/\d/.test(texto)) return false
+  if (!/%/.test(texto)) return false
+  if (!/\dx\b/i.test(texto)) return false
   if (/[\u0400-\u04FF\u0600-\u06FF\u4E00-\u9FFF]/u.test(texto)) return false
   if (tieneRepeticionLarga(texto)) return false
 
@@ -32,7 +35,8 @@ const esAnalisisValido = (texto) => {
     /\b(usa|ee\.?uu\.?|estados unidos)\b/i,
   ]
   const regiones = menciones.reduce((total, regex) => total + (regex.test(texto) ? 1 : 0), 0)
-  return regiones >= 2
+  const frases = texto.split(/[.!?]+/).filter((parte) => parte.trim().length > 12).length
+  return regiones === 3 && frases >= 2
 }
 
 const construirFallback = (crecimientoCol, crecimientoEu, crecimientoUsa, ratioColEu, ratioColUsa, colPorcent) =>
@@ -92,9 +96,24 @@ const iniciarModelo = async () => {
     })
     modeloListo.value = true
   } catch (err) {
-    console.error('Error WebGPU, usando CPU:', err)
-    generador = await pipeline('text-generation', MODELO_ID, { dtype: 'q4' })
-    modeloListo.value = true
+    console.error('Error WebGPU en modelo ligero, usando CPU:', err)
+    try {
+      generador = await pipeline('text-generation', MODELO_ID, { dtype: 'q4f16' })
+      modeloListo.value = true
+    } catch (errLigero) {
+      console.error('Error en modelo ligero, usando respaldo:', errLigero)
+      try {
+        generador = await pipeline('text-generation', MODELO_RESPALDO_ID, {
+          device: 'webgpu',
+          dtype: 'q4f16',
+        })
+        modeloListo.value = true
+      } catch (errRespaldoWebgpu) {
+        console.error('Error respaldo WebGPU, usando CPU:', errRespaldoWebgpu)
+        generador = await pipeline('text-generation', MODELO_RESPALDO_ID, { dtype: 'q4' })
+        modeloListo.value = true
+      }
+    }
   }
 }
 
@@ -157,25 +176,29 @@ const generarAnalisisIA = async () => {
           `USA: ${usaUlt.valor.toLocaleString()} cerdas, variación ${crecimientoUsa}%.\n` +
           `Relación de escala: UE-27/Colombia ${ratioColEu}x, USA/Colombia ${ratioColUsa}x.\n` +
           `Estructura Colombia: traspatio ${col.detalle.traspatio.porcentaje}%, familiar ${col.detalle.familiar.porcentaje}%, industrial ${col.detalle.industrial.porcentaje}%.\n` +
-          `Escribe 3 frases: comparación de escala, dinámica reciente y una implicación para Colombia.`,
+          `Escribe exactamente 3 frases. Debes mencionar explícitamente Colombia, UE-27 y USA, e incluir porcentajes y relaciones en x.`,
       },
     ]
 
-    const resultado = await generador(mensajes, {
-      max_new_tokens: 140,
-      do_sample: true,
-      temperature: 0.45,
-      top_p: 0.9,
-      repetition_penalty: 1.2,
-      no_repeat_ngram_size: 3,
-    })
-
-    let texto = quitarThink(extraerTextoGenerado(resultado))
-      .replace(/^assistant[:\s-]*/i, '')
-      .replace(/\s+/g, ' ')
-      .trim()
+    let texto = ''
+    for (let intento = 0; intento < 2; intento += 1) {
+      const resultado = await generador(mensajes, {
+        max_new_tokens: 140,
+        do_sample: intento === 0,
+        temperature: 0.35,
+        top_p: 0.9,
+        repetition_penalty: 1.2,
+        no_repeat_ngram_size: 3,
+      })
+      texto = quitarThink(extraerTextoGenerado(resultado))
+        .replace(/^assistant[:\s-]*/i, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+      if (esAnalisisValido(texto)) break
+    }
 
     if (!esAnalisisValido(texto)) {
+      error.value = true
       texto = fallback
     }
 

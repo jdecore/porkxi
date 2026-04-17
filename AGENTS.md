@@ -18,7 +18,8 @@ Aplicación web para visualizar y comparar inventario porcino entre Colombia, Eu
 - Datos en: `public/estado-fuentes.json`, `public/data/inventario-unificado.json`
 
 ## IA Generativa (Frontend)
-- `onnx-community/Qwen3-0.6B-ONNX` via `@huggingface/transformers`
+- Modelo principal: `onnx-community/Qwen3-0.6B-DQ-ONNX` via `@huggingface/transformers`
+- Modelo de respaldo: `onnx-community/Qwen3-0.6B-ONNX`
 - 100% ejecutándose en el navegador del usuario
 - Sin costos de API externa
 - Análisis varía con cada click en "↻"
