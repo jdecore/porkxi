@@ -11,6 +11,16 @@ const error = ref(false)
 const analisis = ref('')
 const progresoCarga = ref(0)
 const descargando = ref(false)
+const datosWeb = ref(null)
+
+const cargarDatosWeb = async () => {
+  try {
+    const res = await fetch('/data/inventario-unificado.json', { cache: 'no-store' })
+    datosWeb.value = await res.json()
+  } catch (err) {
+    console.error('Error cargando datos:', err)
+  }
+}
 
 const fuenteTexto = computed(() => {
   return '🤖 Qwen3.5-0.8B · IA en tu navegador'
@@ -63,18 +73,28 @@ let modeloCache = null
 const generarAnalisisLocal = async () => {
   if (cargando.value) return
   
+  await cargarDatosWeb()
+  
   cargando.value = true
   cargandoModelo.value = true
 
-  const enfoques = [
-    "explica por qué los datos abiertos benef prejuí al productor colombiano",
-    "compara la productividad por cerdo entre Colombia y USA",
-    "analiza el riesgo de no tener un sistema de información oficial",
-    "propondré una solución para mejorar la transparencia",
-    "destaca qué país tiene mejor estructura de datos",
-    "evalúa el impacto económico de la fragmentación"
-  ]
-  const enfoque = enfoques[Math.floor(Math.random() * enfoques.length)]
+  const d = datosWeb.value
+  if (!d) {
+    throw new Error('Sin datos')
+  }
+
+  const col = d.Colombia
+  const eu = d.europa
+  const usa = d.usa
+
+  const colUlt = col.serie[col.serie.length - 1]
+  const colAnt = col.serie[col.serie.length - 2]
+  const euUlt = eu.serie[eu.serie.length - 1]
+  const usaUlt = usa.serie[usa.serie.length - 1]
+  
+  const crecimientoCol = ((colUlt.valor - colAnt.valor) / colAnt.valor * 100).toFixed(1)
+  const ratioColEu = (euUlt.valor / colUlt.valor).toFixed(1)
+  const ratioColUsa = (usaUlt.valor / colUlt.valor).toFixed(1)
 
   try {
     if (!modeloCache) {
@@ -88,27 +108,33 @@ const generarAnalisisLocal = async () => {
     }
     const generador = modeloCache
 
-    const prompt = `${enfoque}.
+    const prompt = `Basado en datos oficiales,haz un análisisExecutive del mercado porcino:
 
-Colombia: 10.7M cerdas en 189K predios (78% traspatio, 19% familiar, 2% industrial).
-UE-27: 132M cerdas (-0.5%).
-USA: 75.5M cerdas (+1%).
+DATOS REALES:
+- Colombia 2024: ${colUlt.valor.toLocaleString()} cerdas (+${crecimientoCol}% vs 2023), ${col.detalle.predios.toLocaleString()} predios
+- Estructura: ${col.detalle.traspatio.porcentaje}% traspatio, ${col.detalle.familiar.porcentaje}% familiar, ${col.detalle.industrial.porcentaje}% industrial
+- UE-27 2024: ${euUlt.valor.toLocaleString()} cerdas (${eu.ultimo.var}% vs 2023)
+- USA 2025: ${usaUlt.valor.toLocaleString()} cerdas (+${usa.ultimo.var}%), ${usa.detalle.mercado.toLocaleString()} mercado
 
-Responde en español, máximo 2 oraciones, incluye datos específicos.`
+ANÁLISIS REQUERIDO:
+1. Compara escala: Colombia tiene ${ratioColEu}x menos que UE, ${ratioColUsa}x menos que USA
+2. Estructura: 78% traspatio vs producción industrial
+3. Implicación: Sin API pública,no hay transparencia
+
+Escribeen español exactamente 2 oraciones cortas con los números reales arriba.`
 
     const resultado = await generador(prompt, {
-      max_new_tokens: 60,
-      temperature: 0.9,
-      top_p: 0.85,
+      max_new_tokens: 90,
+      temperature: 0.3,
+      top_p: 0.9,
       do_sample: true,
       repetition_penalty: 1.1
     })
 
     let textoLimpio = resultado[0].generated_text.replace(prompt, '').trim()
     textoLimpio = textoLimpio.replace(/\n+/g, ' ').replace(/\s{2,}/g, ' ').trim()
-    textoLimpio = textoLimpio.replace(/^[A-Z][^.!?]*[.!?]\s*/i, '').trim()
     
-    if (textoLimpio.length > 25 && textoLimpio.length < 250) {
+    if (textoLimpio.length > 30 && textoLimpio.length < 350) {
       analisis.value = textoLimpio
     } else {
       throw new Error('Texto inválido')
@@ -129,7 +155,8 @@ Responde en español, máximo 2 oraciones, incluye datos específicos.`
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await cargarDatosWeb()
   void generarAnalisisLocal()
 })
 </script>
