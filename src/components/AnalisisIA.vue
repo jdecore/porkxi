@@ -12,7 +12,7 @@ const analisis = ref('')
 const progresoCarga = ref(0)
 
 const fuenteTexto = computed(() => {
-  return '🤖 Transformers.js · Qwen2-0.5B-Instruct (corre en tu navegador)'
+  return '🤖 Transformers.js · Qwen3-0.8B-Instruct (corre en tu navegador)'
 })
 
 const datos = {
@@ -30,7 +30,7 @@ const generarAnalisisLocal = async () => {
   error.value = false
 
   try {
-    const generador = await pipeline('text-generation', 'Xenova/Qwen2-0.5B-Instruct', {
+    const generador = await pipeline('text-generation', 'Xenova/Qwen3-0.8B-Instruct', {
       progress_callback: (p) => {
         if (p.status === 'progress') {
           progresoCarga.value = Math.round(p.progress * 100)
