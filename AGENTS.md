@@ -1,40 +1,39 @@
 # porkxi-astro - Estado actual
 
 ## Descripción
-Aplicación web para visualizar y comparar inventario porcino entre Colombia, Europa (UE-27) y EE.UU. con Astro + Vue.
+Sitio estático para comparar inventario porcino entre Colombia, UE-27 y EE.UU., con monitoreo de fuentes y análisis IA ejecutado en el navegador.
 
 ## Stack
-- Astro 6 (sitio estático)
-- Vue 3 para interactividad (`client:idle`)
-- Python 3.12 para actualización de snapshot
+- Astro 6 (`output: static`)
+- Vue 3 (`client:idle` y `client:load`)
+- Python 3.12 (pipeline snapshot)
+- Node 22+
 
-## Arquitectura
-- Render estático para SEO y bajo costo (Vercel Free / GitHub Pages)
-- Componentes Vue:
-  - GraficaInteractiva.vue (gráfica histórica)
-  - AnalisisIA.vue (análisis con Qwen3)
-  - DescargarReporte.vue (reporte HTML)
-  - MonitoreoFuentes.vue (estado de fuentes)
-- Datos en: `public/estado-fuentes.json`, `public/data/inventario-unificado.json`
+## Componentes activos
+- `GraficaInteractiva.vue`: serie histórica por país + vista comparada.
+- `MonitoreoFuentes.vue`: snapshot diario desde `public/estado-fuentes.json` (sin botón de sincronización manual).
+- `AnalisisIA.vue`: selector de modelo y análisis local.
 
-## IA Generativa (Frontend)
-- Modelo principal: `onnx-community/Qwen3-0.6B-DQ-ONNX` via `@huggingface/transformers`
-- Modelo de respaldo: `onnx-community/Qwen3-0.6B-ONNX`
-- 100% ejecutándose en el navegador del usuario
-- Sin costos de API externa
-- Análisis varía con cada click en "↻"
+## IA frontend (estado real)
+- Selección manual de modelo al inicio (no autoload inicial).
+- Modelos de selección:
+  - `onnx-community/SmolLM2-135M-ONNX` (pequeño)
+  - `onnx-community/LFM2.5-350M-ONNX` (mediano)
+- Fallback de carga: `Qwen3-0.6B-DQ-ONNX` -> `Qwen3-0.6B-ONNX` -> `gpt2-medium-ONNX`.
+- Carga con variantes WebGPU/CPU (`q4f16`, `q4`, `q8`) para compatibilidad.
+- Limpieza de eco de prompt + validación mínima de salida; fallback textual local si no cumple.
 
-## Monitoreo de fuentes
-- `MonitoreoFuentes.vue` consume `public/estado-fuentes.json` como snapshot diario
-- El snapshot se actualiza por script (`scripts/generar_estado_fuentes.py`) y workflow diario
+## Datos
+- Fuentes base en `src/data/{colombia,europa,usa}.js`.
+- Snapshot de monitoreo: `public/estado-fuentes.json`.
+- Datasets públicos: `public/data/*.json` y `public/data/serie-completa.csv`.
+- Script de actualización: `scripts/generar_estado_fuentes.py` (también ejecuta `scripts/generar_datasets_publicos.mjs`).
 
-## Fondos y Diseño
-- Fondo unificado: #F9F6F1 (blanco hueso)
-- Sin separadores visuales
-- Tarjetas y gráfica con mismo fondo
+## Deploy y workflows
+- GitHub Pages: `.github/workflows/deploy-pages.yml` (push a `master`).
+- Actualización diaria de snapshot/datasets: `.github/workflows/actualizar-fuentes.yml`.
+- CI de build: `.github/workflows/ci.yml`.
 
-## Limpieza
-- API folder eliminada
-- JSONs no utilizados eliminados
-- InsightsComparativas eliminado
-- Sin referencias a Gemini
+## Diseño
+- Fondo unificado crema y tarjetas en misma línea visual.
+- Enfoque en lectura editorial + visualización interactiva ligera.

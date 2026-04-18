@@ -1,78 +1,69 @@
 # porkxi-astro
 
-Visualización de inventario porcino Colombia vs Europa (UE-27) vs EE.UU.
+Visualización comparativa de inventario porcino entre **Colombia**, **UE-27** y **EE.UU.** con Astro + Vue, datos públicos y análisis IA en navegador.
 
-## Stack
-- Astro 6 (output estático)
-- Vue 3 (`client:idle`)
-- Python 3.12
+## Stack y ejecución
 
-## Scripts
+- Astro 6 (`output: static`)
+- Vue 3 (`client:idle` y `client:load`)
+- Python 3.12 (actualización de snapshot)
+- Node.js 22.12+
+
 | Comando | Acción |
 |---|---|
 | `npm run dev` | Desarrollo local |
-| `npm run build` | Build producción |
-| `npm run update:fuentes` | Genera snapshot |
+| `npm run check` | Diagnóstico Astro |
+| `npm run build` | Build de producción (`dist/`) |
+| `npm run update:fuentes` | Regenera `public/estado-fuentes.json` y `public/data/*` |
+| `npm run update:datasets` | Regenera datasets públicos desde `src/data/*` |
 
-## Frontend optimizado
-- 100% estático (sin API serverless)
-- IA en navegador con `@huggingface/transformers`
-- Modelo principal (ligero): `onnx-community/Qwen3-0.6B-DQ-ONNX` (text-generation)
-- Respaldo automático: `onnx-community/Qwen3-0.6B-ONNX`
-- Fallback local para evitar respuestas repetitivas o de baja calidad
-- Fondo unificado #F9F6F1
+## Arquitectura actual
 
-## Monitoreo de fuentes
-- El bloque de monitoreo consume `public/estado-fuentes.json` (snapshot diario, no streaming en tiempo real)
-- El snapshot se regenera con `npm run update:fuentes` y por GitHub Actions diaria
+- Sitio estático con SEO (meta tags + JSON-LD en `src/pages/index.astro`)
+- Componentes Vue:
+  - `MonitoreoFuentes.vue` (`client:idle`): lee snapshot diario (`public/estado-fuentes.json`)
+  - `AnalisisIA.vue` (`client:load`): selector de modelo + generación local en navegador
+  - `GraficaInteractiva.vue` (`client:idle`): serie histórica y tooltips
+- Base path centralizado en `src/lib/paths.js` para compatibilidad con Vercel / GitHub Pages
 
-## Uso recomendado de Transformers.js
+## Flujo de IA en frontend (`AnalisisIA.vue`)
 
-1. Carga el modelo una sola vez y reutiliza la instancia:
-```js
-import { pipeline, env } from '@huggingface/transformers'
-env.allowLocalModels = false
+- El usuario selecciona tamaño de modelo (no hay carga automática al abrir):
+  - **Pequeño**: `onnx-community/SmolLM2-135M-ONNX`
+  - **Mediano**: `onnx-community/LFM2.5-350M-ONNX`
+- Fallback de compatibilidad de carga:
+  - `onnx-community/Qwen3-0.6B-DQ-ONNX`
+  - `onnx-community/Qwen3-0.6B-ONNX`
+  - `onnx-community/gpt2-medium-ONNX`
+- Carga con variantes WebGPU/CPU (`q4f16`, `q4`, `q8`) según soporte.
+- Validación y limpieza de salida:
+  - remueve `<think>`
+  - evita eco del prompt
+  - si la salida no cumple calidad mínima, usa análisis local de respaldo.
+- Incluye descarga de `public/reportes/radar-porcino.html`.
 
-const generator = await pipeline('text-generation', 'onnx-community/Qwen3-0.6B-DQ-ONNX', {
-  device: 'webgpu',
-  dtype: 'q4f16',
-})
-```
+## Datos y fuentes
 
-2. Usa formato de mensajes (`system` + `user`) en lugar de un prompt plano:
-```js
-const messages = [
-  { role: 'system', content: 'Responde en español claro y factual.' },
-  { role: 'user', content: '/no_think ...datos...' },
-]
-```
+- Fuente visual principal: `src/data/colombia.js`, `src/data/europa.js`, `src/data/usa.js`
+- Snapshot de monitoreo: `public/estado-fuentes.json`
+- Datasets públicos generados: `public/data/*.json` y `public/data/serie-completa.csv`
 
-3. Ajusta decodificación para reducir repetición:
-```js
-const result = await generator(messages, {
-  max_new_tokens: 140,
-  do_sample: true,
-  temperature: 0.35,
-  top_p: 0.9,
-  repetition_penalty: 1.2,
-  no_repeat_ngram_size: 3,
-})
-```
+Fuentes utilizadas:
+- Colombia: Porcinews (sin API pública gubernamental equivalente)
+- UE-27: Eurostat API (`apro_mt_lspig`)
+- EE.UU.: USDA NASS RSS / reportes trimestrales
 
-4. Agrega validación de calidad y fallback local para respuestas incoherentes.
+## Workflows
 
-## Dónde buscar modelos para navegador
+- `deploy-pages.yml`: despliegue a GitHub Pages en push a `master`
+- `actualizar-fuentes.yml`: actualización diaria del snapshot/datasets (`cron`) + ejecución manual
+- `ci.yml`: build de integración continua
 
-- Catálogo HF filtrado por Transformers.js + text generation:  
-  `https://huggingface.co/models?library=transformers.js&pipeline_tag=text-generation`
-- Para priorizar modelos ligeros, revisa `usedStorage` vía API del modelo:  
-  `https://huggingface.co/api/models/<owner>/<model>`
-- Verifica siempre:
-  - `library_name: "transformers.js"`
-  - `pipeline_tag: "text-generation"`
-  - presencia de pesos ONNX (`onnx/model_*.onnx`)
-  - plantilla de chat en `tokenizer_config.chat_template`
+## Configuración de despliegue
 
-## Despliegue
-- Vercel Free (recomendado)
-- GitHub Pages (via Actions)
+`astro.config.mjs` usa:
+- `DEPLOY_TARGET` (`vercel` o `pages`)
+- `ASTRO_BASE`
+- `SITE_URL`
+
+Para GitHub Pages, el workflow define automáticamente base y site URL.
