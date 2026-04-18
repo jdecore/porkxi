@@ -51,6 +51,8 @@ const tieneRepeticionLarga = (texto) => /(\b[\p{L}]{3,}\b)(?:\s+\1){2,}/iu.test(
 
 const esAnalisisValido = (texto) => {
   if (!texto || texto.length < 60) return false
+  if (/^\s*eres analista de datos agropecuarios/i.test(texto)) return false
+  if (/usa únicamente estos datos|escribe exactamente 3 frases|debes mencionar explícitamente|\/no_think/i.test(texto)) return false
   if (!/\d/.test(texto)) return false
   if (!/%/.test(texto)) return false
   if (!/\dx\b/i.test(texto)) return false
@@ -69,6 +71,21 @@ const esAnalisisValido = (texto) => {
 
 const construirFallback = (crecimientoCol, crecimientoEu, crecimientoUsa, ratioColEu, ratioColUsa, colPorcent) =>
   `Colombia crece ${crecimientoCol >= 0 ? '+' : ''}${crecimientoCol}% frente a UE-27 (${crecimientoEu}%) y USA (${crecimientoUsa >= 0 ? '+' : ''}${crecimientoUsa}%). La escala sigue muy concentrada: UE-27 tiene ${ratioColEu}x y USA ${ratioColUsa}x más cerdas que Colombia. Para cerrar brecha, Colombia necesita formalizar datos oficiales periódicos, hoy dominados por producción de traspatio (${colPorcent}%).`
+
+const limpiarEcoPrompt = (texto, promptPlano) => {
+  if (!texto) return ''
+
+  const limpio = texto.trim()
+  if (limpio.startsWith(promptPlano)) return limpio.slice(promptPlano.length).trim()
+
+  const marcadorFinal = 'Debes mencionar explícitamente Colombia, UE-27 y USA, e incluir porcentajes y relaciones en x.'
+  const indiceMarcador = limpio.lastIndexOf(marcadorFinal)
+  if (indiceMarcador >= 0) {
+    return limpio.slice(indiceMarcador + marcadorFinal.length).trim()
+  }
+
+  return limpio
+}
 
 const extraerTextoGenerado = (resultado) => {
   const raw = resultado?.[0]?.generated_text
@@ -241,10 +258,11 @@ const generarAnalisisIA = async () => {
         top_p: 0.9,
         repetition_penalty: 1.2,
         no_repeat_ngram_size: 3,
+        return_full_text: false,
       })
       texto = quitarThink(extraerTextoGenerado(resultado))
-      if (!usaFormatoChat && texto.startsWith(promptPlano)) {
-        texto = texto.slice(promptPlano.length).trim()
+      if (!usaFormatoChat) {
+        texto = limpiarEcoPrompt(texto, promptPlano)
       }
       texto = texto
         .replace(/^assistant[:\s-]*/i, '')
