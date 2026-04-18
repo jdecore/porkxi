@@ -156,7 +156,7 @@ src/data/
 4. 📶 **Rate-limit de HuggingFace** — Esperar unos minutos y reintentar
 
 **Solución:** El sistema usa automáticamente el modelo de respaldo GPT-2 Medium. Si persiste, verifica la consola del navegador (F12) para ver el error exacto.
-## El mayor problema que tiene usar un modelo en el navegador. es que los más ligeros son muy malos y los mejores pesan mucho matando PCs normales.
+### El mayor problema que tiene usar un modelo en el navegador. es que los más ligeros son muy malos y los mejores pesan mucho matando PCs normales.
 ---
 
 ## 📄 Licencia
