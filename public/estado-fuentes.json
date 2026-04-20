@@ -1,5 +1,5 @@
 {
-  "fecha_consulta": "2026-04-19T13:34:35.252381+00:00",
+  "fecha_consulta": "2026-04-20T14:11:35.152886+00:00",
   "usa": {
     "status": "ok",
     "fuente": "USDA NASS RSS",
@@ -7,7 +7,7 @@
     "enlace": "https://www.nass.usda.gov/Newsroom/2025/06-26-2025.php",
     "ultimo_reporte": "26 jun 2025",
     "ultimo_reporte_iso": "2025-06-26T20:00:00+00:00",
-    "dias_desde_reporte": 296,
+    "dias_desde_reporte": 297,
     "inventario_millones": 75.1,
     "proximo_reporte": "Próximo reporte estimado: jun 2026 (trimestral)"
   },
@@ -18,7 +18,7 @@
     "enlace": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/apro_mt_lspig?geo=EU27_2020&animals=A3100&unit=THS_HD&month=M11_M12&sinceTimePeriod=2015",
     "ultimo_reporte": "2025",
     "ultimo_reporte_iso": "2025-12-01T00:00:00+00:00",
-    "dias_desde_reporte": 139,
+    "dias_desde_reporte": 140,
     "inventario_millones": 131.52,
     "proximo_reporte": "Próxima actualización anual estimada: abr 2026",
     "nota": "Dato provisional"
@@ -28,7 +28,7 @@
     "fuente": "Porcinews",
     "ultimo_reporte": "ene 2026",
     "ultimo_reporte_iso": "2026-01-01T00:00:00+00:00",
-    "dias_desde_reporte": 108,
+    "dias_desde_reporte": 109,
     "inventario_millones": 10.7,
     "proximo_reporte": "Sin fecha oficial programada",
     "enlace": "https://www.porcinews.com/actualidad/datos-actuales-del-sector-porcino-en-colombia_21476/"
@@ -36,6 +36,6 @@
   "analisis_ia": {
     "texto": "Europa registra 131.5 millones y EE.UU. 75.1 millones frente a 10.7 millones de Colombia (12.3x y 7.0x). Europa (Eurostat) y EE.UU. (USDA) publican series oficiales trazables, mientras Colombia depende de una fuente periodística especializada sin API gubernamental equivalente. La prioridad para cerrar la brecha es institucionalizar una publicación oficial, periódica y abierta de datos porcinos en Colombia.",
     "fuente": "analisis-local",
-    "actualizado_en": "2026-04-19T13:34:36.310739+00:00"
+    "actualizado_en": "2026-04-20T14:11:36.118711+00:00"
   }
 }
