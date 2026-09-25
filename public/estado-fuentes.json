@@ -1,5 +1,5 @@
 {
-  "fecha_consulta": "2026-09-24T17:09:57.821072+00:00",
+  "fecha_consulta": "2026-09-25T17:10:02.356255+00:00",
   "usa": {
     "status": "error",
     "error": "No se pudo consultar USDA RSS: HTTP Error 403: Forbidden",
@@ -12,7 +12,7 @@
     "enlace": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/apro_mt_lspig?geo=EU27_2020&animals=A3100&unit=THS_HD&month=M11_M12&sinceTimePeriod=2015",
     "ultimo_reporte": "2025",
     "ultimo_reporte_iso": "2025-12-01T00:00:00+00:00",
-    "dias_desde_reporte": 297,
+    "dias_desde_reporte": 298,
     "inventario_millones": 131.45,
     "proximo_reporte": "Próxima actualización anual estimada: abr 2027"
   },
@@ -21,7 +21,7 @@
     "fuente": "Porcinews",
     "ultimo_reporte": "ene 2026",
     "ultimo_reporte_iso": "2026-01-01T00:00:00+00:00",
-    "dias_desde_reporte": 266,
+    "dias_desde_reporte": 267,
     "inventario_millones": 10.7,
     "proximo_reporte": "Sin fecha oficial programada",
     "enlace": "https://www.porcinews.com/actualidad/datos-actuales-del-sector-porcino-en-colombia_21476/"
@@ -29,6 +29,6 @@
   "analisis_ia": {
     "texto": "Europa y EE.UU. mantienen una escala de inventario muy superior a Colombia. Europa (Eurostat) y EE.UU. (USDA) publican series oficiales trazables, mientras Colombia depende de una fuente periodística especializada sin API gubernamental equivalente. La prioridad para cerrar la brecha es institucionalizar una publicación oficial, periódica y abierta de datos porcinos en Colombia.",
     "fuente": "analisis-local",
-    "actualizado_en": "2026-09-24T17:09:58.738395+00:00"
+    "actualizado_en": "2026-09-25T17:10:03.113408+00:00"
   }
 }
